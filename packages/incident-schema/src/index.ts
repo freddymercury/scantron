@@ -1,12 +1,12 @@
 /**
- * @scantron/incident-schema — incident, observation and public-projection schemas with allowlist-by-default validation
+ * @scantron/incident-schema — one canonical definition of what an observation and an
+ * incident are, validated at runtime, with the public projection built as an allowlist.
  *
- * Stub. Implemented by S-A3; S-A1 only establishes the workspace.
+ * Zero dependencies (ADR-002). See `validator.ts` for why we own the validator.
  */
 
-export const PACKAGE_NAME = "@scantron/incident-schema" as const;
-
-/** Marker so the workspace is importable and testable before S-A3 lands. */
-export function packageInfo(): { name: typeof PACKAGE_NAME; implementedBy: string } {
-  return { name: PACKAGE_NAME, implementedBy: "S-A3" };
-}
+export * from "./validator.ts";
+export * from "./domain.ts";
+export * from "./public.ts";
+export * from "./events.ts";
+export * from "./rows.ts";

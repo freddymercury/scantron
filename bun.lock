@@ -5,6 +5,7 @@
     "": {
       "name": "scantron",
       "dependencies": {
+        "@scantron/correlation": "workspace:*",
         "@scantron/database": "workspace:*",
         "@scantron/event-taxonomy": "workspace:*",
         "@scantron/location-normalizer": "workspace:*",

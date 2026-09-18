@@ -83,7 +83,7 @@ test("no location on one side is inapplicable, not zero", () => {
   expect(result.score).toBeUndefined();
 });
 
-test("time decays faster before an incident than after it", () => {
+test("time decays by distance to the incident's span, equally in both directions", () => {
   const fiveAfter = timeScore(
     observation({ occurredAt: new Date(AT.getTime() + 5 * 60_000) }),
     candidate(),
@@ -93,10 +93,22 @@ test("time decays faster before an incident than after it", () => {
     candidate(),
   );
 
-  expect(fiveAfter.score).toBeGreaterThan(fiveBefore.score as number);
+  // Symmetric on purpose: an asymmetric score made correlation depend on the order records
+  // were processed in, which is not a property of the world — and publication lag (median
+  // 36.7 min, p90 128) means arrival order says little about what happened first.
+  expect(fiveAfter.score).toBeCloseTo(fiveBefore.score as number, 6);
   expect(fiveAfter.score).toBeCloseTo(1 - 5 / 15, 3);
-  expect(fiveBefore.score).toBeCloseTo(1 - 5 / 10, 3);
   expect(fiveAfter.reason).toContain("after");
+  expect(fiveBefore.reason).toContain("before");
+});
+
+test("an observation inside an incident's activity window scores 1", () => {
+  const ongoing = candidate({
+    firstObservedAt: new Date(AT.getTime() - 10 * 60_000).toISOString(),
+    lastUpdatedAt: new Date(AT.getTime() + 10 * 60_000).toISOString(),
+  });
+  expect(timeScore(observation(), ongoing).score).toBe(1);
+  expect(timeScore(observation(), ongoing).reason).toContain("within");
 });
 
 test("type similarity is an affinity matrix, not exact match", () => {
@@ -177,7 +189,7 @@ test("flat scoring makes cross-agency merge impossible — the measurement, as a
 test("the breakdown says why, not just how much", () => {
   const result = scorePair(observation(), candidate({ distanceMeters: 0 }));
   expect(result.breakdown.location.reason).toContain("same canonical intersection");
-  expect(result.breakdown.time.reason).toContain("after the incident started");
+  expect(result.breakdown.time.reason).toContain("within the incident's activity window");
   expect(result.breakdown.type.reason).toContain("both collision");
   expect(result.breakdown.units.reason).toContain("no units");
   expect(result.breakdown.text.reason).toContain("Phase 1");

@@ -168,3 +168,44 @@ Three consequences:
 3. **S-E1 gets easier and harder.** Easier: the most sensitive third is already stripped of
    location upstream. Harder: `sensitive_call` now correlates perfectly with "no location",
    so publishing *anything* location-shaped about such a call is a red flag to check for.
+
+## 9. Correlation works, and reduces almost nothing ⚠️ the central hypothesis, measured
+
+First run of the real correlator over 24 hours of live data, 2026-09-18:
+
+```
+observations   2,130
+incidents      2,061
+reduction        3.2%
+merged             69
+probable          166   (logged, not merged)
+cross-agency       25 incidents
+multi-source       65 incidents  (60 with two observations, 2 with three, 1 with four)
+```
+
+The merges it does make are right. Verified by eye across the cross-agency ones:
+
+```
+22:38:50  sf_fire_cad  Traffic Collision   → collision  @ Alert Aly & Dolores St     1.000
+00:18:53  sf_police    INJURY VEH ACCIDENT → collision  @ North Point St & Taylor St 1.000
+23:53:49  sf_ems_cad   Medical Incident    → collision  @ Alemany Blvd & Harrington  0.963
+23:57:54  sf_ems_cad   Medical Incident    → assault    @ 6th St & Natoma St         0.886
+```
+
+**But 96.8% of observations still become their own incident**, which is what docs/05
+warned about: with police and fire CAD alone there is little cross-agency overlap to
+exploit. The signal reduction that justifies the product (PRD §54) is not there yet.
+
+Two things this run established that are worth keeping:
+
+1. **Renormalization was necessary and is sufficient.** Flat weights produced 0 merges from
+   812 observations; renormalized scoring produced 69 from 2,130, of which 25 are
+   cross-agency. The mechanism works — there is simply less overlap in the data than the
+   product assumed.
+2. **The probable band is where the evidence is.** 166 logged near misses is a far richer
+   tuning corpus than 69 merges, and it is the right place to look before moving a
+   threshold. S-D10 should score against these, not against the merges.
+
+The honest framing, unchanged from docs/05: if the merge rate stays near this after tuning,
+the product needs more sources (S-I2's incident reports, S-I4's news adapter) or a different
+claim — and it is much better to know that at issue 19 than at issue 50.

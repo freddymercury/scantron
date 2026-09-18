@@ -116,38 +116,47 @@ export function locationScore(
 // --- time ------------------------------------------------------------------
 
 export interface TimeOptions {
-  backMinutes: number;
-  forwardMinutes: number;
+  /** Minutes of tolerance outside the incident's activity span. */
+  toleranceMinutes: number;
 }
 
-export const DEFAULT_TIME_OPTIONS: TimeOptions = { backMinutes: 15, forwardMinutes: 10 };
+export const DEFAULT_TIME_OPTIONS: TimeOptions = { toleranceMinutes: 15 };
 
 /**
- * Asymmetric, for the same reason the candidate window is: an observation arriving *after*
- * an incident started is the normal shape of a second agency responding. One arriving
- * before it is either out-of-order publication or a different event, so it decays faster.
+ * Distance to the incident's activity span, in both directions equally.
+ *
+ * The first version scored "before the incident started" lower than "after", on the
+ * reasoning that a response follows a call. The concurrency test found what that actually
+ * does: police-then-medic scored 0.877 and merged, while the *same pair* processed
+ * medic-then-police scored 0.84 and created a duplicate. **Correlation became dependent on
+ * the order we happened to process records in**, which is not a property of the world.
+ *
+ * It is also not supported by the data: docs/01 §5 measured publication lag at a median of
+ * 36.7 minutes with a p90 of 128, so arrival order carries almost no information about
+ * which event happened first. Penalising "before" penalises the feed's jitter.
+ *
+ * The candidate *window* stays asymmetric — that is about which rows are worth scoring at
+ * all — but the score itself is symmetric in the pair.
  */
 export function timeScore(
   observation: CandidateObservation,
   candidate: IncidentCandidate,
   options: TimeOptions = DEFAULT_TIME_OPTIONS,
 ): FeatureScore {
-  const incidentStart = Date.parse(candidate.firstObservedAt);
-  const deltaMinutes = (observation.occurredAt.getTime() - incidentStart) / 60_000;
+  const start = Date.parse(candidate.firstObservedAt);
+  const end = Math.max(start, Date.parse(candidate.lastUpdatedAt));
+  const at = observation.occurredAt.getTime();
 
-  if (deltaMinutes >= 0) {
-    const score = Math.max(0, 1 - deltaMinutes / options.backMinutes);
-    return {
-      score,
-      applicable: true,
-      reason: `${deltaMinutes.toFixed(1)} min after the incident started`,
-    };
+  if (at >= start && at <= end) {
+    return { score: 1, applicable: true, reason: "within the incident's activity window" };
   }
-  const score = Math.max(0, 1 - Math.abs(deltaMinutes) / options.forwardMinutes);
+
+  const gapMinutes = (at < start ? start - at : at - end) / 60_000;
+  const score = Math.max(0, 1 - gapMinutes / options.toleranceMinutes);
   return {
     score,
     applicable: true,
-    reason: `${Math.abs(deltaMinutes).toFixed(1)} min before the incident started`,
+    reason: `${gapMinutes.toFixed(1)} min ${at < start ? "before" : "after"} the incident's activity`,
   };
 }
 
@@ -257,7 +266,39 @@ export interface ScoreResult {
   /** Features that actually contributed, and the weight they were renormalized over. */
   appliedFeatures: FeatureName[];
   appliedWeight: number;
+  /** Set when a rule held the score below the merge threshold, with the reason. */
+  cappedBy?: string;
 }
+
+/**
+ * The ceiling on a pair supported by nothing but place and time.
+ *
+ * Found by replaying 24 hours of real data: several merges scored a flat **1.000** into
+ * incidents whose type was `unknown`, because an unclassified type makes the type feature
+ * inapplicable, renormalization divides by the remaining weight, and a same-corner
+ * same-minute pair then scores perfectly on no corroborating evidence at all. An
+ * unclassified incident became a magnet for everything near it.
+ *
+ * Two calls at one corner in one minute is the commonest kind of coincidence in this data
+ * — a busy intersection produces them all day — so this is capped into the probable band
+ * where a human can look, rather than merged silently.
+ */
+export const THIN_EVIDENCE_CEILING = 0.84;
+const CORROBORATING: readonly FeatureName[] = ["type", "units", "text"];
+
+/**
+ * The ceiling on a pair whose types are both known and have no affinity — a theft and a
+ * collision, say. Reached only with a perfect location, a simultaneous time and full unit
+ * overlap:
+ *
+ *   (0.35·1 + 0.25·1 + 0.20·0 + 0.10·1) / (0.35 + 0.25 + 0.20 + 0.10) = 0.78
+ *
+ * Comfortably below the 0.85 merge threshold, so contradictory types cannot auto-merge on
+ * place and time alone. This was very nearly a hand-written cap; the arithmetic already
+ * guarantees it, and a cap that can never fire is worse than none — it reads as protection
+ * that is not there.
+ */
+export const CONTRADICTORY_TYPE_CEILING = 0.78;
 
 /**
  * **Renormalization is the whole design, not a refinement.**
@@ -298,10 +339,18 @@ export function scorePair(
     appliedFeatures.push(name);
   }
 
-  return {
-    score: applicableWeight === 0 ? 0 : weighted / applicableWeight,
+  const raw = applicableWeight === 0 ? 0 : weighted / applicableWeight;
+  const corroborated = appliedFeatures.some((feature) => CORROBORATING.includes(feature));
+
+  const result: ScoreResult = {
+    score: corroborated ? raw : Math.min(raw, THIN_EVIDENCE_CEILING),
     breakdown,
     appliedFeatures,
     appliedWeight: applicableWeight,
   };
+  if (!corroborated && raw > THIN_EVIDENCE_CEILING) {
+    result.cappedBy =
+      "nothing but place and time — no type, units or text could be compared, and one corner can hold two unrelated calls";
+  }
+  return result;
 }

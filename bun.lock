@@ -7,6 +7,7 @@
       "dependencies": {
         "@scantron/database": "workspace:*",
         "@scantron/event-taxonomy": "workspace:*",
+        "@scantron/location-normalizer": "workspace:*",
         "@scantron/sf-domain": "workspace:*",
       },
       "devDependencies": {
@@ -46,6 +47,8 @@
       "name": "@scantron/location-normalizer",
       "version": "0.0.0",
       "dependencies": {
+        "@scantron/database": "workspace:*",
+        "@scantron/incident-schema": "workspace:*",
         "@scantron/sf-domain": "workspace:*",
       },
     },
@@ -65,7 +68,11 @@
       "version": "0.0.0",
       "dependencies": {
         "@scantron/database": "workspace:*",
+        "@scantron/event-taxonomy": "workspace:*",
+        "@scantron/incident-schema": "workspace:*",
+        "@scantron/location-normalizer": "workspace:*",
         "@scantron/observability": "workspace:*",
+        "@scantron/sf-domain": "workspace:*",
       },
     },
     "services/sf-cad-ingest": {

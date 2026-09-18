@@ -13,6 +13,8 @@ import {
   queueStats,
   sourceConfigurations,
 } from "@scantron/database";
+import { createGeocoder } from "@scantron/location-normalizer/geocode";
+import { createGeocodeHandler } from "./handlers/geocode.ts";
 import {
   createAppMetrics,
   createLogger,
@@ -62,13 +64,17 @@ export async function main(): Promise<void> {
     onListening: (url) => log.info("observability.listening", { result: url }),
   });
 
-  // No handlers are registered yet (Epic D). The loop runs so the seam is real: a job
-  // arriving before its handler exists fails loudly and stays visible, rather than
-  // being silently consumed.
+  const geocoder = createGeocoder(db);
+  log.info("geocoder.ready", { count: geocoder.polygonCount });
+
+  // Correlation handlers arrive with Epic D. A job type with no handler fails loudly and
+  // stays visible rather than being silently consumed.
   const worker = createWorker({
     db,
     name: SERVICE,
-    handlers: {},
+    handlers: {
+      geocode_location: createGeocodeHandler({ db, geocoder, metrics, log }) as never,
+    },
     onEvent: (event) => {
       const fields = {
         job_id: event.job.id,

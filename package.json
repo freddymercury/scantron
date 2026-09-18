@@ -16,7 +16,9 @@
     "dev": "bun run scripts/dev.ts",
     "db:migrate": "bun run scripts/migrate.ts",
     "load:neighborhoods": "bun run scripts/load-neighborhoods.ts",
+    "load:geocode-data": "bun run scripts/load-geocode-data.ts",
     "build:street-data": "bun run scripts/build-street-data.ts",
+    "report:geocoding": "bun run scripts/geocode-report.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "bun test",
     "lint": "bun run scripts/lint.ts",
@@ -29,6 +31,7 @@
   "dependencies": {
     "@scantron/database": "workspace:*",
     "@scantron/sf-domain": "workspace:*",
-    "@scantron/event-taxonomy": "workspace:*"
+    "@scantron/event-taxonomy": "workspace:*",
+    "@scantron/location-normalizer": "workspace:*"
   }
 }

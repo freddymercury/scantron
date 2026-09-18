@@ -5,12 +5,15 @@
   "type": "module",
   "main": "src/index.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./geocode": "./src/geocode.ts"
   },
   "scripts": {
     "test": "bun test"
   },
   "dependencies": {
-    "@scantron/sf-domain": "workspace:*"
+    "@scantron/sf-domain": "workspace:*",
+    "@scantron/database": "workspace:*",
+    "@scantron/incident-schema": "workspace:*"
   }
 }

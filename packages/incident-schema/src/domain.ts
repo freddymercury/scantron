@@ -103,6 +103,15 @@ export type AgencyType = (typeof AGENCY_TYPES)[number];
 export const VISIBILITIES = ["public", "delayed", "restricted", "discard"] as const;
 export type Visibility = (typeof VISIBILITIES)[number];
 
+/** How a location was resolved (S-C2). Persisted so the viewer can explain a point. */
+export const LOCATION_METHODS = [
+  "source_coordinates",
+  "intersection_lookup",
+  "block_interpolation",
+  "unresolved",
+] as const;
+export type LocationMethod = (typeof LOCATION_METHODS)[number];
+
 /** S-D5 event kinds. Timeline text is templated from these, never free-text. */
 export const TIMELINE_EVENT_KINDS = [
   "initial_report",
@@ -175,6 +184,10 @@ export interface Observation {
   visibility?: Visibility;
   /** SFPD's own `sensitive_call` flag, treated as authoritative (S-E1). */
   sensitive?: boolean;
+  /** How `location.latitude`/`longitude` were arrived at (S-C2). */
+  locationMethod?: LocationMethod;
+  /** Confidence in the resolved point, separate from the observation's own confidence. */
+  locationConfidence?: number;
 }
 
 export interface TimelineEvent {
@@ -288,6 +301,8 @@ export const ObservationSchema = objectOf(
     confidence: confidence(),
     visibility: optional(enumOf(VISIBILITIES)),
     sensitive: optional(boolean()),
+    locationMethod: optional(enumOf(LOCATION_METHODS)),
+    locationConfidence: optional(confidence()),
   },
   "Observation",
 );

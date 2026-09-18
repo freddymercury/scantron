@@ -183,3 +183,99 @@ export function recordPollFailure(
       WHERE source = ?`,
   ).run(now.toISOString(), error, now.toISOString(), source);
 }
+
+// --- geocoding gazetteer (S-C2) --------------------------------------------
+
+export interface IntersectionRow {
+  canonical: string;
+  street_a: string;
+  street_b: string;
+  lat: number;
+  lng: number;
+  observations: number;
+  source: string;
+  loaded_at: string;
+}
+
+export function upsertIntersections(db: Database, rows: readonly IntersectionRow[]): number {
+  const insert = db.query(
+    `INSERT INTO intersections (canonical, street_a, street_b, lat, lng, observations, source, loaded_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT (canonical) DO UPDATE SET
+       lat = excluded.lat, lng = excluded.lng, observations = excluded.observations,
+       source = excluded.source, loaded_at = excluded.loaded_at`,
+  );
+  const run = db.transaction((batch: readonly IntersectionRow[]) => {
+    for (const row of batch) {
+      insert.run(
+        row.canonical,
+        row.street_a,
+        row.street_b,
+        row.lat,
+        row.lng,
+        row.observations,
+        row.source,
+        row.loaded_at,
+      );
+    }
+  });
+  run(rows);
+  return rows.length;
+}
+
+export interface StreetSegmentRow {
+  cnn: string;
+  street: string;
+  left_from: number | null;
+  left_to: number | null;
+  right_from: number | null;
+  right_to: number | null;
+  min_lat: number;
+  min_lng: number;
+  max_lat: number;
+  max_lng: number;
+  line: string;
+  neighborhood: string | null;
+  source: string;
+  loaded_at: string;
+}
+
+export function upsertStreetSegments(db: Database, rows: readonly StreetSegmentRow[]): number {
+  const columns = [
+    "cnn",
+    "street",
+    "left_from",
+    "left_to",
+    "right_from",
+    "right_to",
+    "min_lat",
+    "min_lng",
+    "max_lat",
+    "max_lng",
+    "line",
+    "neighborhood",
+    "source",
+    "loaded_at",
+  ];
+  const insert = db.query(
+    `INSERT INTO street_segments (${columns.join(", ")})
+     VALUES (${columns.map((column) => `$${column}`).join(", ")})
+     ON CONFLICT (cnn) DO UPDATE SET
+       ${columns
+         .filter((column) => column !== "cnn")
+         .map((column) => `${column} = excluded.${column}`)
+         .join(", ")}`,
+  );
+  const run = db.transaction((batch: readonly StreetSegmentRow[]) => {
+    for (const row of batch) {
+      insert.run(
+        Object.fromEntries(Object.entries(row).map(([key, value]) => [`$${key}`, value])) as Record<
+          string,
+          string | number | null
+        >,
+      );
+    }
+  });
+  run(rows);
+  return rows.length;
+}

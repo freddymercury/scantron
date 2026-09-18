@@ -140,3 +140,31 @@ skipped record is simply never seen, and the gap is invisible without S-B5's det
 
 **Page by keyset — `(time > t) OR (time = t AND id > i)` — never by offset**, on any DataSF
 feed. Applies equally to S-B2 and to the historical backfill in S-B5.
+
+## 8. SFPD publishes no location at all for sensitive calls 🎯 found while building S-C2
+
+Measured 2026-09-18 over 4,082 live dispatch records:
+
+| Records | Location text | Located |
+|---|---|---|
+| Not `sensitive_call` (2,787) | 100% | **98.7%** |
+| `sensitive_call` (1,295) | **0%** | 0% |
+
+**Every single unresolved observation was a sensitive call**, and every sensitive call
+arrived with no `intersection_name`, no `intersection_point` and no
+`analysis_neighborhood`. This is not a gap in our geocoding; it is SFPD's own suppression,
+applied before publication. (A further 37 non-sensitive records carry the literal string
+`Not Available`.)
+
+Three consequences:
+
+1. **S-C2's ">=90% of a sample resolves to coordinates" is unreachable as an overall
+   number, and reaching it would mean something had gone wrong.** The rate that measures
+   our work is over records that came with a location: 98.7%. `bun run report:geocoding`
+   reports both.
+2. **~32% of police calls can never appear on a map**, from any amount of engineering.
+   Feed and search must not treat a missing point as a defect, and the UI should not imply
+   the city is quieter in places where sensitive calls cluster.
+3. **S-E1 gets easier and harder.** Easier: the most sensitive third is already stripped of
+   location upstream. Harder: `sensitive_call` now correlates perfectly with "no location",
+   so publishing *anything* location-shaped about such a call is a red flag to check for.

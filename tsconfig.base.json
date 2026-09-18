@@ -23,6 +23,7 @@
     "paths": {
       "@scantron/incident-schema": ["packages/incident-schema/src/index.ts"],
       "@scantron/location-normalizer": ["packages/location-normalizer/src/index.ts"],
+      "@scantron/location-normalizer/geocode": ["packages/location-normalizer/src/geocode.ts"],
       "@scantron/sf-domain": ["packages/sf-domain/src/index.ts"],
       "@scantron/event-taxonomy": ["packages/event-taxonomy/src/index.ts"],
       "@scantron/database": ["packages/database/src/index.ts"],

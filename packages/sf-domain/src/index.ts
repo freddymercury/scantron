@@ -3,15 +3,10 @@
  * general slippy map, so the projection lives here rather than in a mapping library.
  */
 
-export interface BoundingBox {
-  readonly west: number;
-  readonly east: number;
-  readonly south: number;
-  readonly north: number;
-}
+export * from "./geo.ts";
 
 /** Matches the bbox the mockups project against (`mockups/live.template.html`). */
-export const SF_BBOX: BoundingBox = {
+export const SF_BBOX = {
   west: -122.517,
   east: -122.357,
   south: 37.705,

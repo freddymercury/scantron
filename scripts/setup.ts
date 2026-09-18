@@ -7,6 +7,7 @@
  */
 
 import { migrate, openDatabase, databasePath, loadMigrations } from "@scantron/database";
+import type { Database } from "bun:sqlite";
 import { checkEnv } from "./env.ts";
 
 const ROOT = new URL("..", import.meta.url).pathname.replace(/\/$/, "");
@@ -23,6 +24,29 @@ async function ensureEnvFile(): Promise<void> {
   }
   await Bun.write(envFile, await Bun.file(`${ROOT}/.env.example`).text());
   step(".env created from .env.example");
+}
+
+/**
+ * Neighborhood polygons need the network, and setup must still work offline, so a failure
+ * here is a warning rather than an error: everything except neighborhood backfill (S-C2)
+ * works without them.
+ */
+async function ensureNeighborhoods(db: Database): Promise<void> {
+  const existing = db.query<{ n: number }, []>("SELECT count(*) AS n FROM neighborhoods").get();
+  if ((existing?.n ?? 0) > 0) {
+    step(`${existing?.n} neighborhood polygons already loaded`);
+    return;
+  }
+  const loader = Bun.spawnSync(["bun", "run", `${ROOT}/scripts/load-neighborhoods.ts`], {
+    env: process.env,
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  if (loader.exitCode === 0) {
+    step(loader.stdout.toString().trim());
+  } else {
+    step("! neighborhood polygons not loaded (offline?) — run: bun run load:neighborhoods");
+  }
 }
 
 async function main(): Promise<void> {
@@ -53,10 +77,9 @@ async function main(): Promise<void> {
     );
   }
 
-  // Seed steps land with the stories that own their data:
-  //   neighborhood polygons  → S-C2
-  //   event taxonomy         → S-A4
-  // Each will be a function called from here, skipped when already present.
+  await ensureNeighborhoods(db);
+
+  // Remaining seed step: the event taxonomy (S-A4), which lands with that story.
 
   db.close();
   console.log("\nsetup complete. Next: bun run dev");

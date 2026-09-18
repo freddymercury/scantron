@@ -92,7 +92,9 @@ export async function main(): Promise<void> {
       };
       if (event.event === "completed") {
         metrics.jobsProcessed.increment({ type: event.job.type, result: "completed" });
-        log.info("job.completed", { ...fields, result: "ok" });
+        // Debug, not info: a successful job is a metric, not news. At info this produced
+        // 10,000 lines in one backlog drain and buried everything that mattered.
+        log.debug("job.completed", { ...fields, result: "ok" });
       } else if (event.event === "failed" || event.event === "retrying") {
         metrics.jobsProcessed.increment({ type: event.job.type, result: event.event });
         log.warn(`job.${event.event}`, { ...fields, error: errorMessage(event.error) });

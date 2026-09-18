@@ -116,10 +116,25 @@ News coverage and published incident reports, attached to the incidents they des
 3. **D1 → D2 → D3 → D10** early — the eval harness comes right after the first correlator, not at the end. **D10 is the guard on the project's biggest technical risk.**
 4. **D4, D5, D6 → D9 → D7 → D8** — incident state, then history, then self-healing.
 5. **E1 first in Epic E.** Nothing is public until visibility and delay exist.
-6. **E2 → E3/E4/E5 → F1 → F2/F3 → F4 → F5 → F6 → F7.** F7 can be written alongside F4; it is small and it is the one that keeps the product honest.
-7. **H1 → H2 → H3** right after F3 — this is the first thing that makes the product answer a question instead of presenting a feed. **H6 → H7 → H5 → H4** follow once there is history: rollups before trends, trends before baselines (a baseline is a rollup with statistics on it), and the ask grammar last, built from real logged questions. Note that H5 and H7 cannot be *evaluated* until ~90 days after continuous ingestion begins — build them late, or build them early and accept that the numbers are not yet meaningful.
+6. **E2 → E3/E4/E5 → F1 → F2 → F3 → H1 → H2 → H3 → F4 → F5 → F6 → F7.**
+   **The neighborhood answer comes before the rest of the web work, deliberately.** "What's
+   happening in my neighborhood?" is the front door to this product; the feed and map are the
+   drill-down. Sequencing H1–H3 immediately after the map means the first demo is *a question
+   getting answered*, not a list of dispatch calls — which is also the more honest demo, since
+   a neighborhood digest makes no claim to be live and the source data is ~30 minutes old
+   (`01-data-source-findings.md` §5). H3 genuinely needs F2 and F3 (it scopes the feed and
+   fits the map to a polygon), so this is the earliest it can land.
+   F7 can be written alongside F4; it is small and it is the one that keeps the product honest.
+7. **H6 → H7 → H5 → H4** follow once there is history: rollups before trends, trends before baselines (a baseline is a rollup with statistics on it), and the ask grammar last, built from real logged questions. Note that H5 and H7 cannot be *evaluated* until ~90 days after continuous ingestion begins — build them late, or build them early and accept that the numbers are not yet meaningful.
 8. **Epic I is Phase 3 and should not start until the real-time correlator has a stable committed S-D10 baseline.** Within it the order is inverted from the obvious one: **I2 → I3 first** (ground truth, ships nothing to users, highest value), then **I1**, then **I4 → I5 → I6 → I7** only if the consumer case survives the reality checks.
 9. **G1** folds in during Epic C; **G2** any time; **G3** immediately after the first demo.
+
+## Sequence vs. GitHub issue numbers
+
+Issues are filed at <https://github.com/freddymercury/scantron/issues> with their build-order
+position in the title (`[35] S-H1 — …`). **The title is the authoritative sequence**, not the
+issue number: H1–H3 were moved ahead of F4–G1 after filing, and GitHub issue numbers cannot be
+reordered. Positions 1–34 and 43–55 still match their issue numbers.
 
 ## Definition of done (every story)
 Typechecks, tests pass, metrics/logs emitted where relevant, config documented in

@@ -25,6 +25,7 @@ import {
 } from "@scantron/observability";
 import { SF_BBOX, SF_TIMEZONE } from "@scantron/sf-domain";
 
+import { handleInternal } from "./internal/viewer.ts";
 import { createNonce, escapeHtml, securityHeaders } from "./security.ts";
 
 const PORT = Number(process.env.WEB_PORT ?? 3000);
@@ -83,12 +84,19 @@ function withSecurityHeaders(response: Response): Response {
   return response;
 }
 
-export function createHandler(context: AppContext): (request: Request) => Response {
-  return function handle(request: Request): Response {
+export function createHandler(context: AppContext): (request: Request) => Response | Promise<Response> {
+  return function handle(request: Request): Response | Promise<Response> {
     const path = new URL(request.url).pathname;
     const startedAt = performance.now();
 
     try {
+      // Internal surfaces first, and they fail closed: without INTERNAL_API_KEY the
+      // viewer does not exist at all (S-B4).
+      if (path.startsWith("/internal")) {
+        const internal = handleInternal(request, context.db ? { db: context.db } : {});
+        return internal.then((response) => response ?? new Response("not found", { status: 404 }));
+      }
+
       if (path === "/") {
         const nonce = createNonce();
         return new Response(page(nonce), {

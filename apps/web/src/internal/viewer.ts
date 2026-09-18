@@ -1,0 +1,373 @@
+/**
+ * The raw observation viewer (S-B4) — internal only, and the page Phase 0 is judged from.
+ *
+ * Access is a shared secret in a header or in basic auth, and **the route does not exist
+ * unless `INTERNAL_API_KEY` is set**: an internal page that quietly serves everyone when a
+ * variable is missing is worse than no page at all. Nothing here is linked publicly, and
+ * S-E1 has not shipped, so this is the only surface on which raw source text appears.
+ */
+
+import type { Database } from "bun:sqlite";
+
+import { createNonce, escapeHtml, securityHeaders } from "../security.ts";
+import {
+  failedJobs,
+  listObservations,
+  rawPayloads,
+  requeueJob,
+  sourceCoverage,
+  unmappedCodes,
+  windowCounters,
+  type ObservationFilter,
+  type ObservationListRow,
+  type WindowCounters,
+} from "./queries.ts";
+
+export const INTERNAL_PREFIX = "/internal";
+
+export function internalKey(): string | undefined {
+  return process.env.INTERNAL_API_KEY?.trim() || undefined;
+}
+
+/** Constant-time comparison, so a wrong key cannot be found one character at a time. */
+function secretsMatch(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let difference = 0;
+  for (let i = 0; i < a.length; i += 1) difference |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return difference === 0;
+}
+
+export function isAuthorized(request: Request, key: string): boolean {
+  const header = request.headers.get("x-scantron-internal-key");
+  if (header && secretsMatch(header, key)) return true;
+
+  const authorization = request.headers.get("authorization") ?? "";
+  if (authorization.startsWith("Basic ")) {
+    try {
+      const decoded = atob(authorization.slice("Basic ".length));
+      const password = decoded.slice(decoded.indexOf(":") + 1);
+      return secretsMatch(password, key);
+    } catch {
+      return false;
+    }
+  }
+  return false;
+}
+
+function unauthorized(): Response {
+  return new Response("unauthorized", {
+    status: 401,
+    headers: {
+      ...securityHeaders(),
+      "www-authenticate": 'Basic realm="scantron internal", charset="UTF-8"',
+    },
+  });
+}
+
+const STYLE = `
+  :root { color-scheme: light dark; }
+  body { font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; margin: 0; padding: 1.5rem; }
+  h1 { font-size: 1.1rem; margin: 0 0 .25rem; }
+  .muted { opacity: .65; }
+  .gate { padding: .75rem 1rem; border: 1px solid currentColor; border-radius: .25rem; margin: 1rem 0; }
+  .pass { color: #1a7f37; } .fail { color: #b3261e; }
+  form { margin: 1rem 0; display: flex; gap: .5rem; flex-wrap: wrap; align-items: end; }
+  label { display: flex; flex-direction: column; font-size: .8rem; }
+  input, select { font: inherit; padding: .25rem; }
+  table { border-collapse: collapse; width: 100%; font-size: .85rem; }
+  th, td { text-align: left; padding: .35rem .5rem; border-bottom: 1px solid rgba(128,128,128,.25); vertical-align: top; }
+  th { position: sticky; top: 0; background: Canvas; }
+  details pre { white-space: pre-wrap; word-break: break-all; font-size: .75rem; max-height: 22rem; overflow: auto; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .counters { display: flex; gap: 1.25rem; flex-wrap: wrap; margin: .5rem 0 1rem; }
+  .counters div { min-width: 7rem; }
+  .counters b { display: block; font-size: 1.15rem; }
+  button { font: inherit; }
+`;
+
+function counterBlock(counters: WindowCounters): string {
+  const cells: [string, string][] = [
+    ["observations", String(counters.total)],
+    ["geocoded", `${counters.geocodedPercent.toFixed(1)}%`],
+    ["geocoded (locatable)", `${counters.locatablePercent.toFixed(1)}%`],
+    ["typed", `${counters.typedPercent.toFixed(1)}%`],
+    ["backfilled", String(counters.backfilled)],
+    ["duplicate upserts", String(counters.duplicateUpserts)],
+    ["failed jobs", String(counters.failedJobs)],
+    ["pending jobs", String(counters.pendingJobs)],
+    ["quarantined", String(counters.quarantined)],
+    ["open gaps", String(counters.openGaps)],
+    ["unrecoverable gaps", String(counters.unrecoverableGaps)],
+    ["coverage", `${counters.coverageHours.toFixed(1)} h`],
+  ];
+  return `<div class="counters">${cells
+    .map(([label, value]) => `<div><b>${escapeHtml(value)}</b><span class="muted">${escapeHtml(label)}</span></div>`)
+    .join("")}</div>`;
+}
+
+export interface PhaseZeroGate {
+  continuousHours: number;
+  duplicateUpserts: number;
+  unrecoverableGaps: number;
+  passes: boolean;
+  reasons: string[];
+}
+
+/**
+ * PRD §44: >=72 h of continuous ingestion, no duplicate explosion, no unexplained gaps.
+ * Evaluated here rather than asserted anywhere else, because this is the page the decision
+ * is supposed to be made from.
+ *
+ * "Continuous" is measured as the span from oldest to newest observation *with no recorded
+ * gaps* — the span alone would happily pass on two records three days apart, which is why
+ * a recorded gap fails the gate outright and why ingestion also has to be current now.
+ */
+export function evaluateGate(counters: WindowCounters, now: Date = new Date()): PhaseZeroGate {
+  const reasons: string[] = [];
+  if (counters.coverageHours < 72) {
+    reasons.push(`${counters.coverageHours.toFixed(1)} h of coverage, needs 72 h`);
+  }
+  if (counters.newest) {
+    const behindHours = (now.getTime() - new Date(counters.newest).getTime()) / 3_600_000;
+    // The police feed is a ~30-minute batch (docs/01 §5), so three hours behind means
+    // ingestion has stopped, whatever the historical span says.
+    if (behindHours > 3) {
+      reasons.push(`newest observation is ${behindHours.toFixed(1)} h old — ingestion is not current`);
+    }
+  }
+  if (counters.duplicateUpserts > 0) {
+    reasons.push(`${counters.duplicateUpserts} duplicate source records`);
+  }
+  if (counters.unrecoverableGaps > 0) {
+    reasons.push(`${counters.unrecoverableGaps} unrecoverable gap(s)`);
+  }
+  if (counters.total === 0) reasons.push("no observations ingested");
+  // Ingesting without normalizing is not a working pipeline, and the gate is about the
+  // pipeline rather than about the poller.
+  if (counters.total > 0 && counters.typed === 0) {
+    reasons.push("nothing has been normalized — the worker is not keeping up");
+  }
+  return {
+    continuousHours: counters.coverageHours,
+    duplicateUpserts: counters.duplicateUpserts,
+    unrecoverableGaps: counters.unrecoverableGaps,
+    passes: reasons.length === 0,
+    reasons,
+  };
+}
+
+function filterForm(filter: ObservationFilter, sources: string[], types: string[]): string {
+  const option = (value: string, selected: string | undefined) =>
+    `<option value="${escapeHtml(value)}"${value === selected ? " selected" : ""}>${escapeHtml(value || "any")}</option>`;
+
+  return `<form method="get">
+    <label>source<select name="source">${["", ...sources].map((value) => option(value, filter.source)).join("")}</select></label>
+    <label>type<select name="type">${["", ...types].map((value) => option(value, filter.type)).join("")}</select></label>
+    <label>from<input type="text" name="from" value="${escapeHtml(filter.from ?? "")}" placeholder="2026-09-18T00:00:00Z"></label>
+    <label>to<input type="text" name="to" value="${escapeHtml(filter.to ?? "")}" placeholder="ISO-8601 UTC"></label>
+    <label>geocoded<select name="geocoded">${["", "yes", "no"].map((value) => option(value, filter.geocoded)).join("")}</select></label>
+    <label>unmapped only<input type="checkbox" name="unmapped" value="1"${filter.unmappedOnly ? " checked" : ""}></label>
+    <button type="submit">apply</button>
+  </form>`;
+}
+
+function observationRow(db: Database, row: ObservationListRow): string {
+  const payloads = rawPayloads(db, row.source, row.source_record_id ?? "");
+  const normalized = {
+    id: row.id,
+    source: row.source,
+    sourceRecordId: row.source_record_id,
+    occurredAt: row.occurred_at,
+    ingestedAt: row.ingested_at,
+    type: row.type,
+    typeConfidence: row.type_confidence,
+    rawType: row.raw_type,
+    subtype: row.subtype,
+    priority: row.priority,
+    priorityRank: row.priority_rank,
+    location: {
+      raw: row.location_raw,
+      normalized: row.location_normalized,
+      neighborhood: row.neighborhood,
+      latitude: row.lat,
+      longitude: row.lng,
+      method: row.location_method,
+    },
+    units: row.units ? (JSON.parse(row.units) as string[]) : [],
+    sensitive: row.sensitive === 1,
+    backfilled: row.backfilled === 1,
+  };
+
+  const raw = payloads[0]?.payload ?? "(no stored payload)";
+  const formatted = payloads[0] ? JSON.stringify(JSON.parse(raw) as object, null, 2) : raw;
+
+  return `<tr>
+    <td>${escapeHtml(row.occurred_at)}</td>
+    <td>${escapeHtml(row.source)}</td>
+    <td>${escapeHtml(row.type ?? "—")}${row.type === "unknown" || row.type === null ? ` <span class="muted">(${escapeHtml(row.raw_type ?? "no code")})</span>` : ""}</td>
+    <td>${escapeHtml(row.location_normalized ?? row.location_raw ?? "—")}</td>
+    <td>${row.lat === null ? '<span class="muted">not located</span>' : escapeHtml(`${row.lat.toFixed(4)}, ${(row.lng ?? 0).toFixed(4)}`)}</td>
+    <td>${escapeHtml(row.neighborhood ?? "—")}</td>
+    <td>${row.sensitive === 1 ? "sensitive" : ""}${row.backfilled === 1 ? " backfilled" : ""}</td>
+    <td><details><summary>raw + normalized</summary>
+      <div class="cols">
+        <div><b>source payload</b><pre>${escapeHtml(formatted)}</pre></div>
+        <div><b>normalized observation</b><pre>${escapeHtml(JSON.stringify(normalized, null, 2))}</pre></div>
+      </div>
+      ${payloads.length > 1 ? `<p class="muted">${payloads.length} stored payloads for this record — the source changed it.</p>` : ""}
+    </details></td>
+  </tr>`;
+}
+
+export function parseFilter(url: URL): ObservationFilter {
+  const filter: ObservationFilter = { limit: 50 };
+  const take = (name: string) => url.searchParams.get(name)?.trim() || undefined;
+
+  const source = take("source");
+  if (source) filter.source = source;
+  const type = take("type");
+  if (type) filter.type = type;
+  const from = take("from");
+  if (from) filter.from = from;
+  const to = take("to");
+  if (to) filter.to = to;
+  const geocoded = take("geocoded");
+  if (geocoded) filter.geocoded = geocoded;
+  if (url.searchParams.get("unmapped") === "1") filter.unmappedOnly = true;
+  const offset = Number(take("offset") ?? 0);
+  if (Number.isFinite(offset) && offset > 0) filter.offset = offset;
+  return filter;
+}
+
+export function renderViewer(db: Database, url: URL, nonce: string): string {
+  const filter = parseFilter(url);
+  const counters = windowCounters(db, filter);
+  const gate = evaluateGate(counters);
+  const rows = listObservations(db, filter);
+  const coverage = sourceCoverage(db);
+  const gaps = unmappedCodes(db, 10);
+  const failed = failedJobs(db);
+
+  const sources = coverage.map((row) => row.source);
+  const types = db
+    .query<{ type: string }, []>("SELECT DISTINCT type FROM observations WHERE type IS NOT NULL ORDER BY type")
+    .all()
+    .map((row) => row.type);
+
+  return `<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>scantron — raw observations (internal)</title>
+<style nonce="${nonce}">${STYLE}</style>
+<h1>raw observations <span class="muted">internal · not public</span></h1>
+
+<div class="gate ${gate.passes ? "pass" : "fail"}">
+  <b>Phase 0 gate: ${gate.passes ? "PASS" : "not yet"}</b>
+  <div class="muted">PRD §44 — ≥72 h continuous ingestion, no duplicate explosion, no unexplained gaps.</div>
+  <div class="muted">Coverage is the span from oldest to newest observation; any recorded gap fails the gate.</div>
+  ${gate.reasons.length > 0 ? `<ul>${gate.reasons.map((reason) => `<li>${escapeHtml(reason)}</li>`).join("")}</ul>` : ""}
+</div>
+
+${counterBlock(counters)}
+
+<table>
+  <tr><th>source</th><th>observations</th><th>first</th><th>last</th><th>last poll ok</th><th>failures</th></tr>
+  ${coverage
+    .map(
+      (row) => `<tr><td>${escapeHtml(row.source)}</td><td>${row.observations}</td>
+        <td>${escapeHtml(row.first_at ?? "—")}</td><td>${escapeHtml(row.last_at ?? "—")}</td>
+        <td>${escapeHtml(row.last_success_at ?? "never")}</td><td>${row.consecutive_failures}</td></tr>`,
+    )
+    .join("")}
+</table>
+
+${filterForm(filter, sources, types)}
+
+<table>
+  <tr><th>occurred</th><th>source</th><th>type</th><th>location</th><th>point</th><th>neighborhood</th><th>flags</th><th></th></tr>
+  ${rows.map((row) => observationRow(db, row)).join("")}
+</table>
+${rows.length === 0 ? "<p class=\"muted\">no observations match this filter</p>" : ""}
+
+<h2>unmapped codes <span class="muted">most frequent first</span></h2>
+<table>
+  <tr><th>source</th><th>code</th><th>label</th><th>count</th></tr>
+  ${gaps
+    .map(
+      (row) =>
+        `<tr><td>${escapeHtml(row.source)}</td><td>${escapeHtml(row.raw_type ?? "—")}</td><td>${escapeHtml(row.subtype ?? "—")}</td><td>${row.n}</td></tr>`,
+    )
+    .join("")}
+</table>
+${gaps.length === 0 ? "<p class=\"muted\">every observed code maps to a type</p>" : ""}
+
+<h2>failed jobs</h2>
+<table>
+  <tr><th>type</th><th>attempts</th><th>error</th><th>when</th><th></th></tr>
+  ${failed
+    .map(
+      (job) => `<tr>
+        <td>${escapeHtml(job.type)}</td>
+        <td>${job.attempts}/${job.max_attempts}</td>
+        <td>${escapeHtml(job.last_error ?? "—")}</td>
+        <td>${escapeHtml(job.updated_at)}</td>
+        <td><form method="post" action="${INTERNAL_PREFIX}/jobs/requeue">
+          <input type="hidden" name="id" value="${escapeHtml(job.id)}">
+          <button type="submit">requeue</button>
+        </form></td>
+      </tr>`,
+    )
+    .join("")}
+</table>
+${failed.length === 0 ? "<p class=\"muted\">no failed jobs</p>" : ""}
+`;
+}
+
+export interface InternalContext {
+  db?: Database;
+}
+
+/**
+ * Returns `undefined` when the path is not internal, so the caller can fall through.
+ */
+export async function handleInternal(
+  request: Request,
+  context: InternalContext,
+): Promise<Response | undefined> {
+  const url = new URL(request.url);
+  if (!url.pathname.startsWith(INTERNAL_PREFIX)) return undefined;
+
+  const key = internalKey();
+  // No key configured, no internal surface. Failing closed is the only safe default for a
+  // page that shows raw source text.
+  if (!key) return new Response("not found", { status: 404, headers: securityHeaders() });
+  if (!isAuthorized(request, key)) return unauthorized();
+
+  const db = context.db;
+  if (!db) return new Response("no database", { status: 503, headers: securityHeaders() });
+
+  if (url.pathname === `${INTERNAL_PREFIX}/jobs/requeue` && request.method === "POST") {
+    const form = await request.formData();
+    const id = String(form.get("id") ?? "");
+    const requeued = requeueJob(db, id);
+    return new Response(null, {
+      status: 303,
+      headers: { ...securityHeaders(), location: INTERNAL_PREFIX + (requeued ? "" : "?requeue=failed") },
+    });
+  }
+
+  if (url.pathname === INTERNAL_PREFIX || url.pathname === `${INTERNAL_PREFIX}/`) {
+    const nonce = createNonce();
+    return new Response(renderViewer(db, url, nonce), {
+      headers: {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "no-store",
+        ...securityHeaders(nonce),
+      },
+    });
+  }
+
+  return new Response("not found", { status: 404, headers: securityHeaders() });
+}

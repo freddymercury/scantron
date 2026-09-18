@@ -21,6 +21,11 @@ export const ENV_VARS: readonly EnvVar[] = [
   },
   { name: "WEB_PORT", required: false, fallback: "3000", description: "Port for apps/web" },
   {
+    name: "INTERNAL_API_KEY",
+    required: false,
+    description: "Shared secret for /internal; unset disables the route entirely (S-B4)",
+  },
+  {
     name: "DATASF_HOST",
     required: false,
     fallback: "https://data.sf.gov",

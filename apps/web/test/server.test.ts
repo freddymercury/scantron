@@ -2,7 +2,8 @@ import { expect, test } from "bun:test";
 import { handle } from "../src/server.ts";
 import { contentSecurityPolicy, createNonce, escapeHtml } from "../src/security.ts";
 
-const get = (path: string) => handle(new Request(`http://localhost${path}`));
+/** Every route but /internal answers synchronously; this keeps the tests readable. */
+const get = (path: string) => handle(new Request(`http://localhost${path}`)) as Response;
 
 test("serves the index page", async () => {
   const res = get("/");
@@ -99,7 +100,7 @@ test("health goes non-200 when a configured source has gone silent", async () =>
   ).run();
 
   const handler = createHandler({ db, metrics: createAppMetrics() });
-  const res = handler(new Request("http://localhost/health"));
+  const res = handler(new Request("http://localhost/health")) as Response;
   expect(res.status).toBe(503);
   expect(await res.json()).toMatchObject({ status: "degraded" });
   db.close();

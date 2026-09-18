@@ -68,6 +68,14 @@ this repo actually has — zero third-party runtime dependencies, no service-to-
 imports, no deep relative imports across workspaces, and every `process.env` variable
 documented in [`.env.example`](.env.example).
 
+## Internal viewer
+
+`/internal` is the raw observation viewer (S-B4) — raw payload beside the normalized
+observation, filters, unmapped codes by frequency, failed jobs with one-click requeue, and
+the Phase 0 gate evaluated from the same numbers. It **does not exist** unless
+`INTERNAL_API_KEY` is set; authenticate with that value as an `x-scantron-internal-key`
+header or as the basic-auth password.
+
 ## Status
 
 Implementation started. Epic A scaffold is in; the remaining work is the issues, filed in

@@ -29,6 +29,8 @@ import {
 } from "@scantron/incident-schema";
 
 export const CONFIG_DIR = resolve(import.meta.dir, "../config");
+/** One file per source. Kept in its own directory so other config (priorities) can sit beside it. */
+export const SOURCE_CONFIG_DIR = join(CONFIG_DIR, "sources");
 
 /** Unmapped codes resolve here, and are counted so the gap is visible (S-A4). */
 export const UNKNOWN_TYPE: IncidentType = "unknown";
@@ -93,7 +95,7 @@ export function loadTaxonomyFile(path: string): TaxonomyFile {
   return parse(TaxonomyFileSchema, JSON.parse(text) as unknown, path) as TaxonomyFile;
 }
 
-export function loadTaxonomyConfigs(dir: string = CONFIG_DIR): TaxonomyFile[] {
+export function loadTaxonomyConfigs(dir: string = SOURCE_CONFIG_DIR): TaxonomyFile[] {
   return readdirSync(dir)
     .filter((name) => name.endsWith(".json"))
     .sort()
@@ -184,7 +186,11 @@ export interface TaxonomyOptions {
 }
 
 export interface Taxonomy {
-  classify(input: { source: string; rawCode?: string; rawLabel?: string }): Classification;
+  classify(input: {
+    source: string;
+    rawCode?: string | undefined;
+    rawLabel?: string | undefined;
+  }): Classification;
   /** Force a reload rather than waiting out the interval. */
   reload(): void;
   readonly loadedAt: number;
@@ -297,3 +303,5 @@ function toClassification(
   if (rawLabel !== undefined) classification.rawLabel = rawLabel;
   return classification;
 }
+
+export * from "./priority.ts";

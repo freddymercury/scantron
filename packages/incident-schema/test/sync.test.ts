@@ -71,6 +71,10 @@ const OBSERVATION_KEYS: Record<keyof Observation, true> = {
   sensitive: true,
   locationMethod: true,
   locationConfidence: true,
+  typeConfidence: true,
+  severity: true,
+  priorityRank: true,
+  normalizedAt: true,
 };
 
 const INCIDENT_KEYS: Record<keyof Incident, true> = {

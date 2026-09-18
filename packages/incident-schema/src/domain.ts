@@ -184,6 +184,14 @@ export interface Observation {
   visibility?: Visibility;
   /** SFPD's own `sensitive_call` flag, treated as authoritative (S-E1). */
   sensitive?: boolean;
+  /** Confidence in `type`, from the taxonomy mapping that produced it (S-C3). */
+  typeConfidence?: number;
+  /** Severity hint from the taxonomy, not a judgement of this particular call. */
+  severity?: IncidentSeverity;
+  /** Agency priority on the shared 1 (most urgent) – 5 scale (S-C3). */
+  priorityRank?: number;
+  /** When normalization last ran, so a taxonomy change can find stale rows. */
+  normalizedAt?: Date;
   /** How `location.latitude`/`longitude` were arrived at (S-C2). */
   locationMethod?: LocationMethod;
   /** Confidence in the resolved point, separate from the observation's own confidence. */
@@ -301,6 +309,10 @@ export const ObservationSchema = objectOf(
     confidence: confidence(),
     visibility: optional(enumOf(VISIBILITIES)),
     sensitive: optional(boolean()),
+    typeConfidence: optional(confidence()),
+    severity: optional(enumOf(INCIDENT_SEVERITIES)),
+    priorityRank: optional(number({ integer: true, min: 1, max: 5 })),
+    normalizedAt: optional(timestamp()),
     locationMethod: optional(enumOf(LOCATION_METHODS)),
     locationConfidence: optional(confidence()),
   },

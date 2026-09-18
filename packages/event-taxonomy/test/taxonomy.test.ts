@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { createTestDatabase } from "@scantron/database/testing";
 import { INCIDENT_TYPES } from "@scantron/incident-schema";
 import {
-  CONFIG_DIR,
+  SOURCE_CONFIG_DIR,
   UNKNOWN_CONFIDENCE,
   createTaxonomy,
   loadTaxonomyConfigs,
@@ -18,7 +18,7 @@ function seeded(files?: TaxonomyFile[]) {
 }
 
 test("the shipped configs cover the three CAD sources and validate", () => {
-  const files = loadTaxonomyConfigs(CONFIG_DIR);
+  const files = loadTaxonomyConfigs(SOURCE_CONFIG_DIR);
   expect(files.map((file) => file.source).sort()).toEqual([
     "sf_ems_cad",
     "sf_fire_cad",

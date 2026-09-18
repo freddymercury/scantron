@@ -51,6 +51,10 @@ export interface ObservationRow {
   sensitive: number | null;
   location_method: string | null;
   location_confidence: number | null;
+  type_confidence: number | null;
+  severity: string | null;
+  priority_rank: number | null;
+  normalized_at: string | null;
 }
 
 export interface IncidentRow {
@@ -143,6 +147,10 @@ export function observationToRow(observation: Observation): ObservationRow {
     sensitive: observation.sensitive === undefined ? null : observation.sensitive ? 1 : 0,
     location_method: orNull(observation.locationMethod),
     location_confidence: orNull(observation.locationConfidence),
+    type_confidence: orNull(observation.typeConfidence),
+    severity: orNull(observation.severity),
+    priority_rank: orNull(observation.priorityRank),
+    normalized_at: iso(observation.normalizedAt),
   };
 }
 
@@ -186,6 +194,10 @@ export function rowToObservation(row: ObservationRow): Observation {
   set(observation, "visibility", row.visibility as Visibility | null);
   set(observation, "locationMethod", row.location_method as LocationMethod | null);
   set(observation, "locationConfidence", row.location_confidence);
+  set(observation, "typeConfidence", row.type_confidence);
+  set(observation, "severity", row.severity as IncidentSeverity | null);
+  set(observation, "priorityRank", row.priority_rank);
+  if (row.normalized_at !== null) observation.normalizedAt = new Date(row.normalized_at);
   if (row.sensitive !== null) observation.sensitive = row.sensitive === 1;
   if (row.units !== null) observation.units = parseJson<string[]>(row.units, []);
   if (row.audio !== null) observation.audio = parseJson<ObservationAudio>(row.audio, {});

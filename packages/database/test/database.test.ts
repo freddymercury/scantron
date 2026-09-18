@@ -105,9 +105,11 @@ test("two processes migrating at once do not collide", async () => {
   for (const outcome of outcomes) {
     expect(`${outcome.code}: ${outcome.stderr}`).toBe("0: ");
   }
-  // Exactly one process applied each migration; the others saw it already applied.
-  const appliedCounts = outcomes.map(
-    (outcome) => (JSON.parse(outcome.stdout) as { applied: string[] }).applied.length,
+  // Each migration is applied exactly once across all processes. Which process wins which
+  // migration is a race and does not matter — that no migration runs twice does.
+  const applied = outcomes.flatMap(
+    (outcome) => (JSON.parse(outcome.stdout) as { applied: string[] }).applied,
   );
-  expect(appliedCounts.filter((count) => count > 0)).toHaveLength(1);
+  expect(applied.length).toBe(new Set(applied).size);
+  expect(applied.length).toBeGreaterThan(0);
 });

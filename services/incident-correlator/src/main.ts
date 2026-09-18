@@ -14,7 +14,9 @@ import {
   sourceConfigurations,
 } from "@scantron/database";
 import { createGeocoder } from "@scantron/location-normalizer/geocode";
+import { createPriorityMapper, createTaxonomy, seedTaxonomy } from "@scantron/event-taxonomy";
 import { createGeocodeHandler } from "./handlers/geocode.ts";
+import { createNormalizeHandler } from "./handlers/normalize.ts";
 import {
   createAppMetrics,
   createLogger,
@@ -64,8 +66,13 @@ export async function main(): Promise<void> {
     onListening: (url) => log.info("observability.listening", { result: url }),
   });
 
+  // Seeding on boot means a fresh database is usable without a separate setup step, and an
+  // already-seeded one is untouched apart from a version check.
+  seedTaxonomy(db);
   const geocoder = createGeocoder(db);
-  log.info("geocoder.ready", { count: geocoder.polygonCount });
+  const taxonomy = createTaxonomy(db);
+  const priorities = createPriorityMapper();
+  log.info("normalization.ready", { count: taxonomy.size, result: `${geocoder.polygonCount} polygons` });
 
   // Correlation handlers arrive with Epic D. A job type with no handler fails loudly and
   // stays visible rather than being silently consumed.
@@ -73,6 +80,7 @@ export async function main(): Promise<void> {
     db,
     name: SERVICE,
     handlers: {
+      normalize_observation: createNormalizeHandler({ db, taxonomy, priorities, metrics, log }) as never,
       geocode_location: createGeocodeHandler({ db, geocoder, metrics, log }) as never,
     },
     onEvent: (event) => {

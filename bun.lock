@@ -8,6 +8,7 @@
         "@scantron/database": "workspace:*",
         "@scantron/event-taxonomy": "workspace:*",
         "@scantron/location-normalizer": "workspace:*",
+        "@scantron/observability": "workspace:*",
         "@scantron/sf-domain": "workspace:*",
       },
       "devDependencies": {

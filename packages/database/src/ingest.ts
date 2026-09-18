@@ -119,6 +119,10 @@ export interface SourceConfigurationInput {
   pollSeconds?: number;
   publicationDelaySeconds?: number;
   enabled?: boolean;
+  endpoint?: string;
+  overlapSeconds?: number;
+  healthMaxSilenceSeconds?: number;
+  defaultVisibility?: "public" | "delayed" | "restricted" | "discard";
 }
 
 /** Registers a source if it is unknown; never overwrites operator edits to an existing row. */
@@ -129,8 +133,9 @@ export function ensureSourceConfiguration(
 ): void {
   db.query(
     `INSERT INTO source_configuration
-       (source, dataset_id, enabled, poll_seconds, publication_delay_seconds, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?)
+       (source, dataset_id, enabled, poll_seconds, publication_delay_seconds, endpoint,
+        overlap_seconds, health_max_silence_seconds, default_visibility, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT (source) DO NOTHING`,
   ).run(
     input.source,
@@ -138,6 +143,10 @@ export function ensureSourceConfiguration(
     input.enabled === false ? 0 : 1,
     input.pollSeconds ?? 60,
     input.publicationDelaySeconds ?? 180,
+    input.endpoint ?? null,
+    input.overlapSeconds ?? 120,
+    input.healthMaxSilenceSeconds ?? 3600,
+    input.defaultVisibility ?? "public",
     now.toISOString(),
   );
 }

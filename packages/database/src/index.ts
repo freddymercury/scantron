@@ -240,6 +240,12 @@ export interface SourceConfigurationRow {
   last_error: string | null;
   consecutive_failures: number;
   updated_at: string;
+  endpoint: string | null;
+  overlap_seconds: number;
+  health_max_silence_seconds: number;
+  default_visibility: string;
+  backoff_after_failures: number;
+  max_poll_seconds: number;
 }
 
 export function sourceConfigurations(db: Database): SourceConfigurationRow[] {
@@ -249,3 +255,4 @@ export function sourceConfigurations(db: Database): SourceConfigurationRow[] {
 }
 export * from "./ingest.ts";
 export * from "./units.ts";
+export * from "./source-config.ts";

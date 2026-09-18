@@ -16,6 +16,7 @@ import {
   ensureSourceConfiguration,
   observationBySourceRecord,
   readCursor,
+  readSourceConfig,
   recordPollFailure,
   recordPollSuccess,
   recordSourcePayload,
@@ -65,8 +66,9 @@ export function cursorWhere(
   cursorField: string,
   cursor: string | undefined,
   coldStart: Date,
+  overlapSeconds: number = OVERLAP_SECONDS,
 ): string {
-  const from = cursor ? new Date(new Date(cursor).getTime() - OVERLAP_SECONDS * 1000) : coldStart;
+  const from = cursor ? new Date(new Date(cursor).getTime() - overlapSeconds * 1000) : coldStart;
   // DataSF compares against naive local timestamps, so the bound is rendered as one.
   return `${cursorField} > '${toSfNaiveString(from)}'`;
 }
@@ -82,8 +84,12 @@ export async function runIngestCycle<TRecord extends Record<string, unknown>>(
     source: adapter.source,
     datasetId: adapter.datasetId,
     pollSeconds: deps.pollSeconds ?? Number(process.env.INGEST_POLL_SECONDS ?? 60),
+    healthMaxSilenceSeconds: adapter.silenceThresholdSeconds,
+    endpoint: `/resource/${adapter.datasetId}.json`,
   });
 
+  const config = readSourceConfig(db, adapter.source);
+  const overlapSeconds = config?.overlapSeconds ?? OVERLAP_SECONDS;
   const cursor = readCursor(db, adapter.source);
   const coldStart = new Date(startedAt.getTime() - (deps.coldStartHours ?? 48) * 3600 * 1000);
   const result: IngestResult = {
@@ -101,7 +107,7 @@ export async function runIngestCycle<TRecord extends Record<string, unknown>>(
   try {
     records = await client.queryKeyset<TRecord>({
       dataset: adapter.datasetId,
-      where: cursorWhere(adapter.cursorField, cursor, coldStart),
+      where: cursorWhere(adapter.cursorField, cursor, coldStart, overlapSeconds),
       timeField: adapter.cursorField,
       idField: adapter.idField,
       pageSize: deps.pageSize ?? 1000,

@@ -8,11 +8,15 @@
  */
 
 import {
+  createConfigCache,
   databasePath,
+  effectivePollSeconds,
   migrate,
   openDatabase,
   queueStats,
   sourceConfigurations,
+  type ConfigCache,
+  type SourceConfig,
 } from "@scantron/database";
 import {
   createAppMetrics,
@@ -54,20 +58,55 @@ export function pollSeconds(source: string): number {
   return source === "sf_police_cad" ? fallback : Math.max(fallback, 600);
 }
 
-/** Polls one source forever, on its own schedule. */
+/**
+ * Polls one source forever, on the schedule its *configuration* says — re-read each pass,
+ * so `UPDATE source_configuration SET enabled = 0` stops a feed within a minute and no
+ * deploy is involved. A source past its failure threshold backs off instead of hammering
+ * the endpoint, and says so at error level.
+ */
 async function pollLoop(options: {
   adapter: SourceAdapter<never>;
   db: ReturnType<typeof openDatabase>;
   client: SocrataClient;
   metrics: ReturnType<typeof createAppMetrics>;
   log: Logger;
+  config: ConfigCache;
   running: () => boolean;
 }): Promise<void> {
-  const { adapter, running } = options;
-  const interval = pollSeconds(adapter.source);
-  options.log.info("poller.started", { source: adapter.source, result: `every ${interval}s` });
+  const { adapter, running, log } = options;
+  let wasEnabled: boolean | undefined;
+  let announcedInterval: number | undefined;
 
   while (running()) {
+    const config: SourceConfig | undefined = options.config.get(adapter.source);
+    const enabled = config?.enabled ?? true;
+    const interval = config ? effectivePollSeconds(config) : pollSeconds(adapter.source);
+
+    if (enabled !== wasEnabled) {
+      log.info(enabled ? "poller.enabled" : "poller.disabled", {
+        source: adapter.source,
+        result: `every ${interval}s`,
+      });
+      wasEnabled = enabled;
+    }
+    if (enabled && interval !== announcedInterval) {
+      if (announcedInterval !== undefined) {
+        log.warn("poller.interval_changed", {
+          source: adapter.source,
+          result: `${announcedInterval}s -> ${interval}s`,
+          attempt: config?.consecutiveFailures ?? 0,
+        });
+      }
+      announcedInterval = interval;
+    }
+
+    if (!enabled) {
+      // Checked often enough that toggling a source feels immediate, cheap enough that
+      // doing so costs nothing.
+      await Bun.sleep(Math.min(interval, 30) * 1000);
+      continue;
+    }
+
     try {
       await runIngestCycle({
         db: options.db,
@@ -75,12 +114,20 @@ async function pollLoop(options: {
         client: options.client,
         metrics: options.metrics,
         log: options.log,
-        pollSeconds: interval,
+        pollSeconds: config?.pollSeconds ?? interval,
       });
     } catch (error) {
+      const failures = (config?.consecutiveFailures ?? 0) + 1;
+      const level = failures >= (config?.backoffAfterFailures ?? 3) ? "error" : "warn";
       // The cycle already recorded the failure and left the cursor where it was; the next
       // pass re-reads the same window rather than losing it.
-      options.log.warn("cycle.failed", { source: adapter.source, error: errorMessage(error) });
+      log[level]("cycle.failed", {
+        source: adapter.source,
+        error: errorMessage(error),
+        attempt: failures,
+      });
+      // Re-read immediately so the next sleep already reflects the backoff.
+      options.config.reload();
     }
     await Bun.sleep(interval * 1000);
   }
@@ -93,7 +140,7 @@ export async function main(): Promise<void> {
   const db = openDatabase({ path: databasePath() });
   migrate(db);
 
-  const thresholds = new Map(ADAPTERS.map((adapter) => [adapter.source, adapter.silenceThresholdSeconds]));
+  const config = createConfigCache(db);
 
   const health = (): HealthReport => {
     const stats = queueStats(db);
@@ -106,9 +153,9 @@ export async function main(): Promise<void> {
       sources: sourceConfigurations(db).map((row) => ({
         source: row.source,
         lastSuccessAt: row.last_success_at ? new Date(row.last_success_at) : undefined,
-        // Per source: the fire feed is ~19 h behind by nature and must not be judged
-        // against the police feed's threshold.
-        silenceThresholdSeconds: thresholds.get(row.source) ?? Math.max(1800, row.poll_seconds * 10),
+        // Configuration, per source: the fire feed is ~19 h behind by nature and must not
+        // be judged against the police feed's threshold.
+        silenceThresholdSeconds: row.health_max_silence_seconds,
         enabled: row.enabled === 1,
         consecutiveFailures: row.consecutive_failures,
       })),
@@ -140,7 +187,7 @@ export async function main(): Promise<void> {
 
   await Promise.all(
     ADAPTERS.map((adapter) =>
-      pollLoop({ adapter, db, client, metrics, log, running: () => running }),
+      pollLoop({ adapter, db, client, metrics, log, config, running: () => running }),
     ),
   );
 }

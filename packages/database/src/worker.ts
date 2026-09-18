@@ -28,6 +28,13 @@ export interface WorkerOptions {
   batchSize?: number;
   retry?: RetryPolicy;
   onEvent?: (event: WorkerEvent) => void;
+  /**
+   * Claim only the job types this worker has a handler for (the default). A job whose
+   * handler has not been written yet then waits in the queue as visible depth, instead of
+   * being claimed, failed and retried into a pile of red — which is what "not implemented
+   * yet" actually looks like.
+   */
+  claimOnlyHandled?: boolean;
 }
 
 export interface Worker {
@@ -75,8 +82,16 @@ export function createWorker(options: WorkerOptions): Worker {
     }
   }
 
+  const handledTypes = Object.keys(handlers) as JobType[];
+  const claimOnlyHandled = options.claimOnlyHandled ?? true;
+
   async function tick(): Promise<number> {
-    const jobs = claim(db, { worker: name, limit: batchSize });
+    if (claimOnlyHandled && handledTypes.length === 0) return 0;
+    const jobs = claim(db, {
+      worker: name,
+      limit: batchSize,
+      ...(claimOnlyHandled ? { types: handledTypes } : {}),
+    });
     for (const job of jobs) {
       emit({ event: "claimed", job });
       await runJob(job);

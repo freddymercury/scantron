@@ -54,11 +54,24 @@ test("a handler that throws leaves the job retryable, with its error recorded", 
   db.close();
 });
 
+test("a job type no worker handles waits in the queue rather than failing", async () => {
+  const db = createTestDatabase();
+  enqueue(db, { type: "correlate_incident", payload: {} });
+
+  const worker = createWorker({ db, name: "test", handlers: { normalize_observation: () => {} } });
+  expect(await worker.tick()).toBe(0);
+  expect(queueStats(db).pending).toBe(1);
+  expect(queueStats(db).failed).toBe(0);
+  db.close();
+});
+
 test("an unregistered job type fails loudly rather than disappearing", async () => {
   const db = createTestDatabase();
   const { job } = enqueue(db, { type: "transcribe_audio", payload: {}, maxAttempts: 1 });
 
-  const worker = createWorker({ db, name: "test", handlers: {} });
+  // claimOnlyHandled is off here on purpose: this asserts what happens if a handler
+  // disappears out from under a job that has already been claimed.
+  const worker = createWorker({ db, name: "test", handlers: {}, claimOnlyHandled: false });
   await worker.tick();
 
   const failed = getJob(db, job.id);

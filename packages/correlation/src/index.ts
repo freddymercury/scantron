@@ -9,3 +9,4 @@
 
 export * from "./config.ts";
 export * from "./candidates.ts";
+export * from "./scoring.ts";

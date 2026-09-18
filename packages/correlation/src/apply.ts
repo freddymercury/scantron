@@ -56,9 +56,9 @@ function createIncident(
 
   db.query(
     `INSERT INTO incidents (id, primary_type, title, agency_types, status, lat, lng, neighborhood,
-       location_display_name, first_observed_at, last_updated_at, units, confidence,
-       source_count, independent_source_count, verification_classification)
-     VALUES (?, ?, ?, ?, 'reported', ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, 'reported')
+       location_display_name, first_observed_at, last_observed_at, last_updated_at, units,
+       confidence, source_count, independent_source_count, verification_classification)
+     VALUES (?, ?, ?, ?, 'reported', ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, 'reported')
      ON CONFLICT (id) DO NOTHING`,
   ).run(
     id,
@@ -69,6 +69,7 @@ function createIncident(
     observation.lng ?? null,
     observation.neighborhood ?? null,
     observation.locationCanonical ?? null,
+    observation.occurredAt.toISOString(),
     observation.occurredAt.toISOString(),
     now.toISOString(),
     JSON.stringify(observation.units ?? []),
@@ -85,9 +86,10 @@ function updateIncident(
   now: Date,
 ): void {
   const row = db
-    .query<{ units: string; agency_types: string; first_observed_at: string }, [string]>(
-      "SELECT units, agency_types, first_observed_at FROM incidents WHERE id = ?",
-    )
+    .query<
+      { units: string; agency_types: string; first_observed_at: string; last_observed_at: string | null },
+      [string]
+    >("SELECT units, agency_types, first_observed_at, last_observed_at FROM incidents WHERE id = ?")
     .get(incidentId);
   if (!row) return;
 
@@ -119,9 +121,15 @@ function updateIncident(
     )
     .get(incidentId);
 
+  // The activity span grows with the *reported* times on both ends.
+  const lastObserved =
+    observation.occurredAt.toISOString() > (row.last_observed_at ?? row.first_observed_at)
+      ? observation.occurredAt.toISOString()
+      : (row.last_observed_at ?? row.first_observed_at);
+
   db.query(
     `UPDATE incidents
-        SET units = ?, agency_types = ?, first_observed_at = ?, last_updated_at = ?,
+        SET units = ?, agency_types = ?, first_observed_at = ?, last_observed_at = ?, last_updated_at = ?,
             source_count = (SELECT count(*) FROM incident_observations WHERE incident_id = ?),
             independent_source_count = ?,
             verification_classification = CASE WHEN ? >= 2 THEN 'multi-source' ELSE verification_classification END
@@ -130,6 +138,7 @@ function updateIncident(
     JSON.stringify([...units].sort()),
     JSON.stringify([...agencies].sort()),
     firstObserved,
+    lastObserved,
     now.toISOString(),
     incidentId,
     sources?.n ?? 1,

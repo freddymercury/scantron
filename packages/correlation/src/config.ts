@@ -33,8 +33,13 @@ export interface CorrelationConfig {
 
 export const DEFAULT_CORRELATION_CONFIG: CorrelationConfig = {
   radiusMeters: 400,
-  windowBackMinutes: 15,
-  windowForwardMinutes: 10,
+  // 25 rather than 15, chosen against the labelled set: it recovers 6 of 13 missed merges
+  // with no loss of precision, and it caps a merge at roughly an 8-minute lag between
+  // agencies, which is what a police call summoning a medic actually looks like. 40 would
+  // recover two more, but would merge pairs up to 13 minutes apart on location and type
+  // alone, and the only evidence those are one event is our own labelling.
+  windowBackMinutes: 25,
+  windowForwardMinutes: 15,
   resolvedGraceMinutes: 20,
   candidateWarnThreshold: 50,
   maxCandidates: 200,

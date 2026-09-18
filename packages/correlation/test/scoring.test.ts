@@ -35,6 +35,7 @@ const candidate = (overrides: Partial<IncidentCandidate> = {}): IncidentCandidat
   neighborhood: "Bayview Hunters Point",
   locationDisplayName: "Earl St & Gilman Ave",
   firstObservedAt: AT.toISOString(),
+  lastObservedAt: AT.toISOString(),
   lastUpdatedAt: AT.toISOString(),
   resolvedAt: null,
   units: [],
@@ -97,7 +98,7 @@ test("time decays by distance to the incident's span, equally in both directions
   // were processed in, which is not a property of the world — and publication lag (median
   // 36.7 min, p90 128) means arrival order says little about what happened first.
   expect(fiveAfter.score).toBeCloseTo(fiveBefore.score as number, 6);
-  expect(fiveAfter.score).toBeCloseTo(1 - 5 / 15, 3);
+  expect(fiveAfter.score).toBeCloseTo(1 - 5 / 25, 3);
   expect(fiveAfter.reason).toContain("after");
   expect(fiveBefore.reason).toContain("before");
 });
@@ -105,7 +106,7 @@ test("time decays by distance to the incident's span, equally in both directions
 test("an observation inside an incident's activity window scores 1", () => {
   const ongoing = candidate({
     firstObservedAt: new Date(AT.getTime() - 10 * 60_000).toISOString(),
-    lastUpdatedAt: new Date(AT.getTime() + 10 * 60_000).toISOString(),
+    lastObservedAt: new Date(AT.getTime() + 10 * 60_000).toISOString(),
   });
   expect(timeScore(observation(), ongoing).score).toBe(1);
   expect(timeScore(observation(), ongoing).reason).toContain("within");

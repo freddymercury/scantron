@@ -68,6 +68,7 @@ for (const row of rows) {
     ...(row.lng === null ? {} : { lng: row.lng }),
     ...(row.neighborhood === null ? {} : { neighborhood: row.neighborhood }),
     ...(row.type === null ? {} : { type: row.type }),
+    ...(row.subtype === null ? {} : { rawType: row.subtype }),
     ...(row.units === null ? {} : { units: JSON.parse(row.units) as string[] }),
     ...(row.location_normalized === null ? {} : { locationCanonical: row.location_normalized }),
   };

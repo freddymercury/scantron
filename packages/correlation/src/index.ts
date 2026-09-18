@@ -12,3 +12,4 @@ export * from "./candidates.ts";
 export * from "./scoring.ts";
 export * from "./decide.ts";
 export * from "./apply.ts";
+export * from "./evaluate.ts";

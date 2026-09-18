@@ -135,7 +135,7 @@ test("a call far enough away in time creates its own incident", () => {
     id: "obs_later",
     type: "disturbance",
     units: ["3A99"],
-    occurredAt: new Date(AT.getTime() + 9 * 60_000),
+    occurredAt: new Date(AT.getTime() + 20 * 60_000),
   });
   store(db, later);
 
@@ -190,6 +190,7 @@ test("ties break deterministically, so a replay makes the same incidents", () =>
       neighborhood: "Bayview Hunters Point",
       locationDisplayName: "Earl St & Gilman Ave",
       firstObservedAt,
+      lastObservedAt: firstObservedAt,
       lastUpdatedAt: firstObservedAt,
       resolvedAt: null,
       units: [],
@@ -255,7 +256,7 @@ test("decide() reports what it considered even when it creates", () => {
   applyDecision(db, { observation: police() });
 
   const result = decide(db, {
-    observation: police({ id: "obs_other", type: "theft", occurredAt: new Date(AT.getTime() + 9 * 60_000) }),
+    observation: police({ id: "obs_other", type: "theft", occurredAt: new Date(AT.getTime() + 20 * 60_000) }),
   });
   expect(result.decision).toBe("created");
   // The best candidate is still reported, so a near miss is visible in the log.

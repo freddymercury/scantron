@@ -171,17 +171,24 @@ Three consequences:
 
 ## 9. Correlation works, and reduces almost nothing ⚠️ the central hypothesis, measured
 
-First run of the real correlator over 24 hours of live data, 2026-09-18:
+First run of the real correlator over 24 hours of live data, 2026-09-18, after the
+evaluation harness (S-D10) corrected three faults in it:
 
 ```
-observations   2,130
-incidents      2,061
-reduction        3.2%
-merged             69
-probable          166   (logged, not merged)
-cross-agency       25 incidents
-multi-source       65 incidents  (60 with two observations, 2 with three, 1 with four)
+observations   2,137
+incidents      2,067
+reduction        3.3%
+merged             70
+probable          128   (logged, not merged)
+cross-agency       30 incidents
+multi-source       60 incidents
 ```
+
+An earlier run reported 4.5% — that number was inflated by a bug the harness found, in
+which an incident's *activity span* was taken from the row's last-modified time rather than
+the last time the event was reported, so every incident looked as though it were still
+happening now and time scored a perfect 1.0 against it. The corrected number is lower. It
+is also the real one.
 
 The merges it does make are right. Verified by eye across the cross-agency ones:
 
@@ -192,7 +199,7 @@ The merges it does make are right. Verified by eye across the cross-agency ones:
 23:57:54  sf_ems_cad   Medical Incident    → assault    @ 6th St & Natoma St         0.886
 ```
 
-**But 96.8% of observations still become their own incident**, which is what docs/05
+**But 96.7% of observations still become their own incident**, which is what docs/05
 warned about: with police and fire CAD alone there is little cross-agency overlap to
 exploit. The signal reduction that justifies the product (PRD §54) is not there yet.
 

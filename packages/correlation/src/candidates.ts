@@ -22,6 +22,8 @@ export interface CandidateObservation {
   lng?: number | undefined;
   neighborhood?: string | undefined;
   type?: string | undefined;
+  /** The agency's own code, for the code-level affinity overrides in scoring. */
+  rawType?: string | undefined;
   units?: string[] | undefined;
   locationCanonical?: string | undefined;
 }
@@ -29,12 +31,16 @@ export interface CandidateObservation {
 export interface IncidentCandidate {
   id: string;
   primaryType: string;
+  /** The code of the observation that opened the incident, when it had one. */
+  rawType?: string | null;
   status: string;
   lat: number | null;
   lng: number | null;
   neighborhood: string | null;
   locationDisplayName: string | null;
   firstObservedAt: string;
+  /** When the event was last *reported*, which is not when we last touched the row. */
+  lastObservedAt: string;
   lastUpdatedAt: string;
   resolvedAt: string | null;
   units: string[];
@@ -61,12 +67,14 @@ export interface CandidateResult {
 interface IncidentRow {
   id: string;
   primary_type: string;
+  raw_type: string | null;
   status: string;
   lat: number | null;
   lng: number | null;
   neighborhood: string | null;
   location_display_name: string | null;
   first_observed_at: string;
+  last_observed_at: string | null;
   last_updated_at: string;
   resolved_at: string | null;
   units: string;
@@ -77,12 +85,14 @@ function toCandidate(row: IncidentRow, matchedBy: IncidentCandidate["matchedBy"]
   return {
     id: row.id,
     primaryType: row.primary_type,
+    rawType: row.raw_type,
     status: row.status,
     lat: row.lat,
     lng: row.lng,
     neighborhood: row.neighborhood,
     locationDisplayName: row.location_display_name,
     firstObservedAt: row.first_observed_at,
+    lastObservedAt: row.last_observed_at ?? row.first_observed_at,
     lastUpdatedAt: row.last_updated_at,
     resolvedAt: row.resolved_at,
     units: JSON.parse(row.units) as string[],
@@ -92,7 +102,11 @@ function toCandidate(row: IncidentRow, matchedBy: IncidentCandidate["matchedBy"]
 }
 
 const COLUMNS =
-  "id, primary_type, status, lat, lng, neighborhood, location_display_name, first_observed_at, last_updated_at, resolved_at, units, agency_types";
+  `id, primary_type, status, lat, lng, neighborhood, location_display_name, first_observed_at,
+   last_observed_at, last_updated_at, resolved_at, units, agency_types,
+   (SELECT o.raw_type FROM incident_observations io
+      JOIN observations o ON o.id = io.observation_id
+     WHERE io.incident_id = incidents.id ORDER BY io.attached_at LIMIT 1) AS raw_type`;
 
 /**
  * Eligibility, stated once: never a tombstone, and a resolved incident only inside its

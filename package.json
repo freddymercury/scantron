@@ -21,6 +21,8 @@
     "backfill": "bun run scripts/backfill.ts",
     "renormalize": "bun run scripts/renormalize.ts",
     "replay:correlation": "bun run scripts/correlate-replay.ts",
+    "fixtures:correlation": "bun run scripts/build-correlation-fixtures.ts",
+    "eval:correlation": "bun run scripts/eval-correlation.ts",
     "report:geocoding": "bun run scripts/geocode-report.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "bun test",

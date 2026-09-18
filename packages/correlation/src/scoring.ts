@@ -120,7 +120,7 @@ export interface TimeOptions {
   toleranceMinutes: number;
 }
 
-export const DEFAULT_TIME_OPTIONS: TimeOptions = { toleranceMinutes: 15 };
+export const DEFAULT_TIME_OPTIONS: TimeOptions = { toleranceMinutes: 25 };
 
 /**
  * Distance to the incident's activity span, in both directions equally.
@@ -144,7 +144,9 @@ export function timeScore(
   options: TimeOptions = DEFAULT_TIME_OPTIONS,
 ): FeatureScore {
   const start = Date.parse(candidate.firstObservedAt);
-  const end = Math.max(start, Date.parse(candidate.lastUpdatedAt));
+  // The *reported* span, not the row's mtime: using our processing time here made every
+  // incident look as though it were still happening right now.
+  const end = Math.max(start, Date.parse(candidate.lastObservedAt));
   const at = observation.occurredAt.getTime();
 
   if (at >= start && at <= end) {
@@ -172,17 +174,48 @@ export const TYPE_AFFINITY: Readonly<Record<string, Readonly<Record<string, numb
   assault: { medical: 0.8, weapon: 0.75, disturbance: 0.5 },
   weapon: { assault: 0.75, medical: 0.7, police_activity: 0.3 },
   fire: { medical: 0.7, hazard: 0.6, rescue: 0.6 },
-  medical: { assault: 0.8, collision: 0.85, fire: 0.7, rescue: 0.6, weapon: 0.7, public_safety: 0.3 },
+  // disturbance and public_safety sit higher than they look like they should because the
+  // dispatch patterns are real and the harness measured them: a fight call gets a medic, a
+  // welfare check becomes a medical call. At 0.3 these pairs missed the threshold in 7 of
+  // 139 labelled cases; at these values they merge and precision stays at 1.000.
+  medical: {
+    assault: 0.8,
+    collision: 0.85,
+    fire: 0.7,
+    rescue: 0.6,
+    weapon: 0.7,
+    disturbance: 0.6,
+    public_safety: 0.55,
+  },
   rescue: { fire: 0.6, medical: 0.6, collision: 0.6, hazard: 0.5 },
   hazard: { fire: 0.6, rescue: 0.5, traffic: 0.3 },
   traffic: { collision: 0.7, hazard: 0.3 },
   robbery: { assault: 0.6, weapon: 0.5, theft: 0.5, medical: 0.4 },
   burglary: { theft: 0.6, police_activity: 0.3 },
   theft: { burglary: 0.6, robbery: 0.5 },
-  disturbance: { assault: 0.5, public_safety: 0.4, police_activity: 0.3 },
-  public_safety: { disturbance: 0.4, medical: 0.3, police_activity: 0.3 },
+  disturbance: { assault: 0.5, medical: 0.6, public_safety: 0.4, police_activity: 0.3 },
+  public_safety: { disturbance: 0.4, medical: 0.55, police_activity: 0.3 },
   police_activity: { public_safety: 0.3, disturbance: 0.3 },
   missing_person: { public_safety: 0.4 },
+};
+
+/**
+ * Overrides keyed by the agency's own code, for pairs where the product taxonomy is too
+ * coarse to decide.
+ *
+ * PRD §10 keeps the type list deliberately broad, which puts `FIGHT NO WEAPON` and
+ * `VANDALISM` both in `disturbance` — and only one of them brings an ambulance. Raising
+ * disturbance↔medical to catch the fights merged the vandalism calls too: 3 false merges in
+ * 139 labelled cases, all of them "VANDALISM + Medical Incident at the same corner".
+ *
+ * Each entry here is a measured correction, not a hunch, and the raw code is exactly what
+ * PRD §10 says to keep for this purpose.
+ */
+export const CODE_AFFINITY_OVERRIDES: Readonly<Record<string, Readonly<Record<string, number>>>> = {
+  // Property damage does not summon a medic; the medical call at that corner is a
+  // different event.
+  "594": { medical: 0 },
+  "595": { medical: 0 },
 };
 
 export function typeScore(
@@ -197,6 +230,17 @@ export function typeScore(
   // `unknown` is the absence of a classification, not a type that disagrees with others.
   if (a === "unknown" || b === "unknown") {
     return { applicable: false, reason: "one side is unclassified" };
+  }
+
+  const override =
+    (observation.rawType ? CODE_AFFINITY_OVERRIDES[observation.rawType]?.[b] : undefined) ??
+    (candidate.rawType ? CODE_AFFINITY_OVERRIDES[candidate.rawType]?.[a] : undefined);
+  if (override !== undefined) {
+    return {
+      score: override,
+      applicable: true,
+      reason: `code ${observation.rawType ?? candidate.rawType} ↔ ${override === 0 ? b : a}: ${override.toFixed(2)} (code-level override)`,
+    };
   }
 
   const affinity = TYPE_AFFINITY[a]?.[b] ?? TYPE_AFFINITY[b]?.[a] ?? 0;

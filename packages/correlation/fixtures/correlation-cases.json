@@ -1,0 +1,5811 @@
+{
+ "version": "2026-09-18",
+ "generatedAt": "2026-09-18T21:20:42.797Z",
+ "note": "Real observations from live SF dispatch feeds. `agency_call_number` cases are ground truth — one SFFD call dispatched to two unit types. `hand` cases are a reviewer's judgement of the pair shape, and lean partly on type compatibility, which the scorer also uses; the eval reports the two label sources separately for that reason.",
+ "cases": [
+  {
+   "id": "key_1",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262610180 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262610180",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T08:49:08.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.761747152,
+     "lng": -122.475924093,
+     "neighborhood": "Inner Sunset",
+     "locationCanonical": "18th Ave & Judah St",
+     "units": [
+      "B05",
+      "B08",
+      "B09",
+      "E22",
+      "RS1",
+      "T12"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262610180",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T08:49:08.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.761747152,
+     "lng": -122.475924093,
+     "neighborhood": "Inner Sunset",
+     "locationCanonical": "18th Ave & Judah St",
+     "units": [
+      "AM118",
+      "M502",
+      "RC2"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_2",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262610150 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262610150",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T08:31:02.000Z",
+     "type": "fire",
+     "subtype": "Structure Fire / Smoke in Building",
+     "rawType": "Structure Fire / Smoke in Building",
+     "lat": 37.76407007,
+     "lng": -122.455781066,
+     "neighborhood": "Inner Sunset",
+     "locationCanonical": "Hill Point Ave & Parnassus Ave",
+     "units": [
+      "B05",
+      "B08",
+      "D2",
+      "E12",
+      "E22",
+      "E24",
+      "RS1",
+      "T06",
+      "T12"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262610150",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T08:31:02.000Z",
+     "type": "fire",
+     "subtype": "Structure Fire / Smoke in Building",
+     "rawType": "Structure Fire / Smoke in Building",
+     "lat": 37.76407007,
+     "lng": -122.455781066,
+     "neighborhood": "Inner Sunset",
+     "locationCanonical": "Hill Point Ave & Parnassus Ave",
+     "units": [
+      "M502"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_3",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262610019 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262610019",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T07:05:42.000Z",
+     "type": "fire",
+     "subtype": "Structure Fire / Smoke in Building",
+     "rawType": "Structure Fire / Smoke in Building",
+     "lat": 37.771877742,
+     "lng": -122.447312421,
+     "neighborhood": "Haight Ashbury",
+     "locationCanonical": "Ashbury St & Oak St",
+     "units": [
+      "B02",
+      "B05",
+      "D2",
+      "E10",
+      "E12",
+      "E21",
+      "RS1",
+      "T10",
+      "T12"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262610019",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T07:05:42.000Z",
+     "type": "fire",
+     "subtype": "Structure Fire / Smoke in Building",
+     "rawType": "Structure Fire / Smoke in Building",
+     "lat": 37.771877742,
+     "lng": -122.447312421,
+     "neighborhood": "Haight Ashbury",
+     "locationCanonical": "Ashbury St & Oak St",
+     "units": [
+      "M550"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_4",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262603728 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262603728",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T05:39:22.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.752310758,
+     "lng": -122.396513496,
+     "neighborhood": "Potrero Hill",
+     "locationCanonical": "25th St & Connecticut St",
+     "units": [
+      "E29",
+      "E37"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262603728",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T05:39:22.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.752310758,
+     "lng": -122.396513496,
+     "neighborhood": "Potrero Hill",
+     "locationCanonical": "25th St & Connecticut St",
+     "units": [
+      "M508"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_5",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262603400 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262603400",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T03:38:07.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.776332977,
+     "lng": -122.394035066,
+     "neighborhood": "Mission Bay",
+     "locationCanonical": "4th St & King St",
+     "units": [
+      "E08"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262603400",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T03:38:07.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.776332977,
+     "lng": -122.394035066,
+     "neighborhood": "Mission Bay",
+     "locationCanonical": "4th St & King St",
+     "units": [
+      "M516"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_6",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262603316 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262603316",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T03:01:44.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.751726209,
+     "lng": -122.406219414,
+     "neighborhood": "Mission",
+     "locationCanonical": "25th St & Potrero Ave",
+     "units": [
+      "E09"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262603316",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T03:01:44.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.751726209,
+     "lng": -122.406219414,
+     "neighborhood": "Mission",
+     "locationCanonical": "25th St & Potrero Ave",
+     "units": [
+      "M562"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_7",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262603092 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262603092",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T01:40:55.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.783692642,
+     "lng": -122.392840048,
+     "neighborhood": "Financial District/South Beach",
+     "locationCanonical": "Bryant St & Sterling St",
+     "units": [
+      "E08"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262603092",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T01:40:55.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.783692642,
+     "lng": -122.392840048,
+     "neighborhood": "Financial District/South Beach",
+     "locationCanonical": "Bryant St & Sterling St",
+     "units": [
+      "M516"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_8",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262603045 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262603045",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T01:22:46.000Z",
+     "type": "fire",
+     "subtype": "Structure Fire / Smoke in Building",
+     "rawType": "Structure Fire / Smoke in Building",
+     "lat": 37.737648905,
+     "lng": -122.47096273,
+     "neighborhood": "West of Twin Peaks",
+     "locationCanonical": "15th Ave & Wawona St",
+     "units": [
+      "B08",
+      "B09",
+      "D3",
+      "E19",
+      "E20",
+      "E39",
+      "E40",
+      "RS2",
+      "T15",
+      "T18",
+      "T19"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262603045",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T01:22:46.000Z",
+     "type": "fire",
+     "subtype": "Structure Fire / Smoke in Building",
+     "rawType": "Structure Fire / Smoke in Building",
+     "lat": 37.737648905,
+     "lng": -122.47096273,
+     "neighborhood": "West of Twin Peaks",
+     "locationCanonical": "15th Ave & Wawona St",
+     "units": [
+      "M509"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_9",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262602952 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262602952",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T01:03:05.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.772227493,
+     "lng": -122.491688045,
+     "neighborhood": "Outer Richmond",
+     "locationCanonical": "32nd Ave & Fulton St",
+     "units": [
+      "E14"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262602952",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T01:03:05.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.772227493,
+     "lng": -122.491688045,
+     "neighborhood": "Outer Richmond",
+     "locationCanonical": "32nd Ave & Fulton St",
+     "units": [
+      "M567"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_10",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262602936 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262602936",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T00:56:09.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.796036484,
+     "lng": -122.443761324,
+     "neighborhood": "Marina",
+     "locationCanonical": "Broderick St & Union St",
+     "units": [
+      "B05",
+      "E16",
+      "T16"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262602936",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T00:56:09.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.796036484,
+     "lng": -122.443761324,
+     "neighborhood": "Marina",
+     "locationCanonical": "Broderick St & Union St",
+     "units": [
+      "M573"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_11",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262602919 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262602919",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T00:54:36.000Z",
+     "type": "public_safety",
+     "subtype": "Citizen Assist / Service Call",
+     "rawType": "Citizen Assist / Service Call",
+     "lat": 37.759559129,
+     "lng": -122.404010603,
+     "neighborhood": "Potrero Hill",
+     "locationCanonical": "20th St & Vermont St",
+     "units": [
+      "T07"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262602919",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T00:54:36.000Z",
+     "type": "public_safety",
+     "subtype": "Citizen Assist / Service Call",
+     "rawType": "Citizen Assist / Service Call",
+     "lat": 37.759559129,
+     "lng": -122.404010603,
+     "neighborhood": "Potrero Hill",
+     "locationCanonical": "20th St & Vermont St",
+     "units": [
+      "AM114"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_12",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262602855 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262602855",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T00:37:09.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.786223777,
+     "lng": -122.38963664,
+     "neighborhood": "Financial District/South Beach",
+     "locationCanonical": "Beale St & Bryant St & Delancey St",
+     "units": [
+      "E35",
+      "QRV1"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262602855",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T00:37:09.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.786223777,
+     "lng": -122.38963664,
+     "neighborhood": "Financial District/South Beach",
+     "locationCanonical": "Beale St & Bryant St & Delancey St",
+     "units": [
+      "M521"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_13",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262602816 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262602816",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T00:29:15.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.750628344,
+     "lng": -122.431793997,
+     "neighborhood": "Noe Valley",
+     "locationCanonical": "Jersey St & Noe St",
+     "units": [
+      "E11"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262602816",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T00:29:15.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.750628344,
+     "lng": -122.431793997,
+     "neighborhood": "Noe Valley",
+     "locationCanonical": "Jersey St & Noe St",
+     "units": [
+      "M564"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_14",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262602777 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262602777",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T00:16:05.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.80634343,
+     "lng": -122.41543157,
+     "neighborhood": "North Beach",
+     "locationCanonical": "North Point St & Taylor St",
+     "units": [
+      "E28"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262602777",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T00:16:05.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.80634343,
+     "lng": -122.41543157,
+     "neighborhood": "North Beach",
+     "locationCanonical": "North Point St & Taylor St",
+     "units": [
+      "KM102"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_15",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262602664 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262602664",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T23:48:39.000Z",
+     "type": "rescue",
+     "subtype": "Water Rescue",
+     "rawType": "Water Rescue",
+     "lat": 37.790629627,
+     "lng": -122.483169097,
+     "neighborhood": "Presidio",
+     "locationCanonical": "Battery Chamberlin Rd & Gibson Rd",
+     "units": [
+      "B07",
+      "E14",
+      "E16",
+      "E34",
+      "E51",
+      "RB2",
+      "RS2",
+      "RWC1",
+      "RWC2",
+      "SR34",
+      "T14",
+      "T16"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262602664",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T23:48:39.000Z",
+     "type": "rescue",
+     "subtype": "Water Rescue",
+     "rawType": "Water Rescue",
+     "lat": 37.790629627,
+     "lng": -122.483169097,
+     "neighborhood": "Presidio",
+     "locationCanonical": "Battery Chamberlin Rd & Gibson Rd",
+     "units": [
+      "M517",
+      "RC1",
+      "RC2"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_16",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262602396 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262602396",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T22:38:50.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.765773606,
+     "lng": -122.426490698,
+     "neighborhood": "Castro/Upper Market",
+     "locationCanonical": "Alert Aly & Dolores St",
+     "units": [
+      "E06"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262602396",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T22:38:50.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.765773606,
+     "lng": -122.426490698,
+     "neighborhood": "Castro/Upper Market",
+     "locationCanonical": "Alert Aly & Dolores St",
+     "units": [
+      "AM106"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_17",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262602060 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262602060",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T21:00:55.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.735071656,
+     "lng": -122.411165809,
+     "neighborhood": "Bernal Heights",
+     "locationCanonical": "Crescent Ave & Putnam St",
+     "units": [
+      "E32"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262602060",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T21:00:55.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.735071656,
+     "lng": -122.411165809,
+     "neighborhood": "Bernal Heights",
+     "locationCanonical": "Crescent Ave & Putnam St",
+     "units": [
+      "M556"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_18",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262602018 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262602018",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T20:49:59.000Z",
+     "type": "fire",
+     "subtype": "Structure Fire / Smoke in Building",
+     "rawType": "Structure Fire / Smoke in Building",
+     "lat": 37.765183134,
+     "lng": -122.417486596,
+     "neighborhood": "Mission",
+     "locationCanonical": "16th St & South Van Ness Ave",
+     "units": [
+      "B02",
+      "B06",
+      "D3",
+      "E06",
+      "E07",
+      "E36",
+      "RS2",
+      "T06",
+      "T07"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262602018",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T20:49:59.000Z",
+     "type": "fire",
+     "subtype": "Structure Fire / Smoke in Building",
+     "rawType": "Structure Fire / Smoke in Building",
+     "lat": 37.765183134,
+     "lng": -122.417486596,
+     "neighborhood": "Mission",
+     "locationCanonical": "16th St & South Van Ness Ave",
+     "units": [
+      "M502"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_19",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262601982 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262601982",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T20:32:27.000Z",
+     "type": "unknown",
+     "subtype": "Other",
+     "rawType": "Other",
+     "lat": 37.78530684,
+     "lng": -122.403827439,
+     "neighborhood": "Financial District/South Beach",
+     "locationCanonical": "Fs Yb-bldg 213",
+     "units": [
+      "AM321",
+      "B03",
+      "DU1",
+      "E16",
+      "E35",
+      "E48",
+      "FB3",
+      "RB2",
+      "RWC1",
+      "RWC2",
+      "T16"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262601982",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T20:32:27.000Z",
+     "type": "unknown",
+     "subtype": "Other",
+     "rawType": "Other",
+     "lat": 37.78530684,
+     "lng": -122.403827439,
+     "neighborhood": "Financial District/South Beach",
+     "locationCanonical": "Fs Yb-bldg 213",
+     "units": [
+      "AM112",
+      "RB35"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_20",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262601618 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262601618",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T18:59:34.000Z",
+     "type": "fire",
+     "subtype": "Structure Fire / Smoke in Building",
+     "rawType": "Structure Fire / Smoke in Building",
+     "lat": 37.752204442,
+     "lng": -122.419017543,
+     "neighborhood": "Mission",
+     "locationCanonical": "24th St & Osage Aly",
+     "units": [
+      "B06",
+      "B10",
+      "D3",
+      "DU1",
+      "E07",
+      "E09",
+      "E32",
+      "MA1",
+      "RS2",
+      "T07",
+      "T11"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262601618",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T18:59:34.000Z",
+     "type": "fire",
+     "subtype": "Structure Fire / Smoke in Building",
+     "rawType": "Structure Fire / Smoke in Building",
+     "lat": 37.752204442,
+     "lng": -122.419017543,
+     "neighborhood": "Mission",
+     "locationCanonical": "24th St & Osage Aly",
+     "units": [
+      "M523",
+      "M556",
+      "RC3",
+      "RC4"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_21",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262601555 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262601555",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T18:46:04.000Z",
+     "type": "unknown",
+     "subtype": "Other",
+     "rawType": "Other",
+     "lat": 37.763559498,
+     "lng": -122.477174111,
+     "neighborhood": "Sunset/Parkside",
+     "locationCanonical": "19th Ave & Irving St",
+     "units": [
+      "SCRT6"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262601555",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T18:46:04.000Z",
+     "type": "unknown",
+     "subtype": "Other",
+     "rawType": "Other",
+     "lat": 37.763559498,
+     "lng": -122.477174111,
+     "neighborhood": "Sunset/Parkside",
+     "locationCanonical": "19th Ave & Irving St",
+     "units": [
+      "M587"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_22",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262601030 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262601030",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T16:29:55.000Z",
+     "type": "public_safety",
+     "subtype": "Citizen Assist / Service Call",
+     "rawType": "Citizen Assist / Service Call",
+     "lat": 37.762579649,
+     "lng": -122.396526826,
+     "neighborhood": "Potrero Hill",
+     "locationCanonical": "18th St & Missouri St",
+     "units": [
+      "E37"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262601030",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T16:29:55.000Z",
+     "type": "public_safety",
+     "subtype": "Citizen Assist / Service Call",
+     "rawType": "Citizen Assist / Service Call",
+     "lat": 37.762579649,
+     "lng": -122.396526826,
+     "neighborhood": "Potrero Hill",
+     "locationCanonical": "18th St & Missouri St",
+     "units": [
+      "M568"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_23",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262600430 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262600430",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T13:08:34.000Z",
+     "type": "rescue",
+     "subtype": "Water Rescue",
+     "rawType": "Water Rescue",
+     "lat": 37.806658199,
+     "lng": -122.474716621,
+     "neighborhood": "Presidio",
+     "locationCanonical": "US Hwy 101 Nb Or Sb In Presidio",
+     "units": [
+      "B07",
+      "DU1",
+      "E08",
+      "E16",
+      "E51",
+      "FB3",
+      "RB2",
+      "RS1",
+      "T14",
+      "T16"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262600430",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T13:08:34.000Z",
+     "type": "rescue",
+     "subtype": "Water Rescue",
+     "rawType": "Water Rescue",
+     "lat": 37.806658199,
+     "lng": -122.474716621,
+     "neighborhood": "Presidio",
+     "locationCanonical": "US Hwy 101 Nb Or Sb In Presidio",
+     "units": [
+      "M511",
+      "RC2"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_24",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262600213 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262600213",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T09:33:13.000Z",
+     "type": "public_safety",
+     "subtype": "Citizen Assist / Service Call",
+     "rawType": "Citizen Assist / Service Call",
+     "lat": 37.782558383,
+     "lng": -122.438452306,
+     "neighborhood": "Western Addition",
+     "locationCanonical": "Beideman St & O'Farrell St",
+     "units": [
+      "T05"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262600213",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T09:33:13.000Z",
+     "type": "public_safety",
+     "subtype": "Citizen Assist / Service Call",
+     "rawType": "Citizen Assist / Service Call",
+     "lat": 37.782558383,
+     "lng": -122.438452306,
+     "neighborhood": "Western Addition",
+     "locationCanonical": "Beideman St & O'Farrell St",
+     "units": [
+      "KM107"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_25",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262600155 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262600155",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T08:50:33.000Z",
+     "type": "unknown",
+     "subtype": "Other",
+     "rawType": "Other",
+     "lat": 37.79963393,
+     "lng": -122.437694705,
+     "neighborhood": "Marina",
+     "locationCanonical": "Lombard St & Steiner St",
+     "units": [
+      "B04",
+      "E16",
+      "E38",
+      "RS1",
+      "T05",
+      "T16"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262600155",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T08:50:33.000Z",
+     "type": "unknown",
+     "subtype": "Other",
+     "rawType": "Other",
+     "lat": 37.79963393,
+     "lng": -122.437694705,
+     "neighborhood": "Marina",
+     "locationCanonical": "Lombard St & Steiner St",
+     "units": [
+      "M562",
+      "RC1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_26",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262600120 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262600120",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T08:13:31.000Z",
+     "type": "fire",
+     "subtype": "Structure Fire / Smoke in Building",
+     "rawType": "Structure Fire / Smoke in Building",
+     "lat": 37.796316514,
+     "lng": -122.415094279,
+     "neighborhood": "Nob Hill",
+     "locationCanonical": "Bernard St & Jones St",
+     "units": [
+      "B01",
+      "B04",
+      "D2",
+      "E02",
+      "E28",
+      "E41",
+      "RS1",
+      "T02",
+      "T13"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262600120",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T08:13:31.000Z",
+     "type": "fire",
+     "subtype": "Structure Fire / Smoke in Building",
+     "rawType": "Structure Fire / Smoke in Building",
+     "lat": 37.796316514,
+     "lng": -122.415094279,
+     "neighborhood": "Nob Hill",
+     "locationCanonical": "Bernard St & Jones St",
+     "units": [
+      "M563"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_27",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262600070 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262600070",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T07:44:13.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.776717704,
+     "lng": -122.41532057,
+     "neighborhood": "South of Market",
+     "locationCanonical": "9th St & Jessie St",
+     "units": [
+      "E36"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262600070",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T07:44:13.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.776717704,
+     "lng": -122.41532057,
+     "neighborhood": "South of Market",
+     "locationCanonical": "9th St & Jessie St",
+     "units": [
+      "M517"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_28",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262593998 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262593998",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T06:22:52.000Z",
+     "type": "public_safety",
+     "subtype": "Citizen Assist / Service Call",
+     "rawType": "Citizen Assist / Service Call",
+     "lat": 37.753569181,
+     "lng": -122.423028464,
+     "neighborhood": "Mission",
+     "locationCanonical": "23rd St & Guerrero St",
+     "units": [
+      "E11",
+      "T11"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262593998",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T06:22:52.000Z",
+     "type": "public_safety",
+     "subtype": "Citizen Assist / Service Call",
+     "rawType": "Citizen Assist / Service Call",
+     "lat": 37.753569181,
+     "lng": -122.423028464,
+     "neighborhood": "Mission",
+     "locationCanonical": "23rd St & Guerrero St",
+     "units": [
+      "M552"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_29",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262593734 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262593734",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T04:46:01.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.76485895,
+     "lng": -122.422853414,
+     "neighborhood": "Mission",
+     "locationCanonical": "16th St & Albion St",
+     "units": [
+      "E06"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262593734",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T04:46:01.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.76485895,
+     "lng": -122.422853414,
+     "neighborhood": "Mission",
+     "locationCanonical": "16th St & Albion St",
+     "units": [
+      "M547"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_30",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262593664 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262593664",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T04:19:33.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.770709189,
+     "lng": -122.430167376,
+     "neighborhood": "Hayes Valley",
+     "locationCanonical": "Fillmore St & Germania St",
+     "units": [
+      "B05",
+      "E06",
+      "T06"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262593664",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T04:19:33.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.770709189,
+     "lng": -122.430167376,
+     "neighborhood": "Hayes Valley",
+     "locationCanonical": "Fillmore St & Germania St",
+     "units": [
+      "M580"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_31",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262593044 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262593044",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T00:59:58.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.768770499,
+     "lng": -122.427462058,
+     "neighborhood": "Castro/Upper Market",
+     "locationCanonical": "Market St & Reservoir St",
+     "units": [
+      "E06"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262593044",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T00:59:58.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.768770499,
+     "lng": -122.427462058,
+     "neighborhood": "Castro/Upper Market",
+     "locationCanonical": "Market St & Reservoir St",
+     "units": [
+      "KM113"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_32",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262593005 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262593005",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T00:51:36.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.782230575,
+     "lng": -122.410292027,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Golden Gate Ave & Market St & Taylor St",
+     "units": [
+      "E01"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262593005",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T00:51:36.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.782230575,
+     "lng": -122.410292027,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Golden Gate Ave & Market St & Taylor St",
+     "units": [
+      "M575"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_33",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262592820 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262592820",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T00:08:26.000Z",
+     "type": "rescue",
+     "subtype": "Water Rescue",
+     "rawType": "Water Rescue",
+     "lat": 37.806630836,
+     "lng": -122.473746651,
+     "neighborhood": "Presidio",
+     "locationCanonical": "Hoffman St & Lincoln Blvd",
+     "units": [
+      "B07",
+      "E16",
+      "E51",
+      "EMS2",
+      "RB2",
+      "RS1",
+      "RWC1",
+      "RWC2",
+      "T14",
+      "T16"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262592820",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T00:08:26.000Z",
+     "type": "rescue",
+     "subtype": "Water Rescue",
+     "rawType": "Water Rescue",
+     "lat": 37.806630836,
+     "lng": -122.473746651,
+     "neighborhood": "Presidio",
+     "locationCanonical": "Hoffman St & Lincoln Blvd",
+     "units": [
+      "M580",
+      "RB35",
+      "RC1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_34",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262592780 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262592780",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-16T23:58:34.000Z",
+     "type": "unknown",
+     "subtype": "Other",
+     "rawType": "Other",
+     "lat": 37.755295517,
+     "lng": -122.493677706,
+     "neighborhood": "Sunset/Parkside",
+     "locationCanonical": "35th Ave & Moraga St",
+     "units": [
+      "E18"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262592780",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T23:58:34.000Z",
+     "type": "unknown",
+     "subtype": "Other",
+     "rawType": "Other",
+     "lat": 37.755295517,
+     "lng": -122.493677706,
+     "neighborhood": "Sunset/Parkside",
+     "locationCanonical": "35th Ave & Moraga St",
+     "units": [
+      "RC2"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_35",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262592707 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262592707",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-16T23:42:14.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.790833235,
+     "lng": -122.410998024,
+     "neighborhood": "Nob Hill",
+     "locationCanonical": "Pine St & Vine Ter",
+     "units": [
+      "E41"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262592707",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T23:42:14.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.790833235,
+     "lng": -122.410998024,
+     "neighborhood": "Nob Hill",
+     "locationCanonical": "Pine St & Vine Ter",
+     "units": [
+      "M587"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_36",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262592587 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262592587",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-16T23:10:42.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.753902052,
+     "lng": -122.417505901,
+     "neighborhood": "Mission",
+     "locationCanonical": "23rd St & Capp St",
+     "units": [
+      "E07"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262592587",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T23:10:42.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.753902052,
+     "lng": -122.417505901,
+     "neighborhood": "Mission",
+     "locationCanonical": "23rd St & Capp St",
+     "units": [
+      "M517"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_37",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262592563 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262592563",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-16T23:00:09.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.750580762,
+     "lng": -122.402183518,
+     "neighborhood": "Bayview Hunters Point",
+     "locationCanonical": "26th St & Kansas St",
+     "units": [
+      "E09"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262592563",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T23:00:09.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.750580762,
+     "lng": -122.402183518,
+     "neighborhood": "Bayview Hunters Point",
+     "locationCanonical": "26th St & Kansas St",
+     "units": [
+      "M566"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_38",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262592524 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262592524",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-16T22:50:41.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.783091403,
+     "lng": -122.406023809,
+     "neighborhood": "South of Market",
+     "locationCanonical": "Jessie West St & Mission St",
+     "units": [
+      "E01"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262592524",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T22:50:41.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.783091403,
+     "lng": -122.406023809,
+     "neighborhood": "South of Market",
+     "locationCanonical": "Jessie West St & Mission St",
+     "units": [
+      "M524"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_39",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262592413 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262592413",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-16T22:28:04.000Z",
+     "type": "fire",
+     "subtype": "Structure Fire / Smoke in Building",
+     "rawType": "Structure Fire / Smoke in Building",
+     "lat": 37.70967877,
+     "lng": -122.453887581,
+     "neighborhood": "Outer Mission",
+     "locationCanonical": "Sears St & Sickles Ave",
+     "units": [
+      "B08",
+      "B09",
+      "D3",
+      "E15",
+      "E19",
+      "E33",
+      "RS2",
+      "T15",
+      "T19"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262592413",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T22:28:04.000Z",
+     "type": "fire",
+     "subtype": "Structure Fire / Smoke in Building",
+     "rawType": "Structure Fire / Smoke in Building",
+     "lat": 37.70967877,
+     "lng": -122.453887581,
+     "neighborhood": "Outer Mission",
+     "locationCanonical": "Sears St & Sickles Ave",
+     "units": [
+      "M559"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_40",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262592157 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262592157",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-16T21:22:24.000Z",
+     "type": "rescue",
+     "subtype": "Elevator / Escalator Rescue",
+     "rawType": "Elevator / Escalator Rescue",
+     "lat": 37.761954408,
+     "lng": -122.430650177,
+     "neighborhood": "Castro/Upper Market",
+     "locationCanonical": "Ford St & Sanchez St",
+     "units": [
+      "T06"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262592157",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T21:22:24.000Z",
+     "type": "rescue",
+     "subtype": "Elevator / Escalator Rescue",
+     "rawType": "Elevator / Escalator Rescue",
+     "lat": 37.761954408,
+     "lng": -122.430650177,
+     "neighborhood": "Castro/Upper Market",
+     "locationCanonical": "Ford St & Sanchez St",
+     "units": [
+      "M552"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_41",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262592035 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262592035",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-16T20:48:59.000Z",
+     "type": "hazard",
+     "subtype": "Gas Leak (Natural and LP Gases)",
+     "rawType": "Gas Leak (Natural and LP Gases)",
+     "lat": 37.75446562,
+     "lng": -122.421476521,
+     "neighborhood": "Mission",
+     "locationCanonical": "Alvarado St & San Jose Ave",
+     "units": [
+      "B06",
+      "E11",
+      "T11"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262592035",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T20:48:59.000Z",
+     "type": "hazard",
+     "subtype": "Gas Leak (Natural and LP Gases)",
+     "rawType": "Gas Leak (Natural and LP Gases)",
+     "lat": 37.75446562,
+     "lng": -122.421476521,
+     "neighborhood": "Mission",
+     "locationCanonical": "Alvarado St & San Jose Ave",
+     "units": [
+      "M567"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_42",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262591942 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262591942",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-16T20:24:05.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.787741165,
+     "lng": -122.435293132,
+     "neighborhood": "Pacific Heights",
+     "locationCanonical": "Pine St & Steiner St",
+     "units": [
+      "E38"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262591942",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T20:24:05.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.787741165,
+     "lng": -122.435293132,
+     "neighborhood": "Pacific Heights",
+     "locationCanonical": "Pine St & Steiner St",
+     "units": [
+      "AM102"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_43",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262591773 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262591773",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-16T19:44:39.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.77347442,
+     "lng": -122.418030233,
+     "neighborhood": "Mission",
+     "locationCanonical": "Lafayette St & Mission St",
+     "units": [
+      "E06",
+      "E36"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262591773",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T19:44:39.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.77347442,
+     "lng": -122.418030233,
+     "neighborhood": "Mission",
+     "locationCanonical": "Lafayette St & Mission St",
+     "units": [
+      "M577"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_44",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262591710 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262591710",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-16T19:31:26.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.776161979,
+     "lng": -122.405476063,
+     "neighborhood": "South of Market",
+     "locationCanonical": "Harrison St & Sherman St",
+     "units": [
+      "E01"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262591710",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T19:31:26.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.776161979,
+     "lng": -122.405476063,
+     "neighborhood": "South of Market",
+     "locationCanonical": "Harrison St & Sherman St",
+     "units": [
+      "M589"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_45",
+   "label": "same",
+   "labelSource": "agency_call_number",
+   "note": "SFFD call 262591082 dispatched to both a fire unit and a medic",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262591082",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-16T16:57:25.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.789369268,
+     "lng": -122.39185829,
+     "neighborhood": "Financial District/South Beach",
+     "locationCanonical": "Folsom St & Main St",
+     "units": [
+      "E35"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262591082",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T16:57:25.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.789369268,
+     "lng": -122.39185829,
+     "neighborhood": "Financial District/South Beach",
+     "locationCanonical": "Folsom St & Main St",
+     "units": [
+      "M568"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_46",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "AGG ASSAULT / ADW + Medical Incident, 4.1 min apart — a medic responding to a reported assault",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262610247",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T09:48:52.000Z",
+     "type": "assault",
+     "subtype": "AGG ASSAULT / ADW",
+     "rawType": "245",
+     "lat": 37.777272703,
+     "lng": -122.404070257,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Harrison St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262610249",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T09:52:56.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.777272703,
+     "lng": -122.404070257,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Harrison St",
+     "units": [
+      "M562"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_47",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "PROWLER + Outside Fire, 2.1 min apart — a suspicious-person call and a fire call",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262610243",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T09:46:19.000Z",
+     "type": "public_safety",
+     "subtype": "PROWLER",
+     "rawType": "603",
+     "lat": 37.732918895,
+     "lng": -122.389035068,
+     "neighborhood": "Bayview Hunters Point",
+     "locationCanonical": "Lane St & Palou Ave"
+    },
+    {
+     "id": "obs_sf_fire_cad_262610244",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T09:48:26.000Z",
+     "type": "fire",
+     "subtype": "Outside Fire",
+     "rawType": "Outside Fire",
+     "lat": 37.732918895,
+     "lng": -122.389035068,
+     "neighborhood": "Bayview Hunters Point",
+     "locationCanonical": "Lane St & Palou Ave",
+     "units": [
+      "B10",
+      "E17",
+      "T17"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_48",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "Alarms + SUSPICIOUS PERSON, 8.7 min apart — an alarm and an unrelated police call",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262610173",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T08:43:43.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.786310218,
+     "lng": -122.416449123,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Geary St & Hyde St",
+     "units": [
+      "B04",
+      "E03",
+      "T03"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610184",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T08:52:22.000Z",
+     "type": "public_safety",
+     "subtype": "SUSPICIOUS PERSON",
+     "rawType": "917",
+     "lat": 37.786310218,
+     "lng": -122.416449123,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Geary St & Hyde St"
+    }
+   ]
+  },
+  {
+   "id": "hand_49",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "Outside Fire + FIRE, 3.0 min apart — one fire, reported to both agencies",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262610163",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T08:37:33.000Z",
+     "type": "fire",
+     "subtype": "Outside Fire",
+     "rawType": "Outside Fire",
+     "lat": 37.779208482,
+     "lng": -122.504020633,
+     "neighborhood": "Outer Richmond",
+     "locationCanonical": "43rd Ave & Geary Blvd",
+     "units": [
+      "E34"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610166",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T08:40:33.000Z",
+     "type": "fire",
+     "subtype": "FIRE",
+     "rawType": "528",
+     "lat": 37.779208482,
+     "lng": -122.504020633,
+     "neighborhood": "Outer Richmond",
+     "locationCanonical": "43rd Ave & Geary Blvd"
+    }
+   ]
+  },
+  {
+   "id": "hand_50",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "WELL BEING CHECK + Medical Incident, 2.3 min apart — a welfare check that became a medical call",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262610145",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T08:26:12.000Z",
+     "type": "public_safety",
+     "subtype": "WELL BEING CHECK",
+     "rawType": "910",
+     "lat": 37.778212772,
+     "lng": -122.43505239,
+     "neighborhood": "Western Addition",
+     "locationCanonical": "McAllister St & Pierce St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262610147",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T08:28:29.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.778212772,
+     "lng": -122.43505239,
+     "neighborhood": "Western Addition",
+     "locationCanonical": "McAllister St & Pierce St",
+     "units": [
+      "E05",
+      "M547"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_51",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "Medical Incident + ASSAULT / BATTERY, 14.5 min apart — police following a medical call that turned out to be an assault",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262610115",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T07:54:06.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.781754328,
+     "lng": -122.409693262,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Stevenson St",
+     "units": [
+      "E01",
+      "M586"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610126",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T08:08:34.000Z",
+     "type": "assault",
+     "subtype": "ASSAULT / BATTERY",
+     "rawType": "240",
+     "lat": 37.781754328,
+     "lng": -122.409693262,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Stevenson St"
+    }
+   ]
+  },
+  {
+   "id": "hand_52",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "H&R INJURY ACCIDENT + Traffic Collision, 1.2 min apart — both agencies on one collision",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262603726",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T05:38:07.000Z",
+     "type": "collision",
+     "subtype": "H&R INJURY ACCIDENT",
+     "rawType": "519HR",
+     "lat": 37.752310758,
+     "lng": -122.396513496,
+     "neighborhood": "Potrero Hill",
+     "locationCanonical": "25th St & Connecticut St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262603728",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T05:39:22.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.752310758,
+     "lng": -122.396513496,
+     "neighborhood": "Potrero Hill",
+     "locationCanonical": "25th St & Connecticut St",
+     "units": [
+      "M508"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_53",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "H&R INJURY ACCIDENT + Traffic Collision, 1.2 min apart — both agencies on one collision",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262603726",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T05:38:07.000Z",
+     "type": "collision",
+     "subtype": "H&R INJURY ACCIDENT",
+     "rawType": "519HR",
+     "lat": 37.752310758,
+     "lng": -122.396513496,
+     "neighborhood": "Potrero Hill",
+     "locationCanonical": "25th St & Connecticut St"
+    },
+    {
+     "id": "obs_sf_fire_cad_262603728",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T05:39:22.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.752310758,
+     "lng": -122.396513496,
+     "neighborhood": "Potrero Hill",
+     "locationCanonical": "25th St & Connecticut St",
+     "units": [
+      "E29",
+      "E37"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_54",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "ASSAULT / BATTERY + Medical Incident, 10.0 min apart — a medic responding to a reported assault",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262603665",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T05:18:04.000Z",
+     "type": "assault",
+     "subtype": "ASSAULT / BATTERY",
+     "rawType": "240",
+     "lat": 37.785789585,
+     "lng": -122.412969667,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Jones St & O'Farrell St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262603694",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T05:28:04.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.785789585,
+     "lng": -122.412969667,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Jones St & O'Farrell St",
+     "units": [
+      "M586"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_55",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "NOISE NUISANCE + Alarms, 15.6 min apart — a noise complaint and a fire alarm",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262603399",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T03:37:43.000Z",
+     "type": "disturbance",
+     "subtype": "NOISE NUISANCE",
+     "rawType": "415",
+     "lat": 37.790973191,
+     "lng": -122.417391335,
+     "neighborhood": "Nob Hill",
+     "locationCanonical": "California St & Hyde St"
+    },
+    {
+     "id": "obs_sf_fire_cad_262603433",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T03:53:16.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.790973191,
+     "lng": -122.417391335,
+     "neighborhood": "Nob Hill",
+     "locationCanonical": "California St & Hyde St",
+     "units": [
+      "B01",
+      "E41",
+      "T03"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_56",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "INJURY VEH ACCIDENT + Traffic Collision, 1.2 min apart — both agencies on one collision",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262603396",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T03:36:56.000Z",
+     "type": "collision",
+     "subtype": "INJURY VEH ACCIDENT",
+     "rawType": "519",
+     "lat": 37.776332977,
+     "lng": -122.394035066,
+     "neighborhood": "Mission Bay",
+     "locationCanonical": "4th St & King St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262603400",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T03:38:07.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.776332977,
+     "lng": -122.394035066,
+     "neighborhood": "Mission Bay",
+     "locationCanonical": "4th St & King St",
+     "units": [
+      "M516"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_57",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "INJURY VEH ACCIDENT + Traffic Collision, 1.2 min apart — both agencies on one collision",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262603396",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T03:36:56.000Z",
+     "type": "collision",
+     "subtype": "INJURY VEH ACCIDENT",
+     "rawType": "519",
+     "lat": 37.776332977,
+     "lng": -122.394035066,
+     "neighborhood": "Mission Bay",
+     "locationCanonical": "4th St & King St"
+    },
+    {
+     "id": "obs_sf_fire_cad_262603400",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T03:38:07.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.776332977,
+     "lng": -122.394035066,
+     "neighborhood": "Mission Bay",
+     "locationCanonical": "4th St & King St",
+     "units": [
+      "E08"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_58",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "WELL BEING CHECK + Medical Incident, 4.4 min apart — a welfare check that became a medical call",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262603335",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T03:09:03.000Z",
+     "type": "public_safety",
+     "subtype": "WELL BEING CHECK",
+     "rawType": "910",
+     "lat": 37.765002197,
+     "lng": -122.420482492,
+     "neighborhood": "Mission",
+     "locationCanonical": "16th St & Wiese St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262603337",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T03:13:28.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.765002197,
+     "lng": -122.420482492,
+     "neighborhood": "Mission",
+     "locationCanonical": "16th St & Wiese St",
+     "units": [
+      "M508"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_59",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "ASSAULT / BATTERY + Medical Incident, 5.3 min apart — a medic responding to a reported assault",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262603289",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T02:51:07.000Z",
+     "type": "assault",
+     "subtype": "ASSAULT / BATTERY",
+     "rawType": "240",
+     "lat": 37.801444935,
+     "lng": -122.431311321,
+     "neighborhood": "Marina",
+     "locationCanonical": "Chestnut St & Laguna St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262603300",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T02:56:28.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.801444935,
+     "lng": -122.431311321,
+     "neighborhood": "Marina",
+     "locationCanonical": "Chestnut St & Laguna St",
+     "units": [
+      "M573"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_60",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "SUSPICIOUS PERSON + Outside Fire, 6.0 min apart — a suspicious-person call and a fire call",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262603270",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T02:46:33.000Z",
+     "type": "public_safety",
+     "subtype": "SUSPICIOUS PERSON",
+     "rawType": "917",
+     "lat": 37.777699659,
+     "lng": -122.404605506,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Clara St"
+    },
+    {
+     "id": "obs_sf_fire_cad_262603291",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T02:52:31.000Z",
+     "type": "fire",
+     "subtype": "Outside Fire",
+     "rawType": "Outside Fire",
+     "lat": 37.777699659,
+     "lng": -122.404605506,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Clara St",
+     "units": [
+      "E01"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_61",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "MENTALLY DISTURBED + Medical Incident, 2.8 min apart — a police welfare call and the ambulance for it",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262603080",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T01:36:44.000Z",
+     "type": "medical",
+     "subtype": "MENTALLY DISTURBED",
+     "rawType": "800",
+     "lat": 37.78229614,
+     "lng": -122.405931328,
+     "neighborhood": "South of Market",
+     "locationCanonical": "5th St & Minna St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262603087",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T01:39:32.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.78229614,
+     "lng": -122.405931328,
+     "neighborhood": "South of Market",
+     "locationCanonical": "5th St & Minna St",
+     "units": [
+      "CP12",
+      "M575",
+      "SCRT5"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_62",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "INJURY VEH ACCIDENT + Traffic Collision, 1.3 min apart — both agencies on one collision",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262602950",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T01:01:47.000Z",
+     "type": "collision",
+     "subtype": "INJURY VEH ACCIDENT",
+     "rawType": "519",
+     "lat": 37.772227493,
+     "lng": -122.491688045,
+     "neighborhood": "Outer Richmond",
+     "locationCanonical": "32nd Ave & Fulton St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262602952",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T01:03:05.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.772227493,
+     "lng": -122.491688045,
+     "neighborhood": "Outer Richmond",
+     "locationCanonical": "32nd Ave & Fulton St",
+     "units": [
+      "M567"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_63",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "ASSAULT / BATTERY + Medical Incident, 12.9 min apart — a medic responding to a reported assault",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262602942",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T00:52:36.000Z",
+     "type": "assault",
+     "subtype": "ASSAULT / BATTERY",
+     "rawType": "240",
+     "lat": 37.72171588,
+     "lng": -122.395943828,
+     "neighborhood": "Bayview Hunters Point",
+     "locationCanonical": "3rd St & Hollister Ave"
+    },
+    {
+     "id": "obs_sf_ems_cad_262602958",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T01:05:28.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.72171588,
+     "lng": -122.395943828,
+     "neighborhood": "Bayview Hunters Point",
+     "locationCanonical": "3rd St & Hollister Ave",
+     "units": [
+      "E17",
+      "M559"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_64",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "MENTALLY DISTURBED + Medical Incident, 4.4 min apart — a police welfare call and the ambulance for it",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262602864",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T00:40:35.000Z",
+     "type": "medical",
+     "subtype": "MENTALLY DISTURBED",
+     "rawType": "800",
+     "lat": 37.782378943,
+     "lng": -122.41733888,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Larkin St & Turk St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262602883",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T00:44:59.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.782378943,
+     "lng": -122.41733888,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Larkin St & Turk St",
+     "units": [
+      "M573"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_65",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "Traffic Collision + INJURY VEH ACCIDENT, 2.8 min apart — both agencies on one collision",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262602777",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T00:16:05.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.80634343,
+     "lng": -122.41543157,
+     "neighborhood": "North Beach",
+     "locationCanonical": "North Point St & Taylor St",
+     "units": [
+      "E28"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262602779",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T00:18:53.000Z",
+     "type": "collision",
+     "subtype": "INJURY VEH ACCIDENT",
+     "rawType": "519",
+     "lat": 37.80634343,
+     "lng": -122.41543157,
+     "neighborhood": "North Beach",
+     "locationCanonical": "North Point St & Taylor St"
+    }
+   ]
+  },
+  {
+   "id": "hand_66",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "Traffic Collision + INJURY VEH ACCIDENT, 2.8 min apart — both agencies on one collision",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262602777",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T00:16:05.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.80634343,
+     "lng": -122.41543157,
+     "neighborhood": "North Beach",
+     "locationCanonical": "North Point St & Taylor St",
+     "units": [
+      "KM102"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262602779",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T00:18:53.000Z",
+     "type": "collision",
+     "subtype": "INJURY VEH ACCIDENT",
+     "rawType": "519",
+     "lat": 37.80634343,
+     "lng": -122.41543157,
+     "neighborhood": "North Beach",
+     "locationCanonical": "North Point St & Taylor St"
+    }
+   ]
+  },
+  {
+   "id": "hand_67",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "INJURY VEH ACCIDENT + Medical Incident, 1.4 min apart — a medic at a collision",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262602684",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T23:52:28.000Z",
+     "type": "collision",
+     "subtype": "INJURY VEH ACCIDENT",
+     "rawType": "519",
+     "lat": 37.726058486,
+     "lng": -122.436273176,
+     "neighborhood": "Outer Mission",
+     "locationCanonical": "Alemany Blvd & Harrington St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262602687",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T23:53:49.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.726058486,
+     "lng": -122.436273176,
+     "neighborhood": "Outer Mission",
+     "locationCanonical": "Alemany Blvd & Harrington St",
+     "units": [
+      "E43",
+      "M556"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_68",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "VEH ACCIDENT + Traffic Collision, 3.5 min apart — both agencies on one collision",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262602392",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T22:35:17.000Z",
+     "type": "collision",
+     "subtype": "VEH ACCIDENT",
+     "rawType": "518",
+     "lat": 37.765773606,
+     "lng": -122.426490698,
+     "neighborhood": "Castro/Upper Market",
+     "locationCanonical": "Alert Aly & Dolores St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262602396",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T22:38:50.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.765773606,
+     "lng": -122.426490698,
+     "neighborhood": "Castro/Upper Market",
+     "locationCanonical": "Alert Aly & Dolores St",
+     "units": [
+      "AM106"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_69",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "VEH ACCIDENT + Traffic Collision, 3.5 min apart — both agencies on one collision",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262602392",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T22:35:17.000Z",
+     "type": "collision",
+     "subtype": "VEH ACCIDENT",
+     "rawType": "518",
+     "lat": 37.765773606,
+     "lng": -122.426490698,
+     "neighborhood": "Castro/Upper Market",
+     "locationCanonical": "Alert Aly & Dolores St"
+    },
+    {
+     "id": "obs_sf_fire_cad_262602396",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T22:38:50.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.765773606,
+     "lng": -122.426490698,
+     "neighborhood": "Castro/Upper Market",
+     "locationCanonical": "Alert Aly & Dolores St",
+     "units": [
+      "E06"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_70",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "WELL BEING CHECK + Medical Incident, 2.2 min apart — a welfare check that became a medical call",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262602279",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T22:09:16.000Z",
+     "type": "public_safety",
+     "subtype": "WELL BEING CHECK",
+     "rawType": "910",
+     "lat": 37.788909612,
+     "lng": -122.418655872,
+     "neighborhood": "Nob Hill",
+     "locationCanonical": "Bush St & Larkin St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262602284",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T22:11:27.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.788909612,
+     "lng": -122.418655872,
+     "neighborhood": "Nob Hill",
+     "locationCanonical": "Bush St & Larkin St",
+     "units": [
+      "SCRT2"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_71",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "Medical Incident + AIDED CASE, 11.9 min apart — the same person, both agencies",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262602059",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T21:01:31.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.752204442,
+     "lng": -122.419017543,
+     "neighborhood": "Mission",
+     "locationCanonical": "24th St & Osage Aly",
+     "units": [
+      "M566",
+      "T11"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262602096",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T21:13:26.000Z",
+     "type": "medical",
+     "subtype": "AIDED CASE",
+     "rawType": "520",
+     "lat": 37.752204442,
+     "lng": -122.419017543,
+     "neighborhood": "Mission",
+     "locationCanonical": "24th St & Osage Aly"
+    }
+   ]
+  },
+  {
+   "id": "hand_72",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "VANDALISM + Medical Incident, 5.7 min apart — vandalism and a medical call",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262601905",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T20:13:23.000Z",
+     "type": "disturbance",
+     "subtype": "VANDALISM",
+     "rawType": "594",
+     "lat": 37.761710649,
+     "lng": -122.389607731,
+     "neighborhood": "Potrero Hill",
+     "locationCanonical": "19th St & Tennessee St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262601912",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T20:19:05.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.761710649,
+     "lng": -122.389607731,
+     "neighborhood": "Potrero Hill",
+     "locationCanonical": "19th St & Tennessee St",
+     "units": [
+      "M514"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_73",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "FRAUD + Medical Incident, 17.1 min apart — a property crime and a medical call are not one event",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262601898",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T20:12:16.000Z",
+     "type": "theft",
+     "subtype": "FRAUD",
+     "rawType": "470",
+     "lat": 37.785582475,
+     "lng": -122.414617208,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Leavenworth St & O'Farrell St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262601955",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T20:29:24.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.785582475,
+     "lng": -122.414617208,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Leavenworth St & O'Farrell St",
+     "units": [
+      "AM104",
+      "E03"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_74",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "Medical Incident + AIDED CASE, 3.3 min apart — the same person, both agencies",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262601384",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T18:03:53.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.80407225,
+     "lng": -122.401973427,
+     "neighborhood": "Financial District/South Beach",
+     "locationCanonical": "Battery St & Lombard St & The Embarcadero",
+     "units": [
+      "E02",
+      "E28",
+      "KM210",
+      "M502"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262601390",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T18:07:10.000Z",
+     "type": "medical",
+     "subtype": "AIDED CASE",
+     "rawType": "520",
+     "lat": 37.80407225,
+     "lng": -122.401973427,
+     "neighborhood": "Financial District/South Beach",
+     "locationCanonical": "Battery St & Lombard St & The Embarcadero"
+    }
+   ]
+  },
+  {
+   "id": "hand_75",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "MENTALLY DISTURBED + Medical Incident, 4.1 min apart — a police welfare call and the ambulance for it",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262601360",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T17:56:18.000Z",
+     "type": "medical",
+     "subtype": "MENTALLY DISTURBED",
+     "rawType": "800",
+     "lat": 37.776230521,
+     "lng": -122.414711004,
+     "neighborhood": "South of Market",
+     "locationCanonical": "9th St & Mission St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262601362",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T18:00:22.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.776230521,
+     "lng": -122.414711004,
+     "neighborhood": "South of Market",
+     "locationCanonical": "9th St & Mission St",
+     "units": [
+      "AM104"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_76",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "Medical Incident + VANDALISM, 11.1 min apart — a medical call and a property crime",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262601148",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T16:56:31.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.768273653,
+     "lng": -122.419981512,
+     "neighborhood": "Mission",
+     "locationCanonical": "14th St & Mission St",
+     "units": [
+      "E06",
+      "E36",
+      "KM106"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262601180",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T17:07:39.000Z",
+     "type": "disturbance",
+     "subtype": "VANDALISM",
+     "rawType": "594",
+     "lat": 37.768273653,
+     "lng": -122.419981512,
+     "neighborhood": "Mission",
+     "locationCanonical": "14th St & Mission St"
+    }
+   ]
+  },
+  {
+   "id": "hand_77",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "FIGHT NO WEAPON + Medical Incident, 7.6 min apart — a medic responding to a reported assault",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262600111",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T08:11:36.000Z",
+     "type": "disturbance",
+     "subtype": "FIGHT NO WEAPON",
+     "rawType": "418",
+     "lat": 37.777092185,
+     "lng": -122.410505753,
+     "neighborhood": "South of Market",
+     "locationCanonical": "Howard St & Rausch St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262600119",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T08:19:11.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.777092185,
+     "lng": -122.410505753,
+     "neighborhood": "South of Market",
+     "locationCanonical": "Howard St & Rausch St",
+     "units": [
+      "AM122"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_78",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "FIGHT NO WEAPON + Medical Incident, 10.2 min apart — a medic responding to a reported assault",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262594020",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T06:34:39.000Z",
+     "type": "disturbance",
+     "subtype": "FIGHT NO WEAPON",
+     "rawType": "418",
+     "lat": 37.767306895,
+     "lng": -122.45316479,
+     "neighborhood": "Haight Ashbury",
+     "locationCanonical": "Beulah St & Stanyan St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262594039",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T06:44:53.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.767306895,
+     "lng": -122.45316479,
+     "neighborhood": "Haight Ashbury",
+     "locationCanonical": "Beulah St & Stanyan St",
+     "units": [
+      "M586"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_79",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "Medical Incident + FIGHT NO WEAPON, 14.1 min apart — police following a medical call that turned out to be an assault",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262593835",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T05:19:00.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.765002197,
+     "lng": -122.420482492,
+     "neighborhood": "Mission",
+     "locationCanonical": "16th St & Wiese St",
+     "units": [
+      "M527"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262593878",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T05:33:08.000Z",
+     "type": "disturbance",
+     "subtype": "FIGHT NO WEAPON",
+     "rawType": "418",
+     "lat": 37.765002197,
+     "lng": -122.420482492,
+     "neighborhood": "Mission",
+     "locationCanonical": "16th St & Wiese St"
+    }
+   ]
+  },
+  {
+   "id": "hand_80",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "TRAF VIOLATION CITE + Medical Incident, 8.5 min apart — a traffic citation and a medical call",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262593598",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T03:54:52.000Z",
+     "type": "traffic",
+     "subtype": "TRAF VIOLATION CITE",
+     "rawType": "587",
+     "lat": 37.788387931,
+     "lng": -122.41518527,
+     "neighborhood": "Nob Hill",
+     "locationCanonical": "Leavenworth St & Sutter St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262593627",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T04:03:24.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.788387931,
+     "lng": -122.41518527,
+     "neighborhood": "Nob Hill",
+     "locationCanonical": "Leavenworth St & Sutter St",
+     "units": [
+      "E03",
+      "M515"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_81",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "Medical Incident + BURGLARY, 10.1 min apart — a medical call and a property crime",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262593560",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T03:43:24.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.778747372,
+     "lng": -122.423354025,
+     "neighborhood": "Hayes Valley",
+     "locationCanonical": "Fulton St & Gough St",
+     "units": [
+      "M580",
+      "SCRT8"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262593616",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T03:53:33.000Z",
+     "type": "burglary",
+     "subtype": "BURGLARY",
+     "rawType": "459",
+     "lat": 37.778747372,
+     "lng": -122.423354025,
+     "neighborhood": "Hayes Valley",
+     "locationCanonical": "Fulton St & Gough St"
+    }
+   ]
+  },
+  {
+   "id": "hand_82",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "SHOT SPOTTER + Alarms, 9.1 min apart — gunfire detection and a fire alarm",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262593541",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T03:37:19.000Z",
+     "type": "weapon",
+     "subtype": "SHOT SPOTTER",
+     "rawType": "216S",
+     "lat": 37.775602763,
+     "lng": -122.403076401,
+     "neighborhood": "South of Market",
+     "locationCanonical": "Bryant St & Harriet St"
+    },
+    {
+     "id": "obs_sf_fire_cad_262593582",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-17T03:46:23.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.775602763,
+     "lng": -122.403076401,
+     "neighborhood": "South of Market",
+     "locationCanonical": "Bryant St & Harriet St",
+     "units": [
+      "B03",
+      "E08",
+      "T08"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_83",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "INJURY VEH ACCIDENT + Medical Incident, 2.1 min apart — a medic at a collision",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262593463",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T03:09:22.000Z",
+     "type": "collision",
+     "subtype": "INJURY VEH ACCIDENT",
+     "rawType": "519",
+     "lat": 37.780614967,
+     "lng": -122.416138099,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Breen Pl & McAllister St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262593468",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T03:11:27.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.780614967,
+     "lng": -122.416138099,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Breen Pl & McAllister St",
+     "units": [
+      "M514",
+      "QRV1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_84",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "TRAF VIOLATION CITE + Medical Incident, 16.1 min apart — a traffic citation and a medical call",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262593235",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T01:52:14.000Z",
+     "type": "traffic",
+     "subtype": "TRAF VIOLATION CITE",
+     "rawType": "587",
+     "lat": 37.740474507,
+     "lng": -122.49163494,
+     "neighborhood": "Sunset/Parkside",
+     "locationCanonical": "34th Ave & Ulloa St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262593293",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T02:08:21.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.740474507,
+     "lng": -122.49163494,
+     "neighborhood": "Sunset/Parkside",
+     "locationCanonical": "34th Ave & Ulloa St",
+     "units": [
+      "M527"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_85",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "INJURY VEH ACCIDENT + Medical Incident, 4.1 min apart — a medic at a collision",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262593241",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T01:51:28.000Z",
+     "type": "collision",
+     "subtype": "INJURY VEH ACCIDENT",
+     "rawType": "519",
+     "lat": 37.716090968,
+     "lng": -122.384402011,
+     "neighborhood": "Bayview Hunters Point",
+     "locationCanonical": "Earl St & Gilman Ave"
+    },
+    {
+     "id": "obs_sf_ems_cad_262593243",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T01:55:34.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.716090968,
+     "lng": -122.384402011,
+     "neighborhood": "Bayview Hunters Point",
+     "locationCanonical": "Earl St & Gilman Ave",
+     "units": [
+      "E44",
+      "M555"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_86",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "AIDED CASE + Medical Incident, 0.4 min apart — a police welfare call and the ambulance for it",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262593070",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T01:07:35.000Z",
+     "type": "medical",
+     "subtype": "AIDED CASE",
+     "rawType": "520",
+     "lat": 37.783723783,
+     "lng": -122.414241573,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Eddy St & Leavenworth St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262593073",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T01:07:56.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.783772232,
+     "lng": -122.41430267,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Eddy St & Leavenworth St",
+     "units": [
+      "AM108",
+      "QRV1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_87",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "H&R INJURY ACCIDENT + Traffic Collision, 1.5 min apart — both agencies on one collision",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262593004",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T00:50:06.000Z",
+     "type": "collision",
+     "subtype": "H&R INJURY ACCIDENT",
+     "rawType": "519HR",
+     "lat": 37.782230575,
+     "lng": -122.410292027,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Golden Gate Ave & Market St & Taylor St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262593005",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T00:51:36.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.782230575,
+     "lng": -122.410292027,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Golden Gate Ave & Market St & Taylor St",
+     "units": [
+      "M575"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_88",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "MISSING ADULT + Medical Incident, 17.3 min apart — a missing person report and a medical call",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262592901",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T00:24:18.000Z",
+     "type": "missing_person",
+     "subtype": "MISSING ADULT",
+     "rawType": "809",
+     "lat": 37.710023433,
+     "lng": -122.436687653,
+     "neighborhood": "Excelsior",
+     "locationCanonical": "Drake St & Prague St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262592955",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T00:41:36.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.710023433,
+     "lng": -122.436687653,
+     "neighborhood": "Excelsior",
+     "locationCanonical": "Drake St & Prague St",
+     "units": [
+      "M547"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_89",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "VANDALISM + Medical Incident, 5.4 min apart — vandalism and a medical call",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262592377",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-16T22:16:59.000Z",
+     "type": "disturbance",
+     "subtype": "VANDALISM",
+     "rawType": "594",
+     "lat": 37.752426801,
+     "lng": -122.394586978,
+     "neighborhood": "Bayview Hunters Point",
+     "locationCanonical": "25th St & Dakota St & Texas St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262592378",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T22:22:21.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.752426801,
+     "lng": -122.394586978,
+     "neighborhood": "Bayview Hunters Point",
+     "locationCanonical": "25th St & Dakota St & Texas St",
+     "units": [
+      "M521"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_90",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "VEH ACCIDENT + Medical Incident, 3.3 min apart — a medic at a collision",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262592360",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-16T22:15:32.000Z",
+     "type": "collision",
+     "subtype": "VEH ACCIDENT",
+     "rawType": "518",
+     "lat": 37.779657752,
+     "lng": -122.409283403,
+     "neighborhood": "South of Market",
+     "locationCanonical": "Minna St & Russ St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262592363",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T22:18:48.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.779657752,
+     "lng": -122.409283403,
+     "neighborhood": "South of Market",
+     "locationCanonical": "Minna St & Russ St",
+     "units": [
+      "E01",
+      "E36",
+      "M577"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_91",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "AIDED CASE + Medical Incident, 0.1 min apart — a police welfare call and the ambulance for it",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262592217",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-16T21:43:14.000Z",
+     "type": "medical",
+     "subtype": "AIDED CASE",
+     "rawType": "520",
+     "lat": 37.761835855,
+     "lng": -122.419359267,
+     "neighborhood": "Mission",
+     "locationCanonical": "18th St & Mission St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262592218",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T21:43:18.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.76202032,
+     "lng": -122.417218419,
+     "neighborhood": "Mission",
+     "locationCanonical": "18th St & Mission St",
+     "units": [
+      "AM102"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_92",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "TRAF VIOLATION TOW + Medical Incident, 10.3 min apart — a traffic citation and a medical call",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262592048",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-16T20:53:45.000Z",
+     "type": "traffic",
+     "subtype": "TRAF VIOLATION TOW",
+     "rawType": "588",
+     "lat": 37.784259208,
+     "lng": -122.440151135,
+     "neighborhood": "Japantown",
+     "locationCanonical": "Erkson Ct & Post St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262592089",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T21:04:03.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.784259208,
+     "lng": -122.440151135,
+     "neighborhood": "Japantown",
+     "locationCanonical": "Erkson Ct & Post St",
+     "units": [
+      "E10",
+      "M555"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_93",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "Medical Incident + TRAF VIOLATION TOW, 0.6 min apart — a medical call and a traffic citation",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262592054",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T20:53:08.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.784259208,
+     "lng": -122.440151135,
+     "neighborhood": "Japantown",
+     "locationCanonical": "Erkson Ct & Post St",
+     "units": [
+      "E10",
+      "M502",
+      "RC2"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262592048",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-16T20:53:45.000Z",
+     "type": "traffic",
+     "subtype": "TRAF VIOLATION TOW",
+     "rawType": "588",
+     "lat": 37.784259208,
+     "lng": -122.440151135,
+     "neighborhood": "Japantown",
+     "locationCanonical": "Erkson Ct & Post St"
+    }
+   ]
+  },
+  {
+   "id": "hand_94",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "Alarms + PERSON W/KNIFE, 2.5 min apart — an alarm and an unrelated police call",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262591925",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-16T20:19:30.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.779657752,
+     "lng": -122.409283403,
+     "neighborhood": "South of Market",
+     "locationCanonical": "Minna St & Russ St",
+     "units": [
+      "B03",
+      "E03",
+      "T02"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262591941",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-16T20:22:00.000Z",
+     "type": "weapon",
+     "subtype": "PERSON W/KNIFE",
+     "rawType": "222",
+     "lat": 37.779657752,
+     "lng": -122.409283403,
+     "neighborhood": "South of Market",
+     "locationCanonical": "Minna St & Russ St"
+    }
+   ]
+  },
+  {
+   "id": "hand_95",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "SIT/LIE ENFORCEMENT + Medical Incident, 3.8 min apart — a traffic citation and a medical call",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262591788",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-16T19:50:39.000Z",
+     "type": "police_activity",
+     "subtype": "SIT/LIE ENFORCEMENT",
+     "rawType": "919",
+     "lat": 37.783287853,
+     "lng": -122.408952159,
+     "neighborhood": "South of Market",
+     "locationCanonical": "Market St & Mason St & Turk St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262591816",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T19:54:27.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.783287853,
+     "lng": -122.408952159,
+     "neighborhood": "South of Market",
+     "locationCanonical": "Market St & Mason St & Turk St",
+     "units": [
+      "AM213"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_96",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "TRAF VIOLATION CITE + Medical Incident, 1.8 min apart — a traffic citation and a medical call",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262591687",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-16T19:27:59.000Z",
+     "type": "traffic",
+     "subtype": "TRAF VIOLATION CITE",
+     "rawType": "587",
+     "lat": 37.758584926,
+     "lng": -122.419841317,
+     "neighborhood": "Mission",
+     "locationCanonical": "20th St & San Carlos St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262591696",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T19:29:46.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.758584926,
+     "lng": -122.419841317,
+     "neighborhood": "Mission",
+     "locationCanonical": "20th St & San Carlos St",
+     "units": [
+      "M552"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_97",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "Medical Incident + TRAF VIOLATION CITE, 12.9 min apart — a medical call and a traffic citation",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262591614",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T19:11:02.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.750986068,
+     "lng": -122.411650871,
+     "neighborhood": "Mission",
+     "locationCanonical": "25th St & Harrison St",
+     "units": [
+      "AM130"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262591669",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-16T19:23:54.000Z",
+     "type": "traffic",
+     "subtype": "TRAF VIOLATION CITE",
+     "rawType": "587",
+     "lat": 37.751033895,
+     "lng": -122.411746225,
+     "neighborhood": "Mission",
+     "locationCanonical": "25th St & Harrison St"
+    }
+   ]
+  },
+  {
+   "id": "hand_98",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "VEH ACCIDENT + Traffic Collision, 5.7 min apart — both agencies on one collision",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262590870",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-16T16:04:45.000Z",
+     "type": "collision",
+     "subtype": "VEH ACCIDENT",
+     "rawType": "518",
+     "lat": 37.715429679,
+     "lng": -122.441799465,
+     "neighborhood": "Outer Mission",
+     "locationCanonical": "Mission St & Pope St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262590873",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T16:10:28.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.715429679,
+     "lng": -122.441799465,
+     "neighborhood": "Outer Mission",
+     "locationCanonical": "Mission St & Pope St",
+     "units": [
+      "M589"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_99",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "Traffic Collision + INJURY VEH ACCIDENT, 1.2 min apart — both agencies on one collision",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262590758",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-16T15:32:23.000Z",
+     "type": "collision",
+     "subtype": "Traffic Collision",
+     "rawType": "Traffic Collision",
+     "lat": 37.7657833,
+     "lng": -122.407534229,
+     "neighborhood": "Mission",
+     "locationCanonical": "16th St & Potrero Ave",
+     "units": [
+      "B03",
+      "E29",
+      "RS1",
+      "T07"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262590759",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-16T15:33:34.000Z",
+     "type": "collision",
+     "subtype": "INJURY VEH ACCIDENT",
+     "rawType": "519",
+     "lat": 37.7657833,
+     "lng": -122.407534229,
+     "neighborhood": "Mission",
+     "locationCanonical": "16th St & Potrero Ave"
+    }
+   ]
+  },
+  {
+   "id": "hand_100",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "AGG ASSAULT / ADW + Medical Incident, 5.7 min apart — a medic responding to a reported assault",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262590382",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-16T12:35:27.000Z",
+     "type": "assault",
+     "subtype": "AGG ASSAULT / ADW",
+     "rawType": "245",
+     "lat": 37.774692661,
+     "lng": -122.432648622,
+     "neighborhood": "Hayes Valley",
+     "locationCanonical": "Fell St & Steiner St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262590387",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T12:41:09.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.774692661,
+     "lng": -122.432648622,
+     "neighborhood": "Hayes Valley",
+     "locationCanonical": "Fell St & Steiner St",
+     "units": [
+      "M589"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hand_101",
+   "label": "same",
+   "labelSource": "hand",
+   "note": "FIGHT NO WEAPON + Medical Incident, 3.5 min apart — a medic responding to a reported assault",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262590112",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-16T08:29:33.000Z",
+     "type": "disturbance",
+     "subtype": "FIGHT NO WEAPON",
+     "rawType": "418",
+     "lat": 37.782585033,
+     "lng": -122.415693873,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Hyde St & Turk St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262590114",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-16T08:33:06.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.782585033,
+     "lng": -122.415693873,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Hyde St & Turk St",
+     "units": [
+      "M502"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "apart_102",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "same corner, 101 min apart — too far apart in time to be one dispatch",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262610119",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T08:04:46.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.780971183,
+     "lng": -122.408708674,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Mission St",
+     "units": [
+      "E01",
+      "KM107",
+      "RS1"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610240",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T09:46:07.000Z",
+     "type": "public_safety",
+     "subtype": "SUSPICIOUS PERSON",
+     "rawType": "917",
+     "lat": 37.780971183,
+     "lng": -122.408708674,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Mission St"
+    }
+   ]
+  },
+  {
+   "id": "apart_103",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "same corner, 194 min apart — too far apart in time to be one dispatch",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262610115",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T07:54:06.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.781754328,
+     "lng": -122.409693262,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Stevenson St",
+     "units": [
+      "E01",
+      "M586"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610333",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T11:08:04.000Z",
+     "type": "robbery",
+     "subtype": "STRONGARM ROBBERY",
+     "rawType": "212",
+     "lat": 37.781754328,
+     "lng": -122.409693262,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Stevenson St"
+    }
+   ]
+  },
+  {
+   "id": "apart_104",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "same corner, 239 min apart — too far apart in time to be one dispatch",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262610115",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T07:54:06.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.781754328,
+     "lng": -122.409693262,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Stevenson St",
+     "units": [
+      "E01",
+      "M586"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610369",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T11:53:22.000Z",
+     "type": "public_safety",
+     "subtype": "HOMELESS COMPLAINT",
+     "rawType": "915",
+     "lat": 37.781754328,
+     "lng": -122.409693262,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Stevenson St"
+    }
+   ]
+  },
+  {
+   "id": "apart_105",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "same corner, 105 min apart — too far apart in time to be one dispatch",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262610102",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T07:49:33.000Z",
+     "type": "public_safety",
+     "subtype": "WELL BEING CHECK",
+     "rawType": "910",
+     "lat": 37.775602763,
+     "lng": -122.403076401,
+     "neighborhood": "South of Market",
+     "locationCanonical": "Bryant St & Harriet St"
+    },
+    {
+     "id": "obs_sf_fire_cad_262610228",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T09:34:58.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.775602763,
+     "lng": -122.403076401,
+     "neighborhood": "South of Market",
+     "locationCanonical": "Bryant St & Harriet St",
+     "units": [
+      "B03",
+      "E08",
+      "T08"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "apart_106",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "same corner, 70 min apart — too far apart in time to be one dispatch",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262603911",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T06:55:07.000Z",
+     "type": "public_safety",
+     "subtype": "SUSPICIOUS PERSON",
+     "rawType": "917",
+     "lat": 37.780971183,
+     "lng": -122.408708674,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Mission St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262610119",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T08:04:46.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.780971183,
+     "lng": -122.408708674,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Mission St",
+     "units": [
+      "E01",
+      "KM107",
+      "RS1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "apart_107",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "same corner, 68 min apart — too far apart in time to be one dispatch",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262603848",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T06:23:52.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.7767147,
+     "lng": -122.403370738,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Ahern Way",
+     "units": [
+      "M562"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610068",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T07:31:46.000Z",
+     "type": "public_safety",
+     "subtype": "TRESPASSER",
+     "rawType": "601",
+     "lat": 37.7767147,
+     "lng": -122.403370738,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Ahern Way"
+    }
+   ]
+  },
+  {
+   "id": "apart_108",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "same corner, 73 min apart — too far apart in time to be one dispatch",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262603766",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T05:51:06.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.784141012,
+     "lng": -122.410951618,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Eddy St & Taylor St",
+     "units": [
+      "E01",
+      "M530"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610018",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T07:04:10.000Z",
+     "type": "disturbance",
+     "subtype": "NOISE NUISANCE",
+     "rawType": "415",
+     "lat": 37.784141012,
+     "lng": -122.410951618,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Eddy St & Taylor St"
+    }
+   ]
+  },
+  {
+   "id": "apart_109",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "same corner, 126 min apart — too far apart in time to be one dispatch",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262603753",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T05:47:43.000Z",
+     "type": "public_safety",
+     "subtype": "SUSPICIOUS PERSON",
+     "rawType": "917",
+     "lat": 37.781754328,
+     "lng": -122.409693262,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Stevenson St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262610115",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T07:54:06.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.781754328,
+     "lng": -122.409693262,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Stevenson St",
+     "units": [
+      "E01",
+      "M586"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "apart_110",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "same corner, 51 min apart — too far apart in time to be one dispatch",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262603733",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T05:39:27.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.765002197,
+     "lng": -122.420482492,
+     "neighborhood": "Mission",
+     "locationCanonical": "16th St & Wiese St",
+     "units": [
+      "E07",
+      "M516",
+      "RC3"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262603862",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T06:30:49.000Z",
+     "type": "public_safety",
+     "subtype": "SUSPICIOUS PERSON",
+     "rawType": "917",
+     "lat": 37.765002197,
+     "lng": -122.420482492,
+     "neighborhood": "Mission",
+     "locationCanonical": "16th St & Wiese St"
+    }
+   ]
+  },
+  {
+   "id": "apart_111",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "same corner, 182 min apart — too far apart in time to be one dispatch",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262603733",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T05:39:27.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.765002197,
+     "lng": -122.420482492,
+     "neighborhood": "Mission",
+     "locationCanonical": "16th St & Wiese St",
+     "units": [
+      "E07",
+      "M516",
+      "RC3"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610168",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T08:41:48.000Z",
+     "type": "public_safety",
+     "subtype": "SUSPICIOUS PERSON",
+     "rawType": "917",
+     "lat": 37.765002197,
+     "lng": -122.420482492,
+     "neighborhood": "Mission",
+     "locationCanonical": "16th St & Wiese St"
+    }
+   ]
+  },
+  {
+   "id": "apart_112",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "same corner, 119 min apart — too far apart in time to be one dispatch",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262603723",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T05:35:19.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.743527928,
+     "lng": -122.387629454,
+     "neighborhood": "Bayview Hunters Point",
+     "locationCanonical": "3rd St & Davidson Ave",
+     "units": [
+      "E17",
+      "E25",
+      "M580"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610079",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T07:34:42.000Z",
+     "type": "public_safety",
+     "subtype": "SUSPICIOUS PERSON",
+     "rawType": "917",
+     "lat": 37.743527928,
+     "lng": -122.387629454,
+     "neighborhood": "Bayview Hunters Point",
+     "locationCanonical": "3rd St & Davidson Ave"
+    }
+   ]
+  },
+  {
+   "id": "apart_113",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "same corner, 141 min apart — too far apart in time to be one dispatch",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262603694",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T05:28:04.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.785789585,
+     "lng": -122.412969667,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Jones St & O'Farrell St",
+     "units": [
+      "M586"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610106",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T07:49:12.000Z",
+     "type": "disturbance",
+     "subtype": "THREATS / HARASSMENT",
+     "rawType": "650",
+     "lat": 37.785789585,
+     "lng": -122.412969667,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Jones St & O'Farrell St"
+    }
+   ]
+  },
+  {
+   "id": "apart_114",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "same corner, 161 min apart — too far apart in time to be one dispatch",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262603676",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T05:23:23.000Z",
+     "type": "public_safety",
+     "subtype": "SUSPICIOUS PERSON",
+     "rawType": "917",
+     "lat": 37.780971183,
+     "lng": -122.408708674,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Mission St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262610119",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T08:04:46.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.780971183,
+     "lng": -122.408708674,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Mission St",
+     "units": [
+      "E01",
+      "KM107",
+      "RS1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "apart_115",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "same corner, 123 min apart — too far apart in time to be one dispatch",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262603632",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T05:06:56.000Z",
+     "type": "unknown",
+     "subtype": "MISC",
+     "rawType": "000",
+     "lat": 37.780951763,
+     "lng": -122.411985369,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Jones St & Market St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262610030",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T07:09:54.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.780951763,
+     "lng": -122.411985369,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Jones St & Market St",
+     "units": [
+      "E01",
+      "M586",
+      "RC1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "apart_116",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "same corner, 181 min apart — too far apart in time to be one dispatch",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262603629",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T05:02:58.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.768273653,
+     "lng": -122.419981512,
+     "neighborhood": "Mission",
+     "locationCanonical": "14th St & Mission St",
+     "units": [
+      "E36",
+      "KM103",
+      "T06"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610125",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T08:03:57.000Z",
+     "type": "disturbance",
+     "subtype": "FIGHT NO WEAPON",
+     "rawType": "418",
+     "lat": 37.768273653,
+     "lng": -122.419981512,
+     "neighborhood": "Mission",
+     "locationCanonical": "14th St & Mission St"
+    }
+   ]
+  },
+  {
+   "id": "apart_117",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "same corner, 188 min apart — too far apart in time to be one dispatch",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262603629",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T05:02:58.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.768273653,
+     "lng": -122.419981512,
+     "neighborhood": "Mission",
+     "locationCanonical": "14th St & Mission St",
+     "units": [
+      "E36",
+      "KM103",
+      "T06"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610130",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T08:10:47.000Z",
+     "type": "public_safety",
+     "subtype": "TRESPASSER",
+     "rawType": "601",
+     "lat": 37.768273653,
+     "lng": -122.419981512,
+     "neighborhood": "Mission",
+     "locationCanonical": "14th St & Mission St"
+    }
+   ]
+  },
+  {
+   "id": "apart_118",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "same corner, 187 min apart — too far apart in time to be one dispatch",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262603616",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T05:00:25.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.779318461,
+     "lng": -122.407691083,
+     "neighborhood": "South of Market",
+     "locationCanonical": "Harriet St & Howard St",
+     "units": [
+      "B03",
+      "E01",
+      "T01"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610124",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T08:07:53.000Z",
+     "type": "police_activity",
+     "subtype": "URGENT NOTIFICATION",
+     "rawType": "1036",
+     "lat": 37.779318461,
+     "lng": -122.407691083,
+     "neighborhood": "South of Market",
+     "locationCanonical": "Harriet St & Howard St"
+    }
+   ]
+  },
+  {
+   "id": "apart_119",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "same corner, 189 min apart — too far apart in time to be one dispatch",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262603556",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T04:36:21.000Z",
+     "type": "traffic",
+     "subtype": "TRAF VIOLATION CITE",
+     "rawType": "587",
+     "lat": 37.763462837,
+     "lng": -122.435258661,
+     "neighborhood": "Castro/Upper Market",
+     "locationCanonical": "Castro St & States St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262610095",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T07:45:10.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.763462837,
+     "lng": -122.435258661,
+     "neighborhood": "Castro/Upper Market",
+     "locationCanonical": "Castro St & States St",
+     "units": [
+      "E06",
+      "M574"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "apart_120",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "same corner, 208 min apart — too far apart in time to be one dispatch",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262603510",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T04:21:25.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.775602763,
+     "lng": -122.403076401,
+     "neighborhood": "South of Market",
+     "locationCanonical": "Bryant St & Harriet St",
+     "units": [
+      "M574"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610102",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T07:49:33.000Z",
+     "type": "public_safety",
+     "subtype": "WELL BEING CHECK",
+     "rawType": "910",
+     "lat": 37.775602763,
+     "lng": -122.403076401,
+     "neighborhood": "South of Market",
+     "locationCanonical": "Bryant St & Harriet St"
+    }
+   ]
+  },
+  {
+   "id": "apart_121",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "same corner, 88 min apart — too far apart in time to be one dispatch",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262603499",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T04:19:09.000Z",
+     "type": "disturbance",
+     "subtype": "FIGHT NO WEAPON",
+     "rawType": "418",
+     "lat": 37.77745742,
+     "lng": -122.413157692,
+     "neighborhood": "South of Market",
+     "locationCanonical": "8th St & Mission St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262603751",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T05:47:08.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.777404774,
+     "lng": -122.413193857,
+     "neighborhood": "South of Market",
+     "locationCanonical": "8th St & Mission St",
+     "units": [
+      "KM107"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hard_122",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "Medical Incident + SUSPICIOUS PERSON at one corner, 30 min apart — a separate dispatch, however compatible the types look",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262610115",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T07:54:06.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.781754328,
+     "lng": -122.409693262,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Stevenson St",
+     "units": [
+      "E01",
+      "M586"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610141",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T08:23:41.000Z",
+     "type": "public_safety",
+     "subtype": "SUSPICIOUS PERSON",
+     "rawType": "917",
+     "lat": 37.781754328,
+     "lng": -122.409693262,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Stevenson St"
+    }
+   ]
+  },
+  {
+   "id": "hard_123",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "Medical Incident + SUSPICIOUS PERSON at one corner, 40 min apart — a separate dispatch, however compatible the types look",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262610115",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T07:54:06.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.781754328,
+     "lng": -122.409693262,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Stevenson St",
+     "units": [
+      "E01",
+      "M586"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610155",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T08:34:18.000Z",
+     "type": "public_safety",
+     "subtype": "SUSPICIOUS PERSON",
+     "rawType": "917",
+     "lat": 37.781754328,
+     "lng": -122.409693262,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Stevenson St"
+    }
+   ]
+  },
+  {
+   "id": "hard_124",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "FIGHT NO WEAPON + Medical Incident at one corner, 32 min apart — a separate dispatch, however compatible the types look",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262610041",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T07:13:09.000Z",
+     "type": "disturbance",
+     "subtype": "FIGHT NO WEAPON",
+     "rawType": "418",
+     "lat": 37.763462837,
+     "lng": -122.435258661,
+     "neighborhood": "Castro/Upper Market",
+     "locationCanonical": "Castro St & States St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262610095",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T07:45:10.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.763462837,
+     "lng": -122.435258661,
+     "neighborhood": "Castro/Upper Market",
+     "locationCanonical": "Castro St & States St",
+     "units": [
+      "E06",
+      "M574"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hard_125",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "NOISE NUISANCE + Medical Incident at one corner, 40 min apart — a separate dispatch, however compatible the types look",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262610018",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T07:04:10.000Z",
+     "type": "disturbance",
+     "subtype": "NOISE NUISANCE",
+     "rawType": "415",
+     "lat": 37.784141012,
+     "lng": -122.410951618,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Eddy St & Taylor St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262610099",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T07:44:00.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.784141012,
+     "lng": -122.410951618,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Eddy St & Taylor St",
+     "units": [
+      "M515"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hard_126",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "WELL BEING CHECK + Medical Incident at one corner, 28 min apart — a separate dispatch, however compatible the types look",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262603868",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T06:26:50.000Z",
+     "type": "public_safety",
+     "subtype": "WELL BEING CHECK",
+     "rawType": "910",
+     "lat": 37.75262859,
+     "lng": -122.411899822,
+     "neighborhood": "Mission",
+     "locationCanonical": "24th St & Harrison St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262603909",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T06:54:41.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.75262859,
+     "lng": -122.411899822,
+     "neighborhood": "Mission",
+     "locationCanonical": "24th St & Harrison St",
+     "units": [
+      "AM116"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hard_127",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "Alarms + WELL BEING CHECK at one corner, 36 min apart — a separate dispatch, however compatible the types look",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262603811",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T06:05:37.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.80130372,
+     "lng": -122.424538325,
+     "neighborhood": "Marina",
+     "locationCanonical": "Lombard St & Van Ness Ave",
+     "units": [
+      "B01",
+      "E16",
+      "T16"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262603897",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T06:41:36.000Z",
+     "type": "public_safety",
+     "subtype": "WELL BEING CHECK",
+     "rawType": "910",
+     "lat": 37.80130372,
+     "lng": -122.424538325,
+     "neighborhood": "Marina",
+     "locationCanonical": "Lombard St & Van Ness Ave"
+    }
+   ]
+  },
+  {
+   "id": "hard_128",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "Medical Incident + AIDED CASE at one corner, 37 min apart — a separate dispatch, however compatible the types look",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262603737",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T05:39:29.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.78423574,
+     "lng": -122.41770675,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Ellis St & Larkin St",
+     "units": [
+      "M505",
+      "QRV1"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262603830",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T06:16:28.000Z",
+     "type": "medical",
+     "subtype": "AIDED CASE",
+     "rawType": "520",
+     "lat": 37.78423574,
+     "lng": -122.41770675,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Ellis St & Larkin St"
+    }
+   ]
+  },
+  {
+   "id": "hard_129",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "Medical Incident + ASSAULT / BATTERY at one corner, 39 min apart — a separate dispatch, however compatible the types look",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262603339",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T03:10:56.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.784753446,
+     "lng": -122.421192974,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "O'Farrell St & Van Ness Ave",
+     "units": [
+      "E03",
+      "M505"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262603427",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T03:49:42.000Z",
+     "type": "assault",
+     "subtype": "ASSAULT / BATTERY",
+     "rawType": "240",
+     "lat": 37.784753446,
+     "lng": -122.421192974,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "O'Farrell St & Van Ness Ave"
+    }
+   ]
+  },
+  {
+   "id": "hard_130",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "DRUNK DRIVER + Medical Incident at one corner, 37 min apart — a separate dispatch, however compatible the types look",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262603314",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T02:59:15.000Z",
+     "type": "traffic",
+     "subtype": "DRUNK DRIVER",
+     "rawType": "152",
+     "lat": 37.759133959,
+     "lng": -122.410758543,
+     "neighborhood": "Mission",
+     "locationCanonical": "20th St & Florida St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262603393",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T03:36:22.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.759133959,
+     "lng": -122.410758543,
+     "neighborhood": "Mission",
+     "locationCanonical": "20th St & Florida St",
+     "units": [
+      "M547"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hard_131",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "WANTED VEHICLE / SUB + Medical Incident at one corner, 33 min apart — a separate dispatch, however compatible the types look",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262603191",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T02:17:03.000Z",
+     "type": "police_activity",
+     "subtype": "WANTED VEHICLE / SUB",
+     "rawType": "1030",
+     "lat": 37.746595232,
+     "lng": -122.406495612,
+     "neighborhood": "Bernal Heights",
+     "locationCanonical": "Brewster St & Montcalm St & Mullen Ave"
+    },
+    {
+     "id": "obs_sf_ems_cad_262603278",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T02:49:38.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.746595232,
+     "lng": -122.406495612,
+     "neighborhood": "Bernal Heights",
+     "locationCanonical": "Brewster St & Montcalm St & Mullen Ave",
+     "units": [
+      "M559"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hard_132",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "FIGHT NO WEAPON + Medical Incident at one corner, 43 min apart — a separate dispatch, however compatible the types look",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262602839",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T00:25:47.000Z",
+     "type": "disturbance",
+     "subtype": "FIGHT NO WEAPON",
+     "rawType": "418",
+     "lat": 37.787157756,
+     "lng": -122.432386046,
+     "neighborhood": "Pacific Heights",
+     "locationCanonical": "Bush St & Cottage Row"
+    },
+    {
+     "id": "obs_sf_ems_cad_262602973",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T01:08:57.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.787157756,
+     "lng": -122.432386046,
+     "neighborhood": "Pacific Heights",
+     "locationCanonical": "Bush St & Cottage Row",
+     "units": [
+      "M546"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hard_133",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "Medical Incident + SUSPICIOUS PERSON at one corner, 38 min apart — a separate dispatch, however compatible the types look",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262602701",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T23:57:54.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.780535387,
+     "lng": -122.408160793,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Minna St",
+     "units": [
+      "M515"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262602842",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T00:35:42.000Z",
+     "type": "public_safety",
+     "subtype": "SUSPICIOUS PERSON",
+     "rawType": "917",
+     "lat": 37.780535387,
+     "lng": -122.408160793,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Minna St"
+    }
+   ]
+  },
+  {
+   "id": "hard_134",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "Medical Incident + SUSPICIOUS PERSON at one corner, 38 min apart — a separate dispatch, however compatible the types look",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262602701",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T23:57:54.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.780535387,
+     "lng": -122.408160793,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Minna St",
+     "units": [
+      "M515"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262602843",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T00:35:53.000Z",
+     "type": "public_safety",
+     "subtype": "SUSPICIOUS PERSON",
+     "rawType": "917",
+     "lat": 37.780535387,
+     "lng": -122.408160793,
+     "neighborhood": "South of Market",
+     "locationCanonical": "6th St & Minna St"
+    }
+   ]
+  },
+  {
+   "id": "hard_135",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "SUSPICIOUS PERSON + Medical Incident at one corner, 27 min apart — a separate dispatch, however compatible the types look",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262602515",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T23:11:07.000Z",
+     "type": "public_safety",
+     "subtype": "SUSPICIOUS PERSON",
+     "rawType": "917",
+     "lat": 37.780951763,
+     "lng": -122.411985369,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Jones St & Market St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262602610",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T23:38:12.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.780930125,
+     "lng": -122.412044652,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Jones St & Market St",
+     "units": [
+      "E01"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hard_136",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "WANTED VEHICLE / SUB + Medical Incident at one corner, 27 min apart — a separate dispatch, however compatible the types look",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262601681",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T19:23:48.000Z",
+     "type": "police_activity",
+     "subtype": "WANTED VEHICLE / SUB",
+     "rawType": "1030",
+     "lat": 37.776230521,
+     "lng": -122.414711004,
+     "neighborhood": "South of Market",
+     "locationCanonical": "9th St & Mission St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262601813",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T19:50:53.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.776230521,
+     "lng": -122.414711004,
+     "neighborhood": "South of Market",
+     "locationCanonical": "9th St & Mission St",
+     "units": [
+      "AM215"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hard_137",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "ASSAULT / BATTERY + Medical Incident at one corner, 27 min apart — a separate dispatch, however compatible the types look",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262601666",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-17T19:17:47.000Z",
+     "type": "assault",
+     "subtype": "ASSAULT / BATTERY",
+     "rawType": "240",
+     "lat": 37.752204442,
+     "lng": -122.419017543,
+     "neighborhood": "Mission",
+     "locationCanonical": "24th St & Osage Aly"
+    },
+    {
+     "id": "obs_sf_ems_cad_262601770",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-17T19:44:31.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.752204442,
+     "lng": -122.419017543,
+     "neighborhood": "Mission",
+     "locationCanonical": "24th St & Osage Aly",
+     "units": [
+      "AM202"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "far_138",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "simultaneous calls in Mission and Lone Mountain/USF — different places entirely",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262610288",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T10:25:42.000Z",
+     "type": "disturbance",
+     "subtype": "FIGHT NO WEAPON",
+     "rawType": "418",
+     "lat": 37.750968089,
+     "lng": -122.412838554,
+     "neighborhood": "Mission",
+     "locationCanonical": "25th St & Treat Ave"
+    },
+    {
+     "id": "obs_sf_fire_cad_262610285",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T10:23:33.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.773424225,
+     "lng": -122.44256485,
+     "neighborhood": "Lone Mountain/USF",
+     "locationCanonical": "Fell St & Lyon St",
+     "units": [
+      "B05",
+      "E21",
+      "T10"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "far_139",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "simultaneous calls in Lone Mountain/USF and Sunset/Parkside — different places entirely",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262610285",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T10:23:33.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.773424225,
+     "lng": -122.44256485,
+     "neighborhood": "Lone Mountain/USF",
+     "locationCanonical": "Fell St & Lyon St",
+     "units": [
+      "B05",
+      "E21",
+      "T10"
+     ]
+    },
+    {
+     "id": "obs_sf_ems_cad_262610282",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T10:21:57.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.760377066,
+     "lng": -122.506999208,
+     "neighborhood": "Sunset/Parkside",
+     "locationCanonical": "47th Ave & Judah St",
+     "units": [
+      "AM122",
+      "E18",
+      "E23"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "far_140",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "simultaneous calls in Lone Mountain/USF and Mission — different places entirely",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262610285",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T10:23:33.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.773424225,
+     "lng": -122.44256485,
+     "neighborhood": "Lone Mountain/USF",
+     "locationCanonical": "Fell St & Lyon St",
+     "units": [
+      "B05",
+      "E21",
+      "T10"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610288",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T10:25:42.000Z",
+     "type": "disturbance",
+     "subtype": "FIGHT NO WEAPON",
+     "rawType": "418",
+     "lat": 37.750968089,
+     "lng": -122.412838554,
+     "neighborhood": "Mission",
+     "locationCanonical": "25th St & Treat Ave"
+    }
+   ]
+  },
+  {
+   "id": "far_141",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "simultaneous calls in Lone Mountain/USF and Chinatown — different places entirely",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262610285",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T10:23:33.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.773424225,
+     "lng": -122.44256485,
+     "neighborhood": "Lone Mountain/USF",
+     "locationCanonical": "Fell St & Lyon St",
+     "units": [
+      "B05",
+      "E21",
+      "T10"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610281",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T10:20:37.000Z",
+     "type": "disturbance",
+     "subtype": "FIGHT NO WEAPON",
+     "rawType": "418",
+     "lat": 37.795970584,
+     "lng": -122.407083681,
+     "neighborhood": "Chinatown",
+     "locationCanonical": "Jackson St & Saint Louis Aly"
+    }
+   ]
+  },
+  {
+   "id": "far_142",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "simultaneous calls in Lone Mountain/USF and North Beach — different places entirely",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262610285",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T10:23:33.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.773424225,
+     "lng": -122.44256485,
+     "neighborhood": "Lone Mountain/USF",
+     "locationCanonical": "Fell St & Lyon St",
+     "units": [
+      "B05",
+      "E21",
+      "T10"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610286",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T10:22:18.000Z",
+     "type": "public_safety",
+     "subtype": "SUSPICIOUS PERSON",
+     "rawType": "917",
+     "lat": 37.807275871,
+     "lng": -122.415616436,
+     "neighborhood": "North Beach",
+     "locationCanonical": "Beach St & Taylor St"
+    }
+   ]
+  },
+  {
+   "id": "far_143",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "simultaneous calls in Lone Mountain/USF and Potrero Hill — different places entirely",
+   "observations": [
+    {
+     "id": "obs_sf_fire_cad_262610285",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T10:23:33.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.773424225,
+     "lng": -122.44256485,
+     "neighborhood": "Lone Mountain/USF",
+     "locationCanonical": "Fell St & Lyon St",
+     "units": [
+      "B05",
+      "E21",
+      "T10"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610283",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T10:22:07.000Z",
+     "type": "disturbance",
+     "subtype": "NOISE NUISANCE",
+     "rawType": "415",
+     "lat": 37.760201913,
+     "lng": -122.393364732,
+     "neighborhood": "Potrero Hill",
+     "locationCanonical": "20th St & Pennsylvania Ave"
+    }
+   ]
+  },
+  {
+   "id": "far_144",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "simultaneous calls in North Beach and Lone Mountain/USF — different places entirely",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262610286",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T10:22:18.000Z",
+     "type": "public_safety",
+     "subtype": "SUSPICIOUS PERSON",
+     "rawType": "917",
+     "lat": 37.807275871,
+     "lng": -122.415616436,
+     "neighborhood": "North Beach",
+     "locationCanonical": "Beach St & Taylor St"
+    },
+    {
+     "id": "obs_sf_fire_cad_262610285",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T10:23:33.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.773424225,
+     "lng": -122.44256485,
+     "neighborhood": "Lone Mountain/USF",
+     "locationCanonical": "Fell St & Lyon St",
+     "units": [
+      "B05",
+      "E21",
+      "T10"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "far_145",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "simultaneous calls in North Beach and Sunset/Parkside — different places entirely",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262610286",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T10:22:18.000Z",
+     "type": "public_safety",
+     "subtype": "SUSPICIOUS PERSON",
+     "rawType": "917",
+     "lat": 37.807275871,
+     "lng": -122.415616436,
+     "neighborhood": "North Beach",
+     "locationCanonical": "Beach St & Taylor St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262610282",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T10:21:57.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.760377066,
+     "lng": -122.506999208,
+     "neighborhood": "Sunset/Parkside",
+     "locationCanonical": "47th Ave & Judah St",
+     "units": [
+      "AM122",
+      "E18",
+      "E23"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "far_146",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "simultaneous calls in Potrero Hill and Lone Mountain/USF — different places entirely",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262610283",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T10:22:07.000Z",
+     "type": "disturbance",
+     "subtype": "NOISE NUISANCE",
+     "rawType": "415",
+     "lat": 37.760201913,
+     "lng": -122.393364732,
+     "neighborhood": "Potrero Hill",
+     "locationCanonical": "20th St & Pennsylvania Ave"
+    },
+    {
+     "id": "obs_sf_fire_cad_262610285",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T10:23:33.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.773424225,
+     "lng": -122.44256485,
+     "neighborhood": "Lone Mountain/USF",
+     "locationCanonical": "Fell St & Lyon St",
+     "units": [
+      "B05",
+      "E21",
+      "T10"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "far_147",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "simultaneous calls in Potrero Hill and Sunset/Parkside — different places entirely",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262610283",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T10:22:07.000Z",
+     "type": "disturbance",
+     "subtype": "NOISE NUISANCE",
+     "rawType": "415",
+     "lat": 37.760201913,
+     "lng": -122.393364732,
+     "neighborhood": "Potrero Hill",
+     "locationCanonical": "20th St & Pennsylvania Ave"
+    },
+    {
+     "id": "obs_sf_ems_cad_262610282",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T10:21:57.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.760377066,
+     "lng": -122.506999208,
+     "neighborhood": "Sunset/Parkside",
+     "locationCanonical": "47th Ave & Judah St",
+     "units": [
+      "AM122",
+      "E18",
+      "E23"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "far_148",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "simultaneous calls in Sunset/Parkside and Lone Mountain/USF — different places entirely",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262610282",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T10:21:57.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.760377066,
+     "lng": -122.506999208,
+     "neighborhood": "Sunset/Parkside",
+     "locationCanonical": "47th Ave & Judah St",
+     "units": [
+      "AM122",
+      "E18",
+      "E23"
+     ]
+    },
+    {
+     "id": "obs_sf_fire_cad_262610285",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T10:23:33.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.773424225,
+     "lng": -122.44256485,
+     "neighborhood": "Lone Mountain/USF",
+     "locationCanonical": "Fell St & Lyon St",
+     "units": [
+      "B05",
+      "E21",
+      "T10"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "far_149",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "simultaneous calls in Sunset/Parkside and Chinatown — different places entirely",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262610282",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T10:21:57.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.760377066,
+     "lng": -122.506999208,
+     "neighborhood": "Sunset/Parkside",
+     "locationCanonical": "47th Ave & Judah St",
+     "units": [
+      "AM122",
+      "E18",
+      "E23"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610281",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T10:20:37.000Z",
+     "type": "disturbance",
+     "subtype": "FIGHT NO WEAPON",
+     "rawType": "418",
+     "lat": 37.795970584,
+     "lng": -122.407083681,
+     "neighborhood": "Chinatown",
+     "locationCanonical": "Jackson St & Saint Louis Aly"
+    }
+   ]
+  },
+  {
+   "id": "far_150",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "simultaneous calls in Sunset/Parkside and North Beach — different places entirely",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262610282",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T10:21:57.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.760377066,
+     "lng": -122.506999208,
+     "neighborhood": "Sunset/Parkside",
+     "locationCanonical": "47th Ave & Judah St",
+     "units": [
+      "AM122",
+      "E18",
+      "E23"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610286",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T10:22:18.000Z",
+     "type": "public_safety",
+     "subtype": "SUSPICIOUS PERSON",
+     "rawType": "917",
+     "lat": 37.807275871,
+     "lng": -122.415616436,
+     "neighborhood": "North Beach",
+     "locationCanonical": "Beach St & Taylor St"
+    }
+   ]
+  },
+  {
+   "id": "far_151",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "simultaneous calls in Sunset/Parkside and Potrero Hill — different places entirely",
+   "observations": [
+    {
+     "id": "obs_sf_ems_cad_262610282",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T10:21:57.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.760377066,
+     "lng": -122.506999208,
+     "neighborhood": "Sunset/Parkside",
+     "locationCanonical": "47th Ave & Judah St",
+     "units": [
+      "AM122",
+      "E18",
+      "E23"
+     ]
+    },
+    {
+     "id": "obs_sf_police_cad_262610283",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T10:22:07.000Z",
+     "type": "disturbance",
+     "subtype": "NOISE NUISANCE",
+     "rawType": "415",
+     "lat": 37.760201913,
+     "lng": -122.393364732,
+     "neighborhood": "Potrero Hill",
+     "locationCanonical": "20th St & Pennsylvania Ave"
+    }
+   ]
+  },
+  {
+   "id": "far_152",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "simultaneous calls in Chinatown and Lone Mountain/USF — different places entirely",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262610281",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T10:20:37.000Z",
+     "type": "disturbance",
+     "subtype": "FIGHT NO WEAPON",
+     "rawType": "418",
+     "lat": 37.795970584,
+     "lng": -122.407083681,
+     "neighborhood": "Chinatown",
+     "locationCanonical": "Jackson St & Saint Louis Aly"
+    },
+    {
+     "id": "obs_sf_fire_cad_262610285",
+     "source": "sf_fire_cad",
+     "occurredAt": "2026-09-18T10:23:33.000Z",
+     "type": "fire",
+     "subtype": "Alarms",
+     "rawType": "Alarms",
+     "lat": 37.773424225,
+     "lng": -122.44256485,
+     "neighborhood": "Lone Mountain/USF",
+     "locationCanonical": "Fell St & Lyon St",
+     "units": [
+      "B05",
+      "E21",
+      "T10"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "far_153",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "simultaneous calls in Chinatown and Sunset/Parkside — different places entirely",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262610281",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T10:20:37.000Z",
+     "type": "disturbance",
+     "subtype": "FIGHT NO WEAPON",
+     "rawType": "418",
+     "lat": 37.795970584,
+     "lng": -122.407083681,
+     "neighborhood": "Chinatown",
+     "locationCanonical": "Jackson St & Saint Louis Aly"
+    },
+    {
+     "id": "obs_sf_ems_cad_262610282",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T10:21:57.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.760377066,
+     "lng": -122.506999208,
+     "neighborhood": "Sunset/Parkside",
+     "locationCanonical": "47th Ave & Judah St",
+     "units": [
+      "AM122",
+      "E18",
+      "E23"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "far_154",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "simultaneous calls in Bayview Hunters Point and Mission — different places entirely",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262610274",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T10:12:38.000Z",
+     "type": "public_safety",
+     "subtype": "SUSPICIOUS VEHICLE",
+     "rawType": "916",
+     "lat": 37.732861381,
+     "lng": -122.400565512,
+     "neighborhood": "Bayview Hunters Point",
+     "locationCanonical": "Quint St & Scotia Ave"
+    },
+    {
+     "id": "obs_sf_ems_cad_262610271",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T10:10:36.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.748906531,
+     "lng": -122.420353711,
+     "neighborhood": "Mission",
+     "locationCanonical": "26th St & Valencia St",
+     "units": [
+      "M510"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "far_155",
+   "label": "different",
+   "labelSource": "hand",
+   "note": "simultaneous calls in Tenderloin and Mission — different places entirely",
+   "observations": [
+    {
+     "id": "obs_sf_police_cad_262610268",
+     "source": "sf_police_cad",
+     "occurredAt": "2026-09-18T10:10:58.000Z",
+     "type": "public_safety",
+     "subtype": "SUSPICIOUS PERSON",
+     "rawType": "917",
+     "lat": 37.785167215,
+     "lng": -122.41790141,
+     "neighborhood": "Tenderloin",
+     "locationCanonical": "Larkin St & O'Farrell St"
+    },
+    {
+     "id": "obs_sf_ems_cad_262610271",
+     "source": "sf_ems_cad",
+     "occurredAt": "2026-09-18T10:10:36.000Z",
+     "type": "medical",
+     "subtype": "Medical Incident",
+     "rawType": "Medical Incident",
+     "lat": 37.748906531,
+     "lng": -122.420353711,
+     "neighborhood": "Mission",
+     "locationCanonical": "26th St & Valencia St",
+     "units": [
+      "M510"
+     ]
+    }
+   ]
+  }
+ ]
+}

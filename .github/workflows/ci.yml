@@ -16,3 +16,6 @@ jobs:
       - run: bun run lint
       - run: bun run typecheck
       - run: bun run test
+      # The guard on PRD §55: a correlation change that drops F1 more than the allowed
+      # delta fails here rather than in the feed.
+      - run: bun run eval:correlation

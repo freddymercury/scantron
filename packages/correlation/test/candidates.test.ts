@@ -105,19 +105,19 @@ test("candidates are ordered by distance, nearest first", () => {
 
 test("the time window reaches further back than forward, because a response follows a call", () => {
   const db = createTestDatabase();
-  // Started 12 minutes ago: this medic plausibly belongs to it.
-  incident(db, "inc_12_back", { at: new Date(BASE.getTime() - 12 * 60_000) });
-  // Starts 12 minutes from now: the same gap, the other way, and not plausible.
-  incident(db, "inc_12_forward", { at: new Date(BASE.getTime() + 12 * 60_000) });
+  // Started 20 minutes ago: this medic plausibly belongs to it.
+  incident(db, "inc_20_back", { at: new Date(BASE.getTime() - 20 * 60_000) });
+  // Starts 20 minutes from now: the same gap, the other way, and not plausible.
+  incident(db, "inc_20_forward", { at: new Date(BASE.getTime() + 20 * 60_000) });
   // Just inside the forward window.
-  incident(db, "inc_8_forward", { at: new Date(BASE.getTime() + 8 * 60_000) });
-  incident(db, "inc_40_back", { at: new Date(BASE.getTime() - 40 * 60_000) });
+  incident(db, "inc_12_forward", { at: new Date(BASE.getTime() + 12 * 60_000) });
+  incident(db, "inc_50_back", { at: new Date(BASE.getTime() - 50 * 60_000) });
 
   const ids = findCandidates(db, observation()).candidates.map((candidate) => candidate.id);
-  expect(ids).toContain("inc_12_back");
-  expect(ids).toContain("inc_8_forward");
-  expect(ids).not.toContain("inc_12_forward");
-  expect(ids).not.toContain("inc_40_back");
+  expect(ids).toContain("inc_20_back");
+  expect(ids).toContain("inc_12_forward");
+  expect(ids).not.toContain("inc_20_forward");
+  expect(ids).not.toContain("inc_50_back");
   db.close();
 });
 

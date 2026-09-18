@@ -110,7 +110,7 @@ test("a changed record updates the observation and queues re-correlation", async
   expect(result.updated).toBe(1);
   expect(result.created).toBe(0);
 
-  const stored = observationBySourceRecord(h.db, "sf_police_cad", record.id as string);
+  const stored = observationBySourceRecord(h.db, "sf_police_cad", record.cad_number as string);
   expect(stored?.raw_type).toBe("216");
 
   // Both payloads survive, so the previous values are recoverable (S-D7).
@@ -217,7 +217,9 @@ test("mapping keeps what the model has no column for, and nothing it should not"
   const mapped = mapSfpdRecord(withPoint, new Date("2026-09-18T02:00:00.000Z"));
 
   expect(mapped.observation.source).toBe("sf_police_cad");
-  expect(mapped.observation.sourceRecordId).toBe(withPoint.id as string);
+  // Keyed on cad_number: the historical dataset has no row id, so this is the only key
+  // that makes a backfilled row the same record as the live one.
+  expect(mapped.observation.sourceRecordId).toBe(withPoint.cad_number as string);
   expect(mapped.observation.location?.latitude).toBeCloseTo(
     (withPoint.intersection_point?.coordinates?.[1] as number) ?? 0,
     6,
@@ -237,7 +239,9 @@ test("sensitive_call is carried through as SFPD set it", async () => {
   const h = harness([sensitive, notSensitive]);
   await runIngestCycle(h);
 
-  expect(observationBySourceRecord(h.db, "sf_police_cad", sensitive.id as string)?.sensitive).toBe(1);
-  expect(observationBySourceRecord(h.db, "sf_police_cad", notSensitive.id as string)?.sensitive).toBe(0);
+  expect(observationBySourceRecord(h.db, "sf_police_cad", sensitive.cad_number as string)?.sensitive).toBe(1);
+  expect(
+    observationBySourceRecord(h.db, "sf_police_cad", notSensitive.cad_number as string)?.sensitive,
+  ).toBe(0);
   h.db.close();
 });

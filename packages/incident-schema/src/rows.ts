@@ -55,6 +55,7 @@ export interface ObservationRow {
   severity: string | null;
   priority_rank: number | null;
   normalized_at: string | null;
+  backfilled: number;
 }
 
 export interface IncidentRow {
@@ -151,6 +152,7 @@ export function observationToRow(observation: Observation): ObservationRow {
     severity: orNull(observation.severity),
     priority_rank: orNull(observation.priorityRank),
     normalized_at: iso(observation.normalizedAt),
+    backfilled: observation.backfilled ? 1 : 0,
   };
 }
 
@@ -198,6 +200,7 @@ export function rowToObservation(row: ObservationRow): Observation {
   set(observation, "severity", row.severity as IncidentSeverity | null);
   set(observation, "priorityRank", row.priority_rank);
   if (row.normalized_at !== null) observation.normalizedAt = new Date(row.normalized_at);
+  if (row.backfilled === 1) observation.backfilled = true;
   if (row.sensitive !== null) observation.sensitive = row.sensitive === 1;
   if (row.units !== null) observation.units = parseJson<string[]>(row.units, []);
   if (row.audio !== null) observation.audio = parseJson<ObservationAudio>(row.audio, {});

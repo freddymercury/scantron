@@ -18,6 +18,7 @@
     "load:neighborhoods": "bun run scripts/load-neighborhoods.ts",
     "load:geocode-data": "bun run scripts/load-geocode-data.ts",
     "build:street-data": "bun run scripts/build-street-data.ts",
+    "backfill": "bun run scripts/backfill.ts",
     "renormalize": "bun run scripts/renormalize.ts",
     "report:geocoding": "bun run scripts/geocode-report.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",

@@ -10,6 +10,7 @@
 import {
   createConfigCache,
   databasePath,
+  detectGap,
   effectivePollSeconds,
   migrate,
   openDatabase,
@@ -30,6 +31,7 @@ import {
 
 import type { SourceAdapter } from "./adapter.ts";
 import { emsAdapter, fireAdapter } from "./fire.ts";
+import { fillOpenGaps } from "./backfill.ts";
 import { runIngestCycle } from "./ingest.ts";
 import { policeAdapter } from "./police.ts";
 import { createSocrataClient, type SocrataClient } from "./socrata.ts";
@@ -108,6 +110,22 @@ async function pollLoop(options: {
     }
 
     try {
+      // Detected before the poll, so the gap's bounds are the silence itself rather than
+      // the silence minus this cycle.
+      const gap = detectGap(options.db, adapter.source);
+      if (gap) {
+        log.error("gap.detected", {
+          source: adapter.source,
+          result: `${gap.gap_start} → ${gap.gap_end}`,
+        });
+        void fillOpenGaps(
+          { db: options.db, client: options.client, metrics: options.metrics, log },
+          { source: adapter.source },
+        ).catch((error: unknown) =>
+          log.error("gap.fill_failed", { source: adapter.source, error: errorMessage(error) }),
+        );
+      }
+
       await runIngestCycle({
         db: options.db,
         adapter,
@@ -182,6 +200,21 @@ export async function main(): Promise<void> {
   };
   process.on("SIGINT", stop("SIGINT"));
   process.on("SIGTERM", stop("SIGTERM"));
+
+  // Startup detection matters most: a crash or a long deploy is exactly the silence
+  // nobody was watching, and it must not need an operator to notice.
+  for (const adapter of ADAPTERS) {
+    const gap = detectGap(db, adapter.source);
+    if (gap) {
+      log.error("gap.detected_at_startup", {
+        source: adapter.source,
+        result: `${gap.gap_start} → ${gap.gap_end}`,
+      });
+    }
+  }
+  void fillOpenGaps({ db, client, metrics, log }).catch((error: unknown) =>
+    log.error("gap.fill_failed", { error: errorMessage(error) }),
+  );
 
   log.info("service.started", { count: ADAPTERS.length });
 

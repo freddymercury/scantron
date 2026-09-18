@@ -40,6 +40,7 @@ test("every job type PRD §39 names is registered", () => {
     "correlate_incident",
     "publish_incident",
     "summarize_incident",
+    "backfill_gap",
     "transcribe_audio",
   ]);
 });

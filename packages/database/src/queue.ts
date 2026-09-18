@@ -15,6 +15,8 @@ export const JOB_TYPES = [
   "correlate_incident",
   "publish_incident",
   "summarize_incident",
+  /** Refill a detected ingestion gap from the historical dataset (S-B5). */
+  "backfill_gap",
   /** Registered, unimplemented until Phase 2 (S-G*). */
   "transcribe_audio",
 ] as const;

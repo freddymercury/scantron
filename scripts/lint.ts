@@ -37,10 +37,11 @@ async function sourcePaths(): Promise<string[]> {
 
 const SERVICES = ["sf-cad-ingest", "incident-correlator"];
 
-// Anchored to the start of a line so that import specifiers quoted inside strings
-// (this file quotes several) are not mistaken for real imports.
+// Anchored to the start of a line, and the "from" clause may not span lines: without
+// that second restriction, an `export` on one line and the word "from" inside a prose
+// comment several lines later matched as an import of whatever came next in quotes.
 const IMPORT_RE =
-  /^\s*(?:import|export)\s+(?:[^'"]*\sfrom\s*)?["']([^"']+)["']/gm;
+  /^\s*(?:import|export)\s+(?:[^'"\n]*\sfrom\s*)?["']([^"'\n]+)["']/gm;
 
 function importsOf(source: string): string[] {
   return [...source.matchAll(IMPORT_RE)].map((m) => m[1] as string);

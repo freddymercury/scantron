@@ -60,9 +60,14 @@ function isSensitive(value: SfpdCallRecord["sensitive_call"]): boolean | undefin
  * feed does contain them, and quarantining beats writing a record with a NaN timestamp.
  */
 export function mapSfpdRecord(record: SfpdCallRecord, ingestedAt: Date): MappedRecord {
-  const sourceRecordId = record.id?.trim();
+  // Keyed on `cad_number`, not the feed's row `id`: the historical dataset (2zdj-bwza)
+  // has no `id` column at all, so keying on it would make every backfilled row a
+  // duplicate of the live row for the same call. `cad_number` is present and unique on
+  // both — verified across 1,000 live rows on 2026-09-18 — and is the same key the
+  // incident-report join uses (docs/01 §1).
+  const sourceRecordId = record.cad_number?.trim() || record.id?.trim();
   if (!sourceRecordId) {
-    throw new MalformedRecordError("record has no id", undefined);
+    throw new MalformedRecordError("record has neither cad_number nor id", record.id);
   }
 
   const receivedAt = parseSfTimestamp(record.received_datetime);

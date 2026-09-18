@@ -192,6 +192,8 @@ export interface Observation {
   priorityRank?: number;
   /** When normalization last ran, so a taxonomy change can find stale rows. */
   normalizedAt?: Date;
+  /** Refilled from the historical dataset (S-B5), so latency metrics can exclude it. */
+  backfilled?: boolean;
   /** How `location.latitude`/`longitude` were arrived at (S-C2). */
   locationMethod?: LocationMethod;
   /** Confidence in the resolved point, separate from the observation's own confidence. */
@@ -313,6 +315,7 @@ export const ObservationSchema = objectOf(
     severity: optional(enumOf(INCIDENT_SEVERITIES)),
     priorityRank: optional(number({ integer: true, min: 1, max: 5 })),
     normalizedAt: optional(timestamp()),
+    backfilled: optional(boolean()),
     locationMethod: optional(enumOf(LOCATION_METHODS)),
     locationConfidence: optional(confidence()),
   },

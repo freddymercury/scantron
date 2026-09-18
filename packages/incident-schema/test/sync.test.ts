@@ -75,6 +75,7 @@ const OBSERVATION_KEYS: Record<keyof Observation, true> = {
   severity: true,
   priorityRank: true,
   normalizedAt: true,
+  backfilled: true,
 };
 
 const INCIDENT_KEYS: Record<keyof Incident, true> = {

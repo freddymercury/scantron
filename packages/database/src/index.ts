@@ -256,3 +256,4 @@ export function sourceConfigurations(db: Database): SourceConfigurationRow[] {
 export * from "./ingest.ts";
 export * from "./units.ts";
 export * from "./source-config.ts";
+export * from "./gaps.ts";

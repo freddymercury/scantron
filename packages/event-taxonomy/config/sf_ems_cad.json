@@ -1,0 +1,17 @@
+{
+  "version": "2026-09-18.1",
+  "source": "sf_ems_cad",
+  "note": "EMS shares the SFFD feed (nuek-vuh3); this file exists so EMS mappings can diverge without editing the fire file.",
+  "mappings": [
+    {
+      "rawCode": "Medical Incident",
+      "normalizedType": "medical",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawLabelPattern": "Medical|Aid|Overdose",
+      "normalizedType": "medical",
+      "typeConfidence": 0.6
+    }
+  ]
+}

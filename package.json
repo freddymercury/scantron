@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@scantron/database": "workspace:*",
-    "@scantron/sf-domain": "workspace:*"
+    "@scantron/sf-domain": "workspace:*",
+    "@scantron/event-taxonomy": "workspace:*"
   }
 }

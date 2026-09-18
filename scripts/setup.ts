@@ -7,6 +7,7 @@
  */
 
 import { migrate, openDatabase, databasePath, loadMigrations } from "@scantron/database";
+import { seedTaxonomy } from "@scantron/event-taxonomy";
 import type { Database } from "bun:sqlite";
 import { checkEnv } from "./env.ts";
 
@@ -79,7 +80,12 @@ async function main(): Promise<void> {
 
   await ensureNeighborhoods(db);
 
-  // Remaining seed step: the event taxonomy (S-A4), which lands with that story.
+  const seeded = seedTaxonomy(db);
+  step(
+    `taxonomy seeded: ${seeded
+      .map((result) => `${result.source} ${result.inserted} rules @ ${result.version}`)
+      .join(", ")}`,
+  );
 
   db.close();
   console.log("\nsetup complete. Next: bun run dev");

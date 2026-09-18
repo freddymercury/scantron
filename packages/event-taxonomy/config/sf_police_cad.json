@@ -1,0 +1,642 @@
+{
+  "version": "2026-09-18.1",
+  "source": "sf_police_cad",
+  "note": "Codes observed live in gnap-fj3t on 2026-09-18 (93 distinct), plus label patterns as a safety net for codes the seed has never seen. Exact code always wins over a pattern.",
+  "mappings": [
+    {
+      "rawCode": "000",
+      "rawLabel": "MISC",
+      "normalizedType": "unknown",
+      "typeConfidence": 0.5
+    },
+    {
+      "rawCode": "100",
+      "rawLabel": "ALARM",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "100A",
+      "rawLabel": "AUDIBLE ALARM",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "100P",
+      "rawLabel": "PANIC ALARM",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "100S",
+      "rawLabel": "SILENT ALARM",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "100V",
+      "rawLabel": "VEHICLE ALARM",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "1030",
+      "rawLabel": "WANTED VEHICLE / SUB",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "1036",
+      "rawLabel": "URGENT NOTIFICATION",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "106A",
+      "rawLabel": "416 for medication",
+      "normalizedType": "medical",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "106F",
+      "rawLabel": "Money Counts",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "106J",
+      "rawLabel": "Psych escort",
+      "normalizedType": "medical",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "106R",
+      "rawLabel": "416 for restraints",
+      "normalizedType": "medical",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "106T",
+      "rawLabel": "RO Service",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "1096",
+      "rawLabel": "SURVEILLANCE",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "148",
+      "rawLabel": "RESISTING ARREST",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "152",
+      "rawLabel": "DRUNK DRIVER",
+      "normalizedType": "traffic",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "207",
+      "rawLabel": "KIDNAPPING",
+      "normalizedType": "public_safety",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "critical"
+    },
+    {
+      "rawCode": "211",
+      "rawLabel": "ROBBERY",
+      "normalizedType": "robbery",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "211S",
+      "rawLabel": "SILENT HOLDUP ALARM",
+      "normalizedType": "robbery",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "212",
+      "rawLabel": "STRONGARM ROBBERY",
+      "normalizedType": "robbery",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "216",
+      "rawLabel": "SHOTS FIRED",
+      "normalizedType": "weapon",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "critical"
+    },
+    {
+      "rawCode": "216S",
+      "rawLabel": "SHOT SPOTTER",
+      "normalizedType": "weapon",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "219",
+      "rawLabel": "STABBING",
+      "normalizedType": "assault",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "critical"
+    },
+    {
+      "rawCode": "219DV",
+      "rawLabel": "STABBING DV",
+      "normalizedType": "assault",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "critical"
+    },
+    {
+      "rawCode": "221",
+      "rawLabel": "PERSON W/GUN",
+      "normalizedType": "weapon",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "critical"
+    },
+    {
+      "rawCode": "222",
+      "rawLabel": "PERSON W/KNIFE",
+      "normalizedType": "weapon",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "240",
+      "rawLabel": "ASSAULT / BATTERY",
+      "normalizedType": "assault",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "240DV",
+      "rawLabel": "ASSAULT / BATTERY DV",
+      "normalizedType": "assault",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "245",
+      "rawLabel": "AGG ASSAULT / ADW",
+      "normalizedType": "assault",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "261",
+      "rawLabel": "SEXUAL ASSAULT ADULT",
+      "normalizedType": "assault",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "critical"
+    },
+    {
+      "rawCode": "311",
+      "rawLabel": "INDECENT EXPOSURE",
+      "normalizedType": "public_safety",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "368EA",
+      "rawLabel": "ELDERLY ABUSE",
+      "normalizedType": "assault",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "400",
+      "rawLabel": "DEMO / PROTEST",
+      "normalizedType": "public_safety",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "405",
+      "rawLabel": "CITIZEN ARREST",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "407",
+      "rawLabel": "PRISONER TRANSPORT",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "409",
+      "rawLabel": "TOW TRUCK",
+      "normalizedType": "traffic",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "415",
+      "rawLabel": "NOISE NUISANCE",
+      "normalizedType": "disturbance",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "416",
+      "rawLabel": "CITIZEN STANDBY",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "416DV",
+      "rawLabel": "CITIZEN STANDBY DV",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "417",
+      "rawLabel": "RINGING DOORBELL",
+      "normalizedType": "disturbance",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "low"
+    },
+    {
+      "rawCode": "418",
+      "rawLabel": "FIGHT NO WEAPON",
+      "normalizedType": "disturbance",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "418DV",
+      "rawLabel": "FIGHT NO WEAPON DV",
+      "normalizedType": "disturbance",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "420",
+      "rawLabel": "JUVENILE DISTURBANCE",
+      "normalizedType": "disturbance",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "423",
+      "rawLabel": "CIT/COMM ENGAGEMENT",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "459",
+      "rawLabel": "BURGLARY",
+      "normalizedType": "burglary",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "470",
+      "rawLabel": "FRAUD",
+      "normalizedType": "theft",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "487",
+      "rawLabel": "GRAND THEFT",
+      "normalizedType": "theft",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "488",
+      "rawLabel": "PETTY THEFT",
+      "normalizedType": "theft",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "518",
+      "rawLabel": "VEH ACCIDENT",
+      "normalizedType": "collision",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "518HR",
+      "rawLabel": "H&R VEH ACCIDENT",
+      "normalizedType": "collision",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "519",
+      "rawLabel": "INJURY VEH ACCIDENT",
+      "normalizedType": "collision",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "519HR",
+      "rawLabel": "H&R INJURY ACCIDENT",
+      "normalizedType": "collision",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "520",
+      "rawLabel": "AIDED CASE",
+      "normalizedType": "medical",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "531",
+      "rawLabel": "EXPLOSIVE FOUND",
+      "normalizedType": "hazard",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "critical"
+    },
+    {
+      "rawCode": "532",
+      "rawLabel": "SUSPICIOUS MAILING",
+      "normalizedType": "hazard",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "585",
+      "rawLabel": "TRAFFIC STOP",
+      "normalizedType": "traffic",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "586",
+      "rawLabel": "TRAFFIC HAZARD",
+      "normalizedType": "hazard",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "587",
+      "rawLabel": "TRAF VIOLATION CITE",
+      "normalizedType": "traffic",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "588",
+      "rawLabel": "TRAF VIOLATION TOW",
+      "normalizedType": "traffic",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "594",
+      "rawLabel": "VANDALISM",
+      "normalizedType": "disturbance",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "594DV",
+      "rawLabel": "VANDALISM DV",
+      "normalizedType": "disturbance",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "595",
+      "rawLabel": "GRAFFITI VANDALISM",
+      "normalizedType": "disturbance",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "low"
+    },
+    {
+      "rawCode": "601",
+      "rawLabel": "TRESPASSER",
+      "normalizedType": "public_safety",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "602",
+      "rawLabel": "PERSON BREAKING IN",
+      "normalizedType": "burglary",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "603",
+      "rawLabel": "PROWLER",
+      "normalizedType": "public_safety",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "650",
+      "rawLabel": "THREATS / HARASSMENT",
+      "normalizedType": "disturbance",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "650DV",
+      "rawLabel": "THREATS DV",
+      "normalizedType": "disturbance",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "799",
+      "rawLabel": "SENILE PERSON",
+      "normalizedType": "medical",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "800",
+      "rawLabel": "MENTALLY DISTURBED",
+      "normalizedType": "medical",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "801",
+      "rawLabel": "SUICIDE ATTEMPT",
+      "normalizedType": "medical",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "critical"
+    },
+    {
+      "rawCode": "806",
+      "rawLabel": "JUVE BEYOND CONTROL",
+      "normalizedType": "public_safety",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "807",
+      "rawLabel": "MISSING JUVENILE",
+      "normalizedType": "missing_person",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "809",
+      "rawLabel": "MISSING ADULT",
+      "normalizedType": "missing_person",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "811",
+      "rawLabel": "INTOXICATED PERSON",
+      "normalizedType": "medical",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "851",
+      "rawLabel": "STOLEN VEHICLE",
+      "normalizedType": "theft",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "852",
+      "rawLabel": "AUTO BOOST / STRIP",
+      "normalizedType": "theft",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "853",
+      "rawLabel": "RECOVER MISSING VEH",
+      "normalizedType": "theft",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "903",
+      "rawLabel": "PASSING CALL",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "904",
+      "rawLabel": "MEET W/OFFICER",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "905",
+      "rawLabel": "MEET W/CITY EMPLOYEE",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "908",
+      "rawLabel": "MUNI INSPECTION",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "909",
+      "rawLabel": "MEET W/CITIZEN",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "910",
+      "rawLabel": "WELL BEING CHECK",
+      "normalizedType": "public_safety",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "913",
+      "rawLabel": "COMPLAINT UNKN",
+      "normalizedType": "unknown",
+      "typeConfidence": 0.5
+    },
+    {
+      "rawCode": "913M",
+      "rawLabel": "COMPLAINT UNKN",
+      "normalizedType": "unknown",
+      "typeConfidence": 0.5
+    },
+    {
+      "rawCode": "915",
+      "rawLabel": "HOMELESS COMPLAINT",
+      "normalizedType": "public_safety",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "916",
+      "rawLabel": "SUSPICIOUS VEHICLE",
+      "normalizedType": "public_safety",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "917",
+      "rawLabel": "SUSPICIOUS PERSON",
+      "normalizedType": "public_safety",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "918",
+      "rawLabel": "PERSON SCREAMING",
+      "normalizedType": "disturbance",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "919",
+      "rawLabel": "SIT/LIE ENFORCEMENT",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "921",
+      "rawLabel": "BLOCKED SIDEWALK",
+      "normalizedType": "public_safety",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "ARR",
+      "rawLabel": "ARREST MADE",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "MAR",
+      "rawLabel": "MARINE",
+      "normalizedType": "rescue",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawLabelPattern": "\\bFIRE\\b",
+      "normalizedType": "fire",
+      "typeConfidence": 0.6
+    },
+    {
+      "rawLabelPattern": "ROBBERY|HOLDUP",
+      "normalizedType": "robbery",
+      "typeConfidence": 0.6
+    },
+    {
+      "rawLabelPattern": "ASSAULT|BATTERY|STABBING",
+      "normalizedType": "assault",
+      "typeConfidence": 0.6
+    },
+    {
+      "rawLabelPattern": "GUN|KNIFE|SHOTS|WEAPON",
+      "normalizedType": "weapon",
+      "typeConfidence": 0.6
+    },
+    {
+      "rawLabelPattern": "BURGLAR",
+      "normalizedType": "burglary",
+      "typeConfidence": 0.6
+    },
+    {
+      "rawLabelPattern": "THEFT|STOLEN|SHOPLIFT",
+      "normalizedType": "theft",
+      "typeConfidence": 0.6
+    },
+    {
+      "rawLabelPattern": "ACCIDENT|COLLISION",
+      "normalizedType": "collision",
+      "typeConfidence": 0.6
+    },
+    {
+      "rawLabelPattern": "TRAF|TRAFFIC|VEHICLE",
+      "normalizedType": "traffic",
+      "typeConfidence": 0.5
+    },
+    {
+      "rawLabelPattern": "MISSING",
+      "normalizedType": "missing_person",
+      "typeConfidence": 0.6
+    },
+    {
+      "rawLabelPattern": "MEDIC|AIDED|SUICIDE|OVERDOSE",
+      "normalizedType": "medical",
+      "typeConfidence": 0.6
+    }
+  ]
+}

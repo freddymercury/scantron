@@ -1,0 +1,202 @@
+{
+  "version": "2026-09-18.1",
+  "source": "sf_fire_cad",
+  "note": "Call types observed live in nuek-vuh3, plus types documented by SFFD that had no traffic in the sample window. Exact call type always wins over a pattern.",
+  "mappings": [
+    {
+      "rawCode": "Administrative",
+      "normalizedType": "unknown",
+      "typeConfidence": 0.6
+    },
+    {
+      "rawCode": "Aircraft Emergency",
+      "normalizedType": "rescue",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "critical"
+    },
+    {
+      "rawCode": "Alarms",
+      "normalizedType": "fire",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "Assist Police",
+      "normalizedType": "police_activity",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "Citizen Assist / Service Call",
+      "normalizedType": "public_safety",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "Confined Space / Structure Collapse",
+      "normalizedType": "rescue",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "critical"
+    },
+    {
+      "rawCode": "Electrical Fire",
+      "normalizedType": "fire",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "Electrical Hazard",
+      "normalizedType": "hazard",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "Elevator / Escalator Rescue",
+      "normalizedType": "rescue",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "Explosion",
+      "normalizedType": "fire",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "critical"
+    },
+    {
+      "rawCode": "Extrication / Entrapped (Machinery, Vehicle)",
+      "normalizedType": "rescue",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "Fuel Spill",
+      "normalizedType": "hazard",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "Gas Leak (Natural and LP Gases)",
+      "normalizedType": "hazard",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "HazMat",
+      "normalizedType": "hazard",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "High Angle Rescue",
+      "normalizedType": "rescue",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "Industrial Accidents",
+      "normalizedType": "rescue",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "Lightning Strike (Investigation)",
+      "normalizedType": "hazard",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "Marine Fire",
+      "normalizedType": "fire",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "Medical Incident",
+      "normalizedType": "medical",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "Mutual Aid / Assist Outside Agency",
+      "normalizedType": "public_safety",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "Odor (Strange / Unknown)",
+      "normalizedType": "hazard",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "Oil Spill",
+      "normalizedType": "hazard",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "Other",
+      "normalizedType": "unknown",
+      "typeConfidence": 0.6
+    },
+    {
+      "rawCode": "Outside Fire",
+      "normalizedType": "fire",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "Smoke Investigation (Outside)",
+      "normalizedType": "fire",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "Structure Fire / Smoke in Building",
+      "normalizedType": "fire",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "Suspicious Package",
+      "normalizedType": "hazard",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "Traffic Collision",
+      "normalizedType": "collision",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "Train / Rail Incident",
+      "normalizedType": "rescue",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "Vehicle Fire",
+      "normalizedType": "fire",
+      "typeConfidence": 0.9
+    },
+    {
+      "rawCode": "Water Rescue",
+      "normalizedType": "rescue",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawCode": "Watercraft in Distress",
+      "normalizedType": "rescue",
+      "typeConfidence": 0.9,
+      "defaultSeverity": "high"
+    },
+    {
+      "rawLabelPattern": "Fire",
+      "normalizedType": "fire",
+      "typeConfidence": 0.6
+    },
+    {
+      "rawLabelPattern": "Rescue|Extrication",
+      "normalizedType": "rescue",
+      "typeConfidence": 0.6
+    },
+    {
+      "rawLabelPattern": "Medical|Aid",
+      "normalizedType": "medical",
+      "typeConfidence": 0.6
+    },
+    {
+      "rawLabelPattern": "HazMat|Spill|Leak|Hazard",
+      "normalizedType": "hazard",
+      "typeConfidence": 0.6
+    }
+  ]
+}

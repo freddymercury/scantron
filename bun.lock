@@ -6,6 +6,7 @@
       "name": "scantron",
       "dependencies": {
         "@scantron/database": "workspace:*",
+        "@scantron/event-taxonomy": "workspace:*",
         "@scantron/sf-domain": "workspace:*",
       },
       "devDependencies": {
@@ -33,6 +34,9 @@
     "packages/event-taxonomy": {
       "name": "@scantron/event-taxonomy",
       "version": "0.0.0",
+      "dependencies": {
+        "@scantron/incident-schema": "workspace:*",
+      },
     },
     "packages/incident-schema": {
       "name": "@scantron/incident-schema",

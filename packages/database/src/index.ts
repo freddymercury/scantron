@@ -184,3 +184,6 @@ export function replaceNeighborhoods(db: Database, rows: readonly NeighborhoodRo
 export function neighborhoodRows(db: Database): NeighborhoodRow[] {
   return db.query<NeighborhoodRow, []>("SELECT * FROM neighborhoods ORDER BY name").all();
 }
+
+export * from "./queue.ts";
+export * from "./worker.ts";

@@ -87,19 +87,16 @@ export function normalizeObservation(
 
   // Geocoding is the other half of normalization and runs as its own job, so a slow or
   // failing lookup never holds up classification (S-C2).
-  if (observation.lat === null && observation.location_raw !== null) {
-    enqueue(db, {
-      type: "geocode_location",
-      payload: { observationId: observation.id },
-      dedupeKey: `geocode_location:${observation.id}`,
-    });
-  } else {
-    enqueue(db, {
-      type: "correlate_incident",
-      payload: { observationId: observation.id },
-      dedupeKey: `correlate_incident:${observation.id}`,
-    });
-  }
+  //
+  // It runs even when the source supplied coordinates. Skipping it as an "optimization"
+  // left those records with no `location_method`, no canonical location text and no
+  // neighborhood backfill — the geocoder's first rule is already "the source's own point
+  // wins", so letting it run costs microseconds and keeps every record explainable.
+  enqueue(db, {
+    type: "geocode_location",
+    payload: { observationId: observation.id },
+    dedupeKey: `geocode_location:${observation.id}`,
+  });
 
   return { observationId: observation.id, type: classification.type, changed };
 }

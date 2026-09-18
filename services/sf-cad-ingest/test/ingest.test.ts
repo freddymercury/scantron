@@ -88,7 +88,9 @@ test("the raw payload is stored verbatim before anything interprets it", async (
     .all();
   expect(stored).toHaveLength(5);
 
-  const original = FIXTURE.find((record) => record.id === stored[0]?.source_record_id);
+  // Payloads are keyed by the same id as the observation (cad_number), so the trail is
+  // findable from the record it belongs to.
+  const original = FIXTURE.find((record) => record.cad_number === stored[0]?.source_record_id);
   expect(JSON.parse(stored[0]?.payload as string)).toEqual(original as object);
   h.db.close();
 });
@@ -118,7 +120,7 @@ test("a changed record updates the observation and queues re-correlation", async
     .query<{ n: number }, [string]>(
       "SELECT count(*) AS n FROM source_records WHERE source_record_id = ?",
     )
-    .get(record.id as string);
+    .get(record.cad_number as string);
   expect(payloads?.n).toBe(2);
 
   const types = listJobs(h.db).map((job) => job.type);

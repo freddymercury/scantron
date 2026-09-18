@@ -290,10 +290,19 @@ export function sourceCoverage(db: Database): SourceCoverage[] {
 }
 
 export interface MapPoint {
+  id: string;
   lat: number;
   lng: number;
   source: string;
   type: string | null;
+  occurred_at: string;
+  subtype: string | null;
+  location_normalized: string | null;
+  location_raw: string | null;
+  neighborhood: string | null;
+  units: string | null;
+  priority_rank: number | null;
+  sensitive: number | null;
 }
 
 /**
@@ -305,7 +314,9 @@ export function mapPoints(db: Database, filter: ObservationFilter = {}, limit = 
   const where = sql ? `${sql} AND lat IS NOT NULL` : "WHERE lat IS NOT NULL";
   return db
     .query<MapPoint, (string | number)[]>(
-      `SELECT lat, lng, source, type FROM observations ${where} ORDER BY occurred_at DESC LIMIT ?`,
+      `SELECT id, lat, lng, source, type, occurred_at, subtype, location_normalized, location_raw,
+              neighborhood, units, priority_rank, sensitive
+         FROM observations ${where} ORDER BY occurred_at DESC LIMIT ?`,
     )
     .all(...parameters, limit);
 }
@@ -345,4 +356,53 @@ export function neighborhoodsSeen(db: Database): { neighborhood: string; n: numb
         WHERE neighborhood IS NOT NULL GROUP BY neighborhood ORDER BY neighborhood`,
     )
     .all();
+}
+
+export function observationById(db: Database, id: string): ObservationListRow | undefined {
+  return (
+    db
+      .query<ObservationListRow, [string]>(
+        `SELECT id, source, source_record_id, occurred_at, ingested_at, type, type_confidence,
+                raw_type, subtype, priority, priority_rank, location_raw, location_normalized,
+                neighborhood, lat, lng, location_method, units, sensitive, backfilled
+           FROM observations WHERE id = ?`,
+      )
+      .get(id) ?? undefined
+  );
+}
+
+/** Other observations near this one in space and time — what correlation will later merge. */
+export function nearbyObservations(
+  db: Database,
+  row: ObservationListRow,
+  options: { minutes?: number; degrees?: number; limit?: number } = {},
+): ObservationListRow[] {
+  if (row.lat === null || row.lng === null) return [];
+  const minutes = options.minutes ?? 60;
+  const degrees = options.degrees ?? 0.004; // ~450 m
+  const from = new Date(new Date(row.occurred_at).getTime() - minutes * 60_000).toISOString();
+  const to = new Date(new Date(row.occurred_at).getTime() + minutes * 60_000).toISOString();
+
+  return db
+    .query<ObservationListRow, (string | number)[]>(
+      `SELECT id, source, source_record_id, occurred_at, ingested_at, type, type_confidence,
+              raw_type, subtype, priority, priority_rank, location_raw, location_normalized,
+              neighborhood, lat, lng, location_method, units, sensitive, backfilled
+         FROM observations
+        WHERE occurred_at BETWEEN ? AND ?
+          AND lat BETWEEN ? AND ?
+          AND lng BETWEEN ? AND ?
+          AND id <> ?
+        ORDER BY occurred_at LIMIT ?`,
+    )
+    .all(
+      from,
+      to,
+      row.lat - degrees,
+      row.lat + degrees,
+      row.lng - degrees,
+      row.lng + degrees,
+      row.id,
+      options.limit ?? 20,
+    );
 }

@@ -10,6 +10,7 @@
 import { SF_BBOX, type GeoJsonGeometry } from "@scantron/sf-domain";
 
 import { escapeHtml } from "../security.ts";
+import { INTERNAL_PREFIX } from "./paths.ts";
 import type { MapPoint, NeighborhoodShape } from "./queries.ts";
 
 export const MAP_WIDTH = 760;
@@ -104,13 +105,27 @@ export function renderMap(
     })
     .join("");
 
+  // Each point is a link, so clicking drills into the record and middle-click, keyboard and
+  // no-JS all behave the way they do everywhere else. The hover card is an enhancement on
+  // top of that, not the only way in.
   const circles = points
     .map((point) => {
       const { x, y } = project(point.lat, point.lng);
       const colour = SOURCE_COLOURS[point.source] ?? "var(--other)";
-      return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${radius.toFixed(2)}" fill="${colour}"><title>${escapeHtml(
-        `${point.type ?? "unknown"} · ${point.source}`,
-      )}</title></circle>`;
+      const units = point.units ? (JSON.parse(point.units) as string[]) : [];
+      const where = point.location_normalized ?? point.location_raw ?? point.neighborhood ?? "";
+
+      return `<a href="${INTERNAL_PREFIX}/observation/${encodeURIComponent(point.id)}" class="pt"
+        data-at="${escapeHtml(point.occurred_at)}"
+        data-type="${escapeHtml(point.type ?? "unknown")}"
+        data-label="${escapeHtml(point.subtype ?? "")}"
+        data-where="${escapeHtml(where)}"
+        data-hood="${escapeHtml(point.neighborhood ?? "")}"
+        data-source="${escapeHtml(point.source)}"
+        data-units="${escapeHtml(units.join(" "))}"
+        data-priority="${point.priority_rank ?? ""}"
+        data-sensitive="${point.sensitive === 1 ? "1" : ""}"
+      ><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${radius.toFixed(2)}" fill="${colour}"/></a>`;
     })
     .join("");
 

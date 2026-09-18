@@ -166,10 +166,13 @@ export async function runIngestCycle<TRecord extends Record<string, unknown>>(
       });
     }
 
-    // Every row keeps its own payload, even when several describe one call.
+    // Keyed by the observation, not by the feed's row id: several unit rows describe one
+    // call, and all of their payloads belong to that call. (The unique constraint is on the
+    // payload hash, so every distinct row is still kept.) Keying these differently from the
+    // observation made the stored payloads unfindable from the record they belong to.
     const { isNew } = recordSourcePayload(db, {
       source: adapter.source,
-      sourceRecordId: String(record[adapter.idField] ?? mapped.observation.sourceRecordId),
+      sourceRecordId: mapped.observation.sourceRecordId as string,
       payload: scrubbed.value,
       fetchedAt: ingestedAt,
     });

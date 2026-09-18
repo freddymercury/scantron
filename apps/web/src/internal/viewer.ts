@@ -10,7 +10,9 @@
 import type { Database } from "bun:sqlite";
 
 import { createNonce, escapeHtml, securityHeaders } from "../security.ts";
+import { renderDetail } from "./detail.ts";
 import { renderMap } from "./map.ts";
+import { INTERNAL_PREFIX } from "./paths.ts";
 import {
   failedJobs,
   listObservations,
@@ -28,7 +30,7 @@ import {
   type WindowCounters,
 } from "./queries.ts";
 
-export const INTERNAL_PREFIX = "/internal";
+export { INTERNAL_PREFIX } from "./paths.ts";
 
 /**
  * Time windows for dispatch data. The short end is minutes because a call develops over
@@ -143,6 +145,19 @@ const STYLE = `
   .legend span::before { content: "●"; margin-right: .3rem; }
   .legend .police { color: var(--police); } .legend .fire { color: var(--fire); }
   .legend .ems { color: var(--ems); }
+  .brand a { color: inherit; text-decoration: none; }
+  .pagetitle { margin: 0 0 .5rem; }
+  a { color: var(--police); }
+  a.pt circle { transition: r .08s ease; }
+  a.pt:hover circle, a.pt:focus circle { r: 5; stroke: var(--fg); stroke-width: .8; outline: none; }
+  #hovercard {
+    position: fixed; z-index: 10; pointer-events: none; max-width: 22rem;
+    background: var(--panel); color: var(--fg); border: 1px solid var(--line);
+    border-radius: .3rem; padding: .5rem .6rem; font-size: .8rem; line-height: 1.4;
+    box-shadow: 0 6px 24px rgba(0,0,0,.25);
+  }
+  #hovercard[hidden] { display: none; }
+  details pre { background: var(--panel); padding: .5rem; border-radius: .25rem; }
 `;
 
 /**
@@ -243,6 +258,61 @@ export function evaluateGate(counters: WindowCounters, now: Date = new Date()): 
     reasons,
   };
 }
+
+/**
+ * Hover card for map points. The point itself is a link, so click, middle-click, keyboard
+ * and no-JS already work; this only adds the summary you want before deciding to click.
+ */
+const HOVER_SCRIPT = `
+  (function () {
+    var card = null;
+    function ensure() {
+      card = card || document.getElementById("hovercard");
+      return card;
+    }
+    function show(anchor, event) {
+      var el = ensure();
+      if (!el) return;
+      var d = anchor.dataset;
+      var bits = [];
+      bits.push('<b>' + (d.label || d.type || "unknown") + '</b>');
+      if (d.where) bits.push('<span>' + d.where + '</span>');
+      var meta = [d.source];
+      if (d.units) meta.push(d.units);
+      if (d.priority) meta.push("priority " + d.priority + "/5");
+      if (d.sensitive) meta.push("sensitive");
+      bits.push('<span class="muted">' + meta.join(" · ") + '</span>');
+      bits.push('<span class="muted">' + new Date(d.at).toLocaleString() + '</span>');
+      el.innerHTML = bits.join("<br>");
+      el.hidden = false;
+      var pad = 14;
+      var x = Math.min(event.clientX + pad, window.innerWidth - el.offsetWidth - pad);
+      var y = Math.min(event.clientY + pad, window.innerHeight - el.offsetHeight - pad);
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+    }
+    function hide() {
+      var el = ensure();
+      if (el) el.hidden = true;
+    }
+    document.addEventListener("mouseover", function (event) {
+      var anchor = event.target.closest && event.target.closest("a.pt");
+      if (anchor) show(anchor, event);
+    });
+    document.addEventListener("mousemove", function (event) {
+      var anchor = event.target.closest && event.target.closest("a.pt");
+      if (anchor) show(anchor, event);
+      else hide();
+    });
+    document.addEventListener("focusin", function (event) {
+      var anchor = event.target.closest && event.target.closest("a.pt");
+      if (!anchor) return hide();
+      var box = anchor.getBoundingClientRect();
+      show(anchor, { clientX: box.left, clientY: box.bottom });
+    });
+    document.addEventListener("mouseleave", hide, true);
+  })();
+`;
 
 function filterForm(
   filter: ObservationFilter & { since: string },
@@ -347,6 +417,25 @@ export function parseFilter(url: URL, now: Date = new Date()): ObservationFilter
   return filter;
 }
 
+/** One shell for every internal page: same styles, same theme, same hover behaviour. */
+export function page(nonce: string, title: string, body: string): string {
+  return `<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>scantron — ${escapeHtml(title)} (internal)</title>
+<style nonce="${nonce}">${STYLE}</style>
+<script nonce="${nonce}">${THEME_SCRIPT}</script>
+<script nonce="${nonce}">${HOVER_SCRIPT}</script>
+<div class="topbar">
+  <h1 class="brand"><a href="${INTERNAL_PREFIX}">scantron</a> <span class="muted">internal · not public</span></h1>
+  <button type="button" data-theme-toggle>dark mode</button>
+</div>
+<div id="hovercard" hidden></div>
+${body}`;
+}
+
 export function renderViewer(db: Database, url: URL, nonce: string): string {
   const filter = parseFilter(url);
   const counters = windowCounters(db, filter);
@@ -366,19 +455,10 @@ export function renderViewer(db: Database, url: URL, nonce: string): string {
     .all()
     .map((row) => row.type);
 
-  return `<!doctype html>
-<html lang="en">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,nofollow">
-<title>scantron — raw observations (internal)</title>
-<style nonce="${nonce}">${STYLE}</style>
-<script nonce="${nonce}">${THEME_SCRIPT}</script>
-<div class="topbar">
-  <h1>raw observations <span class="muted">internal · not public</span></h1>
-  <button type="button" data-theme-toggle>dark mode</button>
-</div>
-
+  return page(
+    nonce,
+    "raw observations",
+    `<h2 class="pagetitle">raw observations</h2>
 <div class="gate ${gate.passes ? "pass" : "fail"}">
   <b>Phase 0 gate: ${gate.passes ? "PASS" : "not yet"}</b>
   <div class="muted">PRD §44 — ≥72 h continuous ingestion, no duplicate explosion, no unexplained gaps.</div>
@@ -449,7 +529,8 @@ ${gaps.length === 0 ? "<p class=\"muted\">every observed code maps to a type</p>
     .join("")}
 </table>
 ${failed.length === 0 ? "<p class=\"muted\">no failed jobs</p>" : ""}
-`;
+`,
+  );
 }
 
 export interface InternalContext {
@@ -482,6 +563,25 @@ export async function handleInternal(
     return new Response(null, {
       status: 303,
       headers: { ...securityHeaders(), location: INTERNAL_PREFIX + (requeued ? "" : "?requeue=failed") },
+    });
+  }
+
+  if (url.pathname.startsWith(`${INTERNAL_PREFIX}/observation/`)) {
+    const id = decodeURIComponent(url.pathname.slice(`${INTERNAL_PREFIX}/observation/`.length));
+    const nonce = createNonce();
+    const body = renderDetail(db, id);
+    if (!body) {
+      return new Response(page(nonce, "not found", '<p>No observation with that id.</p>'), {
+        status: 404,
+        headers: { "content-type": "text/html; charset=utf-8", ...securityHeaders(nonce) },
+      });
+    }
+    return new Response(page(nonce, "observation", body), {
+      headers: {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "no-store",
+        ...securityHeaders(nonce),
+      },
     });
   }
 

@@ -26,6 +26,25 @@ afterEach(() => {
   else process.env.INTERNAL_API_KEY = previousKey;
 });
 
+function mapPoint(overrides: Partial<import("../src/internal/queries.ts").MapPoint>) {
+  return {
+    id: "obs_1",
+    lat: 37.7793,
+    lng: -122.4193,
+    source: "sf_police_cad",
+    type: "assault",
+    occurred_at: "2026-09-18T01:00:00.000Z",
+    subtype: "STABBING",
+    location_normalized: "24th St & Mission St",
+    location_raw: null,
+    neighborhood: "Mission",
+    units: null,
+    priority_rank: 1,
+    sensitive: null,
+    ...overrides,
+  };
+}
+
 function observation(overrides: Partial<Observation> = {}): Observation {
   return {
     id: "obs_1",
@@ -293,8 +312,8 @@ test("the map renders points and neighborhood outlines", async () => {
   const { renderMap } = await import("../src/internal/map.ts");
   const svg = renderMap(
     [
-      { lat: 37.7793, lng: -122.4193, source: "sf_police_cad", type: "assault" },
-      { lat: 37.75, lng: -122.41, source: "sf_fire_cad", type: "fire" },
+      mapPoint({ id: "obs_a", lat: 37.7793, lng: -122.4193, source: "sf_police_cad", type: "assault" }),
+      mapPoint({ id: "obs_b", lat: 37.75, lng: -122.41, source: "sf_fire_cad", type: "fire" }),
     ],
     [
       {
@@ -318,7 +337,9 @@ test("the map renders points and neighborhood outlines", async () => {
   expect(svg).toContain("<svg");
   expect((svg.match(/<circle /g) ?? [])).toHaveLength(2);
   expect(svg).toContain("<title>Mission</title>");
-  expect(svg).toContain("assault · sf_police_cad");
+  // Every point is a link to its record: click, middle-click and keyboard all work.
+  expect(svg).toContain('href="/internal/observation/obs_a"');
+  expect(svg).toContain('data-type="assault"');
   // Colours come from CSS variables, so the map follows the theme toggle.
   expect(svg).toContain("var(--police)");
 });
@@ -391,4 +412,100 @@ test("zooming keeps the projection and shrinks what is drawn in user units", asy
   // Circles are in user units, so they must shrink with the view or a zoomed neighborhood
   // becomes a field of blobs.
   expect(mission.scale).toBeLessThan(1);
+});
+
+test("relative time speaks in the unit that fits", async () => {
+  const { relativeTime } = await import("../src/internal/detail.ts");
+  const now = new Date("2026-09-18T12:00:00.000Z");
+  expect(relativeTime("2026-09-18T11:59:40.000Z", now)).toBe("just now");
+  expect(relativeTime("2026-09-18T11:48:00.000Z", now)).toBe("12 min ago");
+  expect(relativeTime("2026-09-18T04:00:00.000Z", now)).toBe("8 h ago");
+  expect(relativeTime("2026-09-15T12:00:00.000Z", now)).toBe("3 d ago");
+  expect(relativeTime("2026-08-28T12:00:00.000Z", now)).toBe("3 w ago");
+  expect(relativeTime("2026-06-18T12:00:00.000Z", now)).toBe("3 mo ago");
+});
+
+test("clicking a point opens its record, with what was near it", async () => {
+  const db = seeded();
+  // A fire unit on the same corner five minutes later — the pair correlation will judge.
+  upsertObservation(
+    db,
+    observationToRow(
+      observation({
+        id: "obs_fire",
+        sourceRecordId: "fire-1",
+        source: "sf_fire_cad",
+        type: "medical",
+        subtype: "Medical Incident",
+        units: ["E07"],
+        occurredAt: new Date("2026-09-18T01:05:00.000Z"),
+        location: { normalized: "24th St & Mission St", latitude: 37.7502, longitude: -122.4101, neighborhood: "Mission" },
+      }),
+    ),
+  );
+
+  const response = await handleInternal(
+    request("/internal/observation/obs_1", { headers: { "x-scantron-internal-key": KEY } }),
+    { db },
+  );
+  const html = (await response?.text()) ?? "";
+
+  expect(response?.status).toBe(200);
+  // The summary answers "what, where, when" before anything else.
+  expect(html).toContain("STABBING · 24th St &amp; Mission St");
+  expect(html).toContain("agency code");
+  expect(html).toContain("219");
+  // What else was happening beside it — the raw material of correlation.
+  expect(html).toContain("within 450 m and an hour");
+  expect(html).toContain("sf_fire_cad");
+  expect(html).toContain("E07");
+  // And the payload as fetched.
+  expect(html).toContain("source payloads");
+  expect(html).toContain("262600914");
+  db.close();
+});
+
+test("an unknown observation id is a 404, not a blank page", async () => {
+  const db = seeded();
+  const response = await handleInternal(
+    request("/internal/observation/nope", { headers: { "x-scantron-internal-key": KEY } }),
+    { db },
+  );
+  expect(response?.status).toBe(404);
+  expect(await response?.text()).toContain("No observation with that id");
+  db.close();
+});
+
+test("a record whose location was withheld says so rather than showing an empty map", async () => {
+  const db = seeded();
+  upsertObservation(
+    db,
+    observationToRow(
+      observation({ id: "obs_secret", sourceRecordId: "s1", sensitive: true, location: undefined } as unknown as Partial<Observation>),
+    ),
+  );
+  const response = await handleInternal(
+    request("/internal/observation/obs_secret", { headers: { "x-scantron-internal-key": KEY } }),
+    { db },
+  );
+  const html = (await response?.text()) ?? "";
+  expect(html).toContain("No location was published");
+  expect(html).toContain("SFPD's suppression, not a gap in our geocoding");
+  expect(html).not.toContain("<svg");
+  db.close();
+});
+
+test("the hover card is an enhancement, not the only way in", async () => {
+  const db = seeded();
+  const response = await handleInternal(
+    request("/internal?since=all", { headers: { "x-scantron-internal-key": KEY } }),
+    { db },
+  );
+  const html = (await response?.text()) ?? "";
+
+  // Points are links first: click, middle-click and keyboard focus all work without JS.
+  expect(html).toContain('<a href="/internal/observation/obs_1" class="pt"');
+  expect(html).toContain('data-where="24th St &amp; Mission St"');
+  expect(html).toContain('id="hovercard"');
+  db.close();
 });

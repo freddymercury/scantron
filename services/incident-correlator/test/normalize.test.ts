@@ -127,13 +127,13 @@ test("normalization hands off to geocoding when there is a location to resolve",
   h.db.close();
 });
 
-test("an already-located observation goes straight to correlation", () => {
+test("an already-located observation is still geocoded, so it can explain its point", () => {
   const h = harness();
   insert(h.db, observation({ location: { latitude: 37.78, longitude: -122.41 } }));
   normalizeObservation(h, "obs_1");
-  const types = listJobs(h.db).map((job) => job.type);
-  expect(types).toContain("correlate_incident");
-  expect(types).not.toContain("geocode_location");
+  // The geocoder's first rule is that the source's own point wins, so this is cheap — and
+  // skipping it left such records with no location_method and no canonical location text.
+  expect(listJobs(h.db).map((job) => job.type)).toContain("geocode_location");
   h.db.close();
 });
 

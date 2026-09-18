@@ -167,6 +167,26 @@ Result, live: "gunshots" → weapon calls. "someone smashed a car window" → th
 disturbance, top hit `AUTO BOOST / STRIP`. "person not breathing" → medical. None of those
 three questions shares a word with the records it now finds.
 
+### Where the remaining limit actually is
+
+Asked to separate a car break-in from a smashed shop window, Jev scores every candidate
+"partially matches" — `AUTO BOOST / STRIP` at 2.45, `VANDALISM` at 2.32, overlapping. That
+is not a failure of the model; it is the honest reading of a record that is a code, a
+label, a corner and a unit list, with **no narrative at all**. Nothing in the data says a
+window was broken. A model that answered "exactly what they asked about" here would be
+inventing.
+
+The distinction that *does* exist lives in the agency's code — `852` is a vehicle burglary,
+`594` is vandalism — so the expansion carries codes **in priority order** and the answer is
+ordered by that rank before recency. Deterministic, free, and sharper than a semantic score
+on evidence this thin. The model then orders *within* that, and only when it separated the
+candidates by at least half a level; when everything lands in one band the code order
+stands and the page says so ("the records were too alike to rank further").
+
+The rule this leaves behind: **use the model where meaning is in the language, and a
+lookup where meaning is in the data.** Asking a model to recover a fact the record never
+carried produces confident noise.
+
 ## What the ranking claims
 
 "Most interesting" is a ranking we have to be able to defend, so every point it awards is

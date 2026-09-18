@@ -50,7 +50,7 @@ function interpretation(query: AskQuery): string {
   }</p>`;
 }
 
-function row(observation: AskAnswer["rows"][number], now: Date): string {
+function row(observation: AskAnswer["rows"][number], now: Date, relevance?: Map<string, string>): string {
   const what = observation.subtype ?? observation.type ?? "unknown";
   const where = observation.location_normalized ?? observation.location_raw ?? "location withheld";
   return `<tr>
@@ -59,6 +59,7 @@ function row(observation: AskAnswer["rows"][number], now: Date): string {
     <td>${escapeHtml(where)}</td>
     <td>${escapeHtml(observation.neighborhood ?? "—")}</td>
     <td>${escapeHtml(observation.source.replace("sf_", "").replace("_cad", ""))}</td>
+    ${relevance ? `<td class="muted">${escapeHtml(relevance.get(observation.id) ?? "—")}</td>` : ""}
     <td><a href="${INTERNAL_PREFIX}/observation/${encodeURIComponent(observation.id)}">open</a></td>
   </tr>`;
 }
@@ -182,9 +183,10 @@ export function renderAnswer(answer: AskAnswer, now: Date = new Date()): string 
           ? ` <span class="muted">${answer.withheldLocations} of them were published without a location.</span>`
           : ""
       }</p>
+      ${answer.ordering ? `<p class="muted">${escapeHtml(answer.ordering)}.</p>` : ""}
       <table>
-        <tr><th>when</th><th>reported as</th><th>where</th><th>neighborhood</th><th>source</th><th></th></tr>
-        ${answer.rows.map((observation) => row(observation, now)).join("")}
+        <tr><th>when</th><th>reported as</th><th>where</th><th>neighborhood</th><th>source</th>${answer.relevance ? "<th>match</th>" : ""}<th></th></tr>
+        ${answer.rows.map((observation) => row(observation, now, answer.relevance)).join("")}
       </table>
       ${answer.total > answer.rows.length ? `<p class="muted">Showing the ${answer.rows.length} most recent of ${answer.total}.</p>` : ""}
     </div>

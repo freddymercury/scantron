@@ -22,6 +22,14 @@ export interface Expansion {
   terms: string;
   types: IncidentType[];
   rawCodes: string[];
+  /**
+   * Codes in priority order, best first. This is what separates a car break-in from a
+   * smashed shop window: both are plausible for "someone smashed a car window", but `852
+   * AUTO BOOST / STRIP` is what was asked about and `594 VANDALISM` is the fallback. The
+   * distinction lives in the agency's code, so a deterministic rank beats a semantic score
+   * on evidence this thin — the record carries no narrative for a model to read.
+   */
+  codeOrder: string[];
   /** What produced the expansion, shown to the reader so the search explains itself. */
   matched: string[];
 }
@@ -78,12 +86,19 @@ export function expandQuery(db: Database, text: string): Expansion {
   const types = new Set<IncidentType>();
   const rawCodes = new Set<string>();
   const matched: string[] = [];
+  // Lower is better. A code named first by the phrase that matched outranks one named
+  // later, which outranks one found only by scanning agency labels.
+  const rank = new Map<string, number>();
+  const note = (code: string, weight: number) => {
+    rawCodes.add(code);
+    rank.set(code, Math.min(rank.get(code) ?? Number.POSITIVE_INFINITY, weight));
+  };
 
   for (const rule of CATEGORIES) {
     const hit = rule.phrases.find((phrase) => phraseIn(normalized, phrase));
     if (!hit) continue;
     for (const type of rule.types ?? []) types.add(type);
-    for (const code of rule.rawCodes ?? []) rawCodes.add(code);
+    (rule.rawCodes ?? []).forEach((code, index) => note(code, index));
     matched.push(rule.label);
   }
 
@@ -91,13 +106,15 @@ export function expandQuery(db: Database, text: string): Expansion {
     const hit = rule.phrases.find((phrase) => phraseIn(normalized, phrase));
     if (!hit) continue;
     for (const type of rule.types) types.add(type);
-    for (const code of rule.rawCodes ?? []) rawCodes.add(code);
+    (rule.rawCodes ?? []).forEach((code, index) => note(code, index));
     matched.push(rule.label);
   }
 
   const words = normalized.split(" ").filter((word) => word.length > 3 && !SKIP.has(word));
   const fromTaxonomy = codesFromTaxonomy(db, words);
-  for (const code of fromTaxonomy.codes) rawCodes.add(code);
+  // Found by scanning labels rather than named by a rule: useful, but never ahead of a
+  // code the question matched directly.
+  for (const code of fromTaxonomy.codes) note(code, 100);
   if (fromTaxonomy.labels.length > 0) {
     matched.push(`agency wording: ${fromTaxonomy.labels.slice(0, 3).join(", ")}`);
   }
@@ -106,6 +123,7 @@ export function expandQuery(db: Database, text: string): Expansion {
     terms: normalized,
     types: [...types],
     rawCodes: [...rawCodes],
+    codeOrder: [...rawCodes].sort((a, b) => (rank.get(a) ?? 99) - (rank.get(b) ?? 99)),
     matched: [...new Set(matched)],
   };
 }

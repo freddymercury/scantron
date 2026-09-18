@@ -14,7 +14,7 @@ import type { AppMetrics } from "@scantron/observability";
 import { createNonce, escapeHtml, securityHeaders } from "../security.ts";
 import { askBox, renderAnswer, renderExamples } from "../ask/render.ts";
 import { parseQuestion } from "../ask/parse.ts";
-import { expandForRetrieval, runAsk, runSearchFallback } from "../ask/answer.ts";
+import { expandForRetrieval, rerankAnswer, runAsk, runSearchFallback } from "../ask/answer.ts";
 import { createJevClient } from "../ask/jev.ts";
 import { renderDetail } from "./detail.ts";
 import { renderMap } from "./map.ts";
@@ -634,7 +634,14 @@ export async function handleInternal(
       }
     }
 
-    const answer = runAsk(db, query);
+    const answer = runAsk(db, query, new Date(), expansion ? { codeOrder: expansion.codeOrder } : {});
+    if (expansion && expansion.types.length > 0) {
+      await rerankAnswer(answer, client);
+      if (!answer.ordering && expansion.codeOrder.length > 1) {
+        answer.ordering = "ordered by call type, then most recent";
+      }
+    }
+
     // Anything still unplaced is a keyword search, not a dead end.
     if (query.unresolved.length > 0 && !query.unanswerable && !expansion?.types.length) {
       answer.search = await runSearchFallback(db, query, new Date(), client);

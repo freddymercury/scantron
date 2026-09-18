@@ -366,3 +366,85 @@ test("a catch-all type never widens a query alongside a specific one", async () 
   );
   expect(fallback.types).toEqual(["public_safety"]);
 });
+
+test("ranked codes put the kind that was asked about first", async () => {
+  const { expandQuery } = await import("../src/ask/expand.ts");
+  const { runAsk } = await import("../src/ask/answer.ts");
+  const { parseQuestion } = await import("../src/ask/parse.ts");
+  const db = createTestDatabase();
+
+  // A vandalism call more recent than the car break-in: recency alone puts it first.
+  upsertObservation(
+    db,
+    observationToRow(
+      observation({ id: "obs_boost", sourceRecordId: "1", rawType: "852", subtype: "AUTO BOOST / STRIP", type: "theft", occurredAt: new Date(Date.now() - 60 * 60_000) }),
+    ),
+  );
+  upsertObservation(
+    db,
+    observationToRow(
+      observation({ id: "obs_vandal", sourceRecordId: "2", rawType: "594", subtype: "VANDALISM", type: "disturbance", occurredAt: new Date(Date.now() - 5 * 60_000) }),
+    ),
+  );
+
+  const expansion = expandQuery(db, "someone smashed a car window");
+  expect(expansion.codeOrder).toEqual(["852", "594"]);
+
+  const query = parseQuestion("someone smashed a car window", { knownAreas: [] });
+  query.rawCodes = expansion.rawCodes;
+  const answer = runAsk(db, query, new Date(), { codeOrder: expansion.codeOrder });
+
+  // The car break-in leads despite being older, because the code says what it is and the
+  // record carries no narrative for anything else to read.
+  expect(answer.rows.map((row) => row.id)).toEqual(["obs_boost", "obs_vandal"]);
+  db.close();
+});
+
+test("the main answer is only reordered when the model actually separated the records", async () => {
+  const { rerankAnswer, runAsk } = await import("../src/ask/answer.ts");
+  const { parseQuestion } = await import("../src/ask/parse.ts");
+  const db = createTestDatabase();
+  // Inside the default 3-hour window, or the question finds nothing to rank.
+  const recent = (minutes: number) => new Date(Date.now() - minutes * 60_000);
+  upsertObservation(db, observationToRow(observation({ id: "obs_a", sourceRecordId: "1", occurredAt: recent(30) })));
+  upsertObservation(db, observationToRow(observation({ id: "obs_b", sourceRecordId: "2", occurredAt: recent(60) })));
+
+  const query = parseQuestion("car break ins", { knownAreas: [] });
+  const clustered = runAsk(db, query);
+  const order = clustered.rows.map((row) => row.id);
+
+  // Every candidate scored the same band — which is what thin records actually produce.
+  const flat = (async () =>
+    new Response(
+      JSON.stringify({
+        model: "jev-latest",
+        answers: {
+          rel_0: { type: "score", score: 2.3, confidence: 0.8, probabilities: {} },
+          rel_1: { type: "score", score: 2.45, confidence: 0.8, probabilities: {} },
+        },
+      }),
+    )) as unknown as typeof fetch;
+
+  await rerankAnswer(clustered, createJevClient({ apiKey: "test", fetchImpl: flat }));
+  expect(clustered.rows.map((row) => row.id)).toEqual(order);
+  expect(clustered.ordering).toContain("too alike to rank further");
+  // The labels are still shown, so the reader can see what the model made of each.
+  expect(clustered.relevance?.size).toBe(2);
+
+  // A real separation does reorder.
+  const separated = runAsk(db, query);
+  const sharp = (async () =>
+    new Response(
+      JSON.stringify({
+        model: "jev-latest",
+        answers: {
+          rel_0: { type: "score", score: 0.4, confidence: 0.9, probabilities: {} },
+          rel_1: { type: "score", score: 3.9, confidence: 0.9, probabilities: {} },
+        },
+      }),
+    )) as unknown as typeof fetch;
+  await rerankAnswer(separated, createJevClient({ apiKey: "test", fetchImpl: sharp }));
+  expect(separated.rows[0]?.id).toBe(order[1] as string);
+  expect(separated.ordering).toContain("how well each matches");
+  db.close();
+});

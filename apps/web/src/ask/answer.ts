@@ -27,6 +27,8 @@ export interface RankedObservation {
 export interface RetrievalExpansion {
   types: string[];
   rawCodes: string[];
+  /** Codes best-first; the order results are presented in. */
+  codeOrder: string[];
   /** Reader-facing words for what the question was expanded to. */
   matched: string[];
 }
@@ -46,6 +48,7 @@ export async function expandForRetrieval(
   return {
     types: [...new Set([...expansion.types, ...plan.types])],
     rawCodes: expansion.rawCodes,
+    codeOrder: expansion.codeOrder,
     matched: [...expansion.matched, ...(plan.reason === undefined ? [] : [plan.reason])],
   };
 }
@@ -63,6 +66,51 @@ export interface AskAnswer {
   previousTotal: number;
   /** Present when the question fell through the grammar and was answered by search. */
   search?: RerankResult;
+  /** Relevance labels for the main rows, when Jev ordered them. */
+  relevance?: Map<string, string>;
+  /** How the main rows were ordered, in the words shown to the reader. */
+  ordering?: string;
+}
+
+/**
+ * Re-rank the main answer.
+ *
+ * The deterministic code order already puts the right *kind* of call first; this orders
+ * within it, and only when the model is confident. On thin records it often is not — asked
+ * about a smashed car window it scores every candidate "partially matches", because
+ * `AUTO BOOST / STRIP` genuinely does not say a window was broken. That clustering is the
+ * honest answer, and leaving the order alone is the right response to it.
+ */
+export async function rerankAnswer(
+  answer: AskAnswer,
+  client: JevClient,
+  limit = 20,
+): Promise<void> {
+  if (!client.available || answer.rows.length < 2) return;
+
+  const top = answer.rows.slice(0, limit);
+  const result = await rerank(
+    client,
+    answer.query.question,
+    top.map((row) => ({ row, lexicalScore: 0, via: "category" as const })),
+  );
+  if (!result.reranked) return;
+
+  const labels = new Map<string, string>();
+  for (const hit of result.hits) {
+    if (hit.relevanceLabel) labels.set(hit.row.id, hit.relevanceLabel);
+  }
+  // Only reorder when the model actually separated the candidates. A set that all scored
+  // the same band is left in the order the codes gave it.
+  const scores = result.hits.map((hit) => hit.relevance ?? 0);
+  const spread = Math.max(...scores) - Math.min(...scores);
+  if (spread >= 0.5) {
+    answer.rows = [...result.hits.map((hit) => hit.row), ...answer.rows.slice(limit)];
+    answer.ordering = `ordered by how well each matches the question (Jev, ${Math.round(result.latencyMs ?? 0)} ms)`;
+  } else if (labels.size > 0) {
+    answer.ordering = "ordered by call type, then most recent — the records were too alike to rank further";
+  }
+  if (labels.size > 0) answer.relevance = labels;
 }
 
 /**
@@ -220,16 +268,35 @@ export function rank(db: Database, rows: ObservationListRow[], limit = 3): Ranke
     .slice(0, limit);
 }
 
-export function runAsk(db: Database, query: AskQuery, now: Date = new Date()): AskAnswer {
+export interface AskOptions {
+  /** Agency codes best-first; results are ordered by this before recency. */
+  codeOrder?: readonly string[];
+}
+
+export function runAsk(
+  db: Database,
+  query: AskQuery,
+  now: Date = new Date(),
+  options: AskOptions = {},
+): AskAnswer {
   const { sql, parameters } = conditions(query, now);
   const columns =
     "id, source, source_record_id, occurred_at, ingested_at, type, type_confidence, raw_type, subtype, priority, priority_rank, location_raw, location_normalized, neighborhood, lat, lng, location_method, units, sensitive, backfilled";
 
+  // When the question expanded to ranked codes, they order the answer: every car break-in
+  // ahead of every vandalism call for "someone smashed a car window", deterministically.
+  const codeOrder = options.codeOrder ?? [];
+  const ordering =
+    codeOrder.length > 1
+      ? `CASE raw_type ${codeOrder.map((_, index) => `WHEN ? THEN ${index}`).join(" ")} ELSE ${codeOrder.length} END, occurred_at DESC`
+      : "occurred_at DESC";
+  const orderParameters = codeOrder.length > 1 ? [...codeOrder] : [];
+
   const rows = db
     .query<ObservationListRow, (string | number)[]>(
-      `SELECT ${columns} FROM observations ${sql} ORDER BY occurred_at DESC LIMIT 200`,
+      `SELECT ${columns} FROM observations ${sql} ORDER BY ${ordering} LIMIT 200`,
     )
-    .all(...parameters);
+    .all(...parameters, ...orderParameters);
 
   const total =
     db

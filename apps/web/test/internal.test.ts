@@ -510,3 +510,13 @@ test("the hover card is an enhancement, not the only way in", async () => {
   expect(html).toContain('id="hovercard"');
   db.close();
 });
+
+test("a guessable internal credential is flagged, not silently accepted", async () => {
+  const { isWeakKey } = await import("../src/internal/viewer.ts");
+  for (const weak of ["admin", "password", "dev", "secret", "short"]) {
+    expect(`${weak}: ${isWeakKey(weak)}`).toBe(`${weak}: true`);
+  }
+  expect(isWeakKey("2Iv1Bvqs6sfKL-_qvGguXPC1")).toBe(false);
+  // Unset is a different thing entirely: the route does not exist at all.
+  expect(isWeakKey(undefined)).toBe(false);
+});

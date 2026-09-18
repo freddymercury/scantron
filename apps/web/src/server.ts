@@ -25,7 +25,7 @@ import {
 } from "@scantron/observability";
 import { SF_BBOX, SF_TIMEZONE } from "@scantron/sf-domain";
 
-import { handleInternal } from "./internal/viewer.ts";
+import { handleInternal, internalKey, isWeakKey } from "./internal/viewer.ts";
 import { createNonce, escapeHtml, securityHeaders } from "./security.ts";
 
 const PORT = Number(process.env.WEB_PORT ?? 3000);
@@ -131,6 +131,14 @@ export function main(): void {
   const log = createLogger({ context: { processor: "web" } });
   const db = openDatabase({ path: databasePath() });
   migrate(db);
+
+  // Said once, at startup, where it is visible: /internal shows raw source text, and a
+  // guessable credential in front of it is only acceptable while this is bound to a laptop.
+  if (isWeakKey(internalKey())) {
+    log.warn("internal.weak_credential", {
+      result: "INTERNAL_API_KEY is short or common — fine locally, not fine on a public host",
+    });
+  }
 
   const server = Bun.serve({
     port: PORT,

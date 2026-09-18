@@ -70,6 +70,13 @@ export function internalKey(): string | undefined {
   return process.env.INTERNAL_API_KEY?.trim() || undefined;
 }
 
+/** Credentials fine on a laptop and not fine anywhere else. */
+const WEAK_KEYS = new Set(["admin", "password", "changeme", "secret", "test", "dev", "letmein"]);
+
+export function isWeakKey(key: string | undefined): boolean {
+  return key !== undefined && (key.length < 12 || WEAK_KEYS.has(key.toLowerCase()));
+}
+
 /** Constant-time comparison, so a wrong key cannot be found one character at a time. */
 function secretsMatch(a: string, b: string): boolean {
   if (a.length !== b.length) return false;

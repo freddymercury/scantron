@@ -237,3 +237,71 @@ test("gaps and quarantine show up in the counters", () => {
   expect(evaluateGate(counters).passes).toBe(false);
   db.close();
 });
+
+test("the map projects San Francisco into the viewport, corners included", async () => {
+  const { project, MAP_WIDTH, MAP_HEIGHT } = await import("../src/internal/map.ts");
+  const { SF_BBOX } = await import("@scantron/sf-domain");
+
+  const northWest = project(SF_BBOX.north, SF_BBOX.west);
+  const southEast = project(SF_BBOX.south, SF_BBOX.east);
+  expect(northWest).toEqual({ x: 0, y: 0 });
+  expect(southEast).toEqual({ x: MAP_WIDTH, y: MAP_HEIGHT });
+
+  // Civic Center lands in the middle-ish, and latitude is flipped for SVG's y axis.
+  const civic = project(37.7793, -122.4193);
+  expect(civic.x).toBeGreaterThan(0);
+  expect(civic.x).toBeLessThan(MAP_WIDTH);
+  expect(project(37.8, -122.42).y).toBeLessThan(project(37.72, -122.42).y);
+});
+
+test("the map renders points and neighborhood outlines", async () => {
+  const { renderMap } = await import("../src/internal/map.ts");
+  const svg = renderMap(
+    [
+      { lat: 37.7793, lng: -122.4193, source: "sf_police_cad", type: "assault" },
+      { lat: 37.75, lng: -122.41, source: "sf_fire_cad", type: "fire" },
+    ],
+    [
+      {
+        name: "Mission",
+        geometry: JSON.stringify({
+          type: "Polygon",
+          coordinates: [
+            [
+              [-122.42, 37.75],
+              [-122.41, 37.75],
+              [-122.41, 37.76],
+              [-122.42, 37.76],
+              [-122.42, 37.75],
+            ],
+          ],
+        }),
+      },
+    ],
+  );
+
+  expect(svg).toContain("<svg");
+  expect((svg.match(/<circle /g) ?? [])).toHaveLength(2);
+  expect(svg).toContain("<title>Mission</title>");
+  expect(svg).toContain("assault · sf_police_cad");
+  // Colours come from CSS variables, so the map follows the theme toggle.
+  expect(svg).toContain("var(--police)");
+});
+
+test("the page carries a theme toggle whose script runs under the nonce", async () => {
+  const db = seeded();
+  const response = await handleInternal(
+    request("/internal", { headers: { "x-scantron-internal-key": KEY } }),
+    { db },
+  );
+  const html = (await response?.text()) ?? "";
+  const policy = response?.headers.get("content-security-policy") ?? "";
+  const nonce = /script-src 'nonce-([^']+)'/.exec(policy)?.[1];
+
+  expect(html).toContain("data-theme-toggle");
+  expect(html).toContain(`<script nonce="${nonce}">`);
+  expect(html).toContain("scantron-theme");
+  // No unsafe-inline escape hatch was added to make the toggle work.
+  expect(policy).not.toContain("unsafe-inline");
+  db.close();
+});

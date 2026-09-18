@@ -283,3 +283,33 @@ export function sourceCoverage(db: Database): SourceCoverage[] {
     )
     .all();
 }
+
+export interface MapPoint {
+  lat: number;
+  lng: number;
+  source: string;
+  type: string | null;
+}
+
+/**
+ * Located observations for the map. Capped, because this is a server-rendered SVG and a
+ * page with 50,000 circles in it helps nobody.
+ */
+export function mapPoints(db: Database, filter: ObservationFilter = {}, limit = 3000): MapPoint[] {
+  const { sql, parameters } = conditions(filter);
+  const where = sql ? `${sql} AND lat IS NOT NULL` : "WHERE lat IS NOT NULL";
+  return db
+    .query<MapPoint, (string | number)[]>(
+      `SELECT lat, lng, source, type FROM observations ${where} ORDER BY occurred_at DESC LIMIT ?`,
+    )
+    .all(...parameters, limit);
+}
+
+export interface NeighborhoodShape {
+  name: string;
+  geometry: string;
+}
+
+export function neighborhoodShapes(db: Database): NeighborhoodShape[] {
+  return db.query<NeighborhoodShape, []>("SELECT name, geometry FROM neighborhoods").all();
+}

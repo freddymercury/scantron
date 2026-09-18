@@ -10,9 +10,12 @@
 import type { Database } from "bun:sqlite";
 
 import { createNonce, escapeHtml, securityHeaders } from "../security.ts";
+import { renderMap } from "./map.ts";
 import {
   failedJobs,
   listObservations,
+  mapPoints,
+  neighborhoodShapes,
   rawPayloads,
   requeueJob,
   sourceCoverage,
@@ -65,24 +68,75 @@ function unauthorized(): Response {
 }
 
 const STYLE = `
-  :root { color-scheme: light dark; }
-  body { font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; margin: 0; padding: 1.5rem; }
+  /* Themed with variables so the toggle is one attribute on <html>, not two stylesheets. */
+  :root {
+    --bg: #fff; --fg: #16181d; --muted: #5b6270; --line: rgba(20,22,28,.18);
+    --panel: #f6f7f9; --pass: #1a7f37; --fail: #b3261e;
+    --police: #2f6fed; --fire: #e05a2b; --ems: #12a594; --other: #8a8f98;
+    --hood: rgba(20,22,28,.14); --hood-fill: rgba(20,22,28,.03);
+  }
+  :root[data-theme="dark"] {
+    --bg: #101216; --fg: #e6e8ec; --muted: #969cab; --line: rgba(230,232,236,.16);
+    --panel: #171a20; --pass: #4ac26b; --fail: #ff7b72;
+    --police: #6ea0ff; --fire: #ff9a63; --ems: #4fd6c4; --other: #9aa0aa;
+    --hood: rgba(230,232,236,.22); --hood-fill: rgba(230,232,236,.03);
+  }
+  body {
+    font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+    margin: 0; padding: 1.5rem; background: var(--bg); color: var(--fg);
+  }
   h1 { font-size: 1.1rem; margin: 0 0 .25rem; }
-  .muted { opacity: .65; }
+  h2 { font-size: .95rem; margin: 1.5rem 0 .5rem; }
+  .muted { color: var(--muted); }
+  .topbar { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
   .gate { padding: .75rem 1rem; border: 1px solid currentColor; border-radius: .25rem; margin: 1rem 0; }
-  .pass { color: #1a7f37; } .fail { color: #b3261e; }
+  .pass { color: var(--pass); } .fail { color: var(--fail); }
   form { margin: 1rem 0; display: flex; gap: .5rem; flex-wrap: wrap; align-items: end; }
-  label { display: flex; flex-direction: column; font-size: .8rem; }
-  input, select { font: inherit; padding: .25rem; }
+  label { display: flex; flex-direction: column; font-size: .8rem; color: var(--muted); }
+  input, select, button {
+    font: inherit; padding: .25rem; background: var(--panel); color: var(--fg);
+    border: 1px solid var(--line); border-radius: .2rem;
+  }
+  button { cursor: pointer; padding: .25rem .6rem; }
   table { border-collapse: collapse; width: 100%; font-size: .85rem; }
-  th, td { text-align: left; padding: .35rem .5rem; border-bottom: 1px solid rgba(128,128,128,.25); vertical-align: top; }
-  th { position: sticky; top: 0; background: Canvas; }
+  th, td { text-align: left; padding: .35rem .5rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { position: sticky; top: 0; background: var(--bg); }
   details pre { white-space: pre-wrap; word-break: break-all; font-size: .75rem; max-height: 22rem; overflow: auto; }
   .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
   .counters { display: flex; gap: 1.25rem; flex-wrap: wrap; margin: .5rem 0 1rem; }
   .counters div { min-width: 7rem; }
   .counters b { display: block; font-size: 1.15rem; }
-  button { font: inherit; }
+  .map { width: 100%; max-width: 760px; height: auto; background: var(--panel);
+         border: 1px solid var(--line); border-radius: .25rem; }
+  .map .hood { fill: var(--hood-fill); stroke: var(--hood); stroke-width: .7; }
+  .legend { display: flex; gap: 1rem; font-size: .8rem; margin: .4rem 0 0; flex-wrap: wrap; }
+  .legend span::before { content: "●"; margin-right: .3rem; }
+  .legend .police { color: var(--police); } .legend .fire { color: var(--fire); }
+  .legend .ems { color: var(--ems); }
+`;
+
+/**
+ * Theme: OS preference by default, overridden by an explicit choice kept in localStorage.
+ * Applied before first paint so the page does not flash the wrong theme on load.
+ */
+const THEME_SCRIPT = `
+  (function () {
+    var stored = null;
+    try { stored = localStorage.getItem("scantron-theme"); } catch (e) {}
+    var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var theme = stored || (prefersDark ? "dark" : "light");
+    document.documentElement.dataset.theme = theme;
+    document.addEventListener("click", function (event) {
+      var button = event.target.closest("[data-theme-toggle]");
+      if (!button) return;
+      var next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      button.textContent = next === "dark" ? "light mode" : "dark mode";
+      try { localStorage.setItem("scantron-theme", next); } catch (e) {}
+    });
+    var toggle = document.querySelector("[data-theme-toggle]");
+    if (toggle) toggle.textContent = theme === "dark" ? "light mode" : "dark mode";
+  })();
 `;
 
 function counterBlock(counters: WindowCounters): string {
@@ -247,6 +301,8 @@ export function renderViewer(db: Database, url: URL, nonce: string): string {
   const coverage = sourceCoverage(db);
   const gaps = unmappedCodes(db, 10);
   const failed = failedJobs(db);
+  const points = mapPoints(db, filter);
+  const shapes = neighborhoodShapes(db);
 
   const sources = coverage.map((row) => row.source);
   const types = db
@@ -261,7 +317,11 @@ export function renderViewer(db: Database, url: URL, nonce: string): string {
 <meta name="robots" content="noindex,nofollow">
 <title>scantron — raw observations (internal)</title>
 <style nonce="${nonce}">${STYLE}</style>
-<h1>raw observations <span class="muted">internal · not public</span></h1>
+<script nonce="${nonce}">${THEME_SCRIPT}</script>
+<div class="topbar">
+  <h1>raw observations <span class="muted">internal · not public</span></h1>
+  <button type="button" data-theme-toggle>dark mode</button>
+</div>
 
 <div class="gate ${gate.passes ? "pass" : "fail"}">
   <b>Phase 0 gate: ${gate.passes ? "PASS" : "not yet"}</b>
@@ -284,6 +344,10 @@ ${counterBlock(counters)}
 </table>
 
 ${filterForm(filter, sources, types)}
+
+<h2>map <span class="muted">${points.length} located of ${counters.total} — ${(counters.total - counters.geocoded).toLocaleString()} have no point, almost all of them sensitive calls SFPD publishes without a location</span></h2>
+${renderMap(points, shapes)}
+<p class="legend"><span class="police">police</span><span class="fire">fire</span><span class="ems">EMS</span></p>
 
 <table>
   <tr><th>occurred</th><th>source</th><th>type</th><th>location</th><th>point</th><th>neighborhood</th><th>flags</th><th></th></tr>

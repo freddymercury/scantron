@@ -19,6 +19,24 @@ Docker daemon.** Nothing in Epic A beyond S-A1/S-A3 can run until this is resolv
 - [ ] Tests run against a disposable test database that is created and dropped per run, never the dev database.
 - [ ] README documents the setup path in under ten lines, verified by following it on a clean machine.
 
+## Decision (recorded 2026-09-18)
+
+**None of (a), (b) or (c) — there is no Postgres.** [ADR-003](../docs/04-database-decision.md),
+written after this story, chose SQLite via `bun:sqlite`, which removes the install, the
+`createdb`, the `postgis` extension and the hosted option together. This story became:
+
+- `bun run setup` — writes `.env` from `.env.example` if absent, creates the database file
+  and its directory, runs pending migrations. Idempotent.
+- `bun run doctor` — Bun version, `.env`, every documented variable, database reachable and
+  in WAL mode, migrations applied vs pending. Actionable lines, exit 1 on failure.
+- Test isolation is `scripts/test-preload.ts` (wired in `bunfig.toml`): every `bun test` run
+  gets a fresh temp `DATABASE_URL` that is deleted on exit, so no test can reach the
+  development database even by accident.
+
+The criteria mentioning PostGIS, `createdb` and hosted Postgres are satisfied by being
+obsolete. Seeding neighborhood polygons (S-C2) and taxonomy (S-A4) stays on `setup`'s list
+and lands with those stories.
+
 ## Note
 Every command here is a Bun script in the repo — no `make`, no task runner, no `docker
 compose` requirement.

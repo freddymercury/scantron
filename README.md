@@ -49,11 +49,15 @@ Findings that changed the design, all measured against the live APIs on 2026-09-
 Requires [Bun](https://bun.sh) >= 1.4. Nothing else — there are no runtime dependencies.
 
 ```bash
+git clone https://github.com/freddymercury/scantron && cd scantron
 bun install
-cp .env.example .env
+bun run setup      # .env, database file, migrations — idempotent, safe to re-run
 bun run dev        # web + ingest + correlator, hot-reloaded, in one terminal
-bun run check      # lint + typecheck + test, the same three CI runs
 ```
+
+There is no database server to install: ADR-003 chose SQLite, so the database is a file
+under `data/`. `bun run doctor` checks the environment and prints what to fix;
+`bun run check` runs lint + typecheck + test, the same three things CI runs.
 
 Layout is a Bun workspace monorepo: `packages/*` (shared code), `services/*` (long-running
 processes, which never import each other), `apps/web` (server-rendered HTML from

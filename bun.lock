@@ -4,6 +4,9 @@
   "workspaces": {
     "": {
       "name": "scantron",
+      "dependencies": {
+        "@scantron/database": "workspace:*",
+      },
       "devDependencies": {
         "@types/bun": "latest",
         "typescript": "^5.9.2",

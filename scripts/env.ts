@@ -80,14 +80,19 @@ export const ENV_VARS: readonly EnvVar[] = [
   {
     name: "JEV_BASE_URL",
     required: false,
-    fallback: "https://api.typesafe.ai/v1/systemone",
-    description: "Jev endpoint; TypeSafe direct, or an OpenRouter-compatible gateway",
+    fallback: "https://openrouter.ai/api/alpha/decisions",
+    description: "Jev decisions endpoint; OpenRouter, or TypeSafe direct",
   },
   {
     name: "JEV_TIMEOUT_MS",
     required: false,
-    fallback: "400",
+    fallback: "1200",
     description: "Deadline for the re-rank; a late answer is dropped, not waited for",
+  },
+  {
+    name: "JEV_LIVE",
+    required: false,
+    description: "Set to 1 to let tests call the live Jev API; otherwise the key is stripped",
   },
   { name: "LOG_LEVEL", required: false, fallback: "info", description: "debug | info | warn | error" },
 ] as const;

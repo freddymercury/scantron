@@ -9,10 +9,13 @@
 
 import type { Database } from "bun:sqlite";
 
+import type { AppMetrics } from "@scantron/observability";
+
 import { createNonce, escapeHtml, securityHeaders } from "../security.ts";
 import { askBox, renderAnswer, renderExamples } from "../ask/render.ts";
 import { parseQuestion } from "../ask/parse.ts";
 import { runAsk, runSearchFallback } from "../ask/answer.ts";
+import { createJevClient } from "../ask/jev.ts";
 import { renderDetail } from "./detail.ts";
 import { renderMap } from "./map.ts";
 import { INTERNAL_PREFIX } from "./paths.ts";
@@ -546,6 +549,7 @@ ${failed.length === 0 ? "<p class=\"muted\">no failed jobs</p>" : ""}
 
 export interface InternalContext {
   db?: Database;
+  metrics: AppMetrics;
 }
 
 /**
@@ -617,7 +621,21 @@ export async function handleInternal(
     const answer = runAsk(db, query);
     // Words the grammar could not place are a search, not a dead end.
     if (query.unresolved.length > 0 && !query.unanswerable) {
-      answer.search = await runSearchFallback(db, query);
+      const client = createJevClient();
+      answer.search = await runSearchFallback(db, query, new Date(), client);
+
+      const outcome = answer.search.reranked
+        ? "answered"
+        : client.stats.timeouts > 0
+          ? "timeout"
+          : client.available
+            ? "failed"
+            : "skipped";
+      context.metrics.searchRerankOutcomes.increment({ outcome });
+      if (client.stats.requests > 0) {
+        context.metrics.searchRerankSeconds.observe(client.stats.lastMs / 1000);
+        context.metrics.searchRerankCostUsd.increment({}, client.stats.costUsd);
+      }
     }
     return new Response(page(nonce, "ask", renderAnswer(answer)), {
       headers: {

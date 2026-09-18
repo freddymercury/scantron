@@ -2,6 +2,7 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { enqueue, claim, fail as failJob, upsertObservation, ensureSourceConfiguration, recordSourcePayload, recordGap } from "@scantron/database";
 import { createTestDatabase } from "@scantron/database/testing";
 import { observationToRow, type Observation } from "@scantron/incident-schema";
+import { createAppMetrics } from "@scantron/observability";
 
 import {
   describeWindow,
@@ -80,14 +81,14 @@ const request = (path: string, init: RequestInit = {}) =>
 test("without a key configured the internal route does not exist", async () => {
   delete process.env.INTERNAL_API_KEY;
   const db = seeded();
-  const response = await handleInternal(request("/internal"), { db });
+  const response = await handleInternal(request("/internal"), { db, metrics: createAppMetrics() });
   expect(response?.status).toBe(404);
   db.close();
 });
 
 test("an unauthenticated request is challenged, not served", async () => {
   const db = seeded();
-  const response = await handleInternal(request("/internal"), { db });
+  const response = await handleInternal(request("/internal"), { db, metrics: createAppMetrics() });
   expect(response?.status).toBe(401);
   expect(response?.headers.get("www-authenticate")).toContain("Basic");
   expect(await response?.text()).not.toContain("observations");
@@ -109,7 +110,7 @@ test("the page shows raw payload beside the normalized observation", async () =>
   const db = seeded();
   const response = await handleInternal(
     request("/internal", { headers: { "x-scantron-internal-key": KEY } }),
-    { db },
+    { db, metrics: createAppMetrics() },
   );
   const html = (await response?.text()) ?? "";
 
@@ -269,7 +270,7 @@ test("a failed job is listed and can be requeued in one click", async () => {
       headers: { "x-scantron-internal-key": KEY },
       body: form,
     }),
-    { db },
+    { db, metrics: createAppMetrics() },
   );
 
   expect(response?.status).toBe(303);
@@ -348,7 +349,7 @@ test("the page carries a theme toggle whose script runs under the nonce", async 
   const db = seeded();
   const response = await handleInternal(
     request("/internal", { headers: { "x-scantron-internal-key": KEY } }),
-    { db },
+    { db, metrics: createAppMetrics() },
   );
   const html = (await response?.text()) ?? "";
   const policy = response?.headers.get("content-security-policy") ?? "";
@@ -382,7 +383,7 @@ test("selecting a neighborhood filters the rows and zooms the map", async () => 
 
   const response = await handleInternal(
     request("/internal?since=all&neighborhood=Mission", { headers: { "x-scantron-internal-key": KEY } }),
-    { db },
+    { db, metrics: createAppMetrics() },
   );
   const html = (await response?.text()) ?? "";
 
@@ -446,7 +447,7 @@ test("clicking a point opens its record, with what was near it", async () => {
 
   const response = await handleInternal(
     request("/internal/observation/obs_1", { headers: { "x-scantron-internal-key": KEY } }),
-    { db },
+    { db, metrics: createAppMetrics() },
   );
   const html = (await response?.text()) ?? "";
 
@@ -469,7 +470,7 @@ test("an unknown observation id is a 404, not a blank page", async () => {
   const db = seeded();
   const response = await handleInternal(
     request("/internal/observation/nope", { headers: { "x-scantron-internal-key": KEY } }),
-    { db },
+    { db, metrics: createAppMetrics() },
   );
   expect(response?.status).toBe(404);
   expect(await response?.text()).toContain("No observation with that id");
@@ -486,7 +487,7 @@ test("a record whose location was withheld says so rather than showing an empty 
   );
   const response = await handleInternal(
     request("/internal/observation/obs_secret", { headers: { "x-scantron-internal-key": KEY } }),
-    { db },
+    { db, metrics: createAppMetrics() },
   );
   const html = (await response?.text()) ?? "";
   expect(html).toContain("No location was published");
@@ -499,7 +500,7 @@ test("the hover card is an enhancement, not the only way in", async () => {
   const db = seeded();
   const response = await handleInternal(
     request("/internal?since=all", { headers: { "x-scantron-internal-key": KEY } }),
-    { db },
+    { db, metrics: createAppMetrics() },
   );
   const html = (await response?.text()) ?? "";
 

@@ -56,8 +56,10 @@ export function applyAnswers(hits: SearchHit[], response: JevResponse): Reranked
     if (!answer || answer.type !== "score" || answer.confidence < GATE.relevance) {
       return { ...hit, finalScore: normalized };
     }
+    // The score is fractional (an expected value over the levels), so the ranking uses it
+    // as-is and only the human-readable label is rounded.
     const relevance = answer.score / (RELEVANCE_LEVELS.length - 1);
-    const label = RELEVANCE_LEVELS[answer.score];
+    const label = RELEVANCE_LEVELS[Math.round(answer.score)];
     return {
       ...hit,
       relevance: answer.score,

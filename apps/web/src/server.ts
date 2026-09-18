@@ -93,7 +93,10 @@ export function createHandler(context: AppContext): (request: Request) => Respon
       // Internal surfaces first, and they fail closed: without INTERNAL_API_KEY the
       // viewer does not exist at all (S-B4).
       if (path.startsWith("/internal")) {
-        const internal = handleInternal(request, context.db ? { db: context.db } : {});
+        const internal = handleInternal(
+          request,
+          context.db ? { db: context.db, metrics: context.metrics } : { metrics: context.metrics },
+        );
         return internal.then((response) => response ?? new Response("not found", { status: 404 }));
       }
 

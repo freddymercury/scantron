@@ -106,6 +106,31 @@ Search is two passes, and the first is the one that has to work:
 With no `JEV_API_KEY` the second pass does not happen and search is lexical, which the UI
 says in those words rather than pretending the ordering was semantic.
 
+### Measured, 2026-09-18, live through OpenRouter
+
+Routed via `https://openrouter.ai/api/alpha/decisions` — a `chat/completions` call is
+rejected outright ("is a decisions model and cannot be used with the chat/completions
+endpoint"), which is a pleasing way for an API to enforce the same boundary this codebase
+cares about. Resolved model: `typesafe/jev-1.13-20260917`.
+
+| Candidates | p50 | p90 | Input tokens | $ per 1,000 searches |
+|---|---|---|---|---|
+| 10 | 253 ms | 464 ms | 3,202 | $0.134 |
+| 20 | 235 ms | 294 ms | 5,168 | $0.217 |
+| 30 | 261 ms | 911 ms | 6,746 | $0.283 |
+
+Hence the 1,200 ms default deadline: headroom for the tail without a stalled request
+sitting in front of a rendered page. Search-as-you-type would need a tighter budget, fewer
+candidates, and a closer endpoint.
+
+**What it buys, in one example.** Asked *"car break in"*, lexical retrieval returns
+`PERSON BREAKING IN` calls — the words match. Jev scores them **1.3 of 4, "same general
+area of activity, but not what they asked about"**, because a person breaking into a
+building is not a car break-in. Asked *"someone with a knife"*, `PERSON W/KNIFE` scores
+3.95. That distinction is the entire value: the retriever decides what is in the running,
+the model decides the order within it, and the reader sees the ladder label next to each
+result rather than an unexplained ranking.
+
 The route in is the grammar's own tail: words Tier 1 could not place are a *search*, not a
 failure. "anything about a boarded up storefront on valencia" has no category in our
 taxonomy, and search finds the FIGHT W/WEAPONS call at Mission & Valencia anyway.

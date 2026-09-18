@@ -36,9 +36,15 @@ export interface JevRequest {
 
 interface RawScore {
   type: "score";
+  /**
+   * A *fractional* position on the ladder — 1.83, not 2. It is the expected value over the
+   * level probabilities, which is more information than an argmax and the reason the label
+   * shown to a reader is rounded while the ranking uses the raw number.
+   */
   score: number;
   confidence: number;
   probabilities: Record<string, number>;
+  legend?: Record<string, string>;
 }
 interface RawChoice {
   type: "choice";
@@ -53,9 +59,12 @@ interface RawNoul {
 export type JevAnswer = RawScore | RawChoice | RawNoul;
 
 export interface JevResponse {
+  /** The resolved version, e.g. `typesafe/jev-1.13-20260917` — worth logging. */
   model: string;
   answers: Record<string, JevAnswer>;
-  usage?: { input_tokens: number; output_tokens: number };
+  usage?: { input_tokens: number; output_tokens: number; cost?: number };
+  id?: string;
+  provider?: string;
 }
 
 /**
@@ -171,6 +180,8 @@ export interface JevStats {
   lastMs: number;
   totalMs: number;
   costUsd: number;
+  /** The resolved model version the provider actually answered with. */
+  model?: string;
 }
 
 export interface JevClient {
@@ -179,12 +190,22 @@ export interface JevClient {
   ask(request: JevRequest): Promise<JevResponse | undefined>;
 }
 
-export const DEFAULT_BASE_URL = "https://api.typesafe.ai/v1/systemone";
+/**
+ * OpenRouter serves this family on a dedicated decisions endpoint — a chat/completions
+ * call is rejected with "is a decisions model and cannot be used with the chat/completions
+ * endpoint", which is a pleasing way for an API to enforce the same boundary this codebase
+ * cares about. TypeSafe's own `https://api.typesafe.ai/v1/systemone` takes the same body.
+ */
+export const DEFAULT_BASE_URL = "https://openrouter.ai/api/alpha/decisions";
 
 export function createJevClient(options: JevClientOptions = {}): JevClient {
   const apiKey = options.apiKey ?? process.env.JEV_API_KEY?.trim();
   const baseUrl = options.baseUrl ?? process.env.JEV_BASE_URL?.trim() ?? DEFAULT_BASE_URL;
-  const timeoutMs = options.timeoutMs ?? Number(process.env.JEV_TIMEOUT_MS ?? 400);
+  // Measured against OpenRouter from a laptop on 2026-09-18: p50 235–261 ms, p90 294–911 ms
+  // for 10–30 candidates. 1,200 ms leaves headroom for the tail without letting a stalled
+  // request sit in front of a rendered page. A keystroke-latency budget would need fewer
+  // candidates and a closer endpoint.
+  const timeoutMs = options.timeoutMs ?? Number(process.env.JEV_TIMEOUT_MS ?? 1200);
   const doFetch = options.fetchImpl ?? fetch;
 
   const stats: JevStats = {
@@ -235,7 +256,9 @@ export function createJevClient(options: JevClientOptions = {}): JevClient {
         const parsed = (await response.json()) as JevResponse;
         const tokens = parsed.usage?.input_tokens ?? 0;
         stats.inputTokens += tokens;
-        stats.costUsd += tokens * PRICE_PER_INPUT_TOKEN_USD;
+        // Prefer the cost the provider reports; fall back to the published input rate.
+        stats.costUsd += parsed.usage?.cost ?? tokens * PRICE_PER_INPUT_TOKEN_USD;
+        stats.model = parsed.model;
         return parsed;
       } catch (error) {
         stats.lastMs = performance.now() - startedAt;

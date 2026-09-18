@@ -25,6 +25,9 @@ export interface AppMetrics {
   jobsProcessed: Counter;
   queueDepth: Gauge;
   sourceLastSuccessAgeSeconds: Gauge;
+  searchRerankSeconds: Histogram;
+  searchRerankOutcomes: Counter;
+  searchRerankCostUsd: Counter;
 }
 
 export function createAppMetrics(): AppMetrics {
@@ -80,6 +83,19 @@ export function createAppMetrics(): AppMetrics {
     sourceLastSuccessAgeSeconds: registry.gauge(
       "scantron_source_last_success_age_seconds",
       "Seconds since a source last polled successfully",
+    ),
+    searchRerankSeconds: registry.histogram(
+      "scantron_search_rerank_seconds",
+      "Time for the semantic search re-rank to answer",
+      [0.05, 0.1, 0.2, 0.3, 0.5, 0.8, 1.2, 2, 5],
+    ),
+    searchRerankOutcomes: registry.counter(
+      "scantron_search_rerank_total",
+      "Search re-ranks by outcome: answered, timeout, failed, or skipped",
+    ),
+    searchRerankCostUsd: registry.counter(
+      "scantron_search_rerank_cost_usd",
+      "Money spent on semantic re-ranking — this model is billed per input token",
     ),
   };
 }

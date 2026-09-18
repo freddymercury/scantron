@@ -70,7 +70,10 @@
       "version": "0.0.0",
       "dependencies": {
         "@scantron/database": "workspace:*",
+        "@scantron/event-taxonomy": "workspace:*",
+        "@scantron/incident-schema": "workspace:*",
         "@scantron/observability": "workspace:*",
+        "@scantron/sf-domain": "workspace:*",
       },
     },
   },

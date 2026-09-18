@@ -117,3 +117,26 @@ setting a hard SLO.
 `location-normalizer` work in `S-C1`/`S-C2` is still needed — but for **the remaining 37%**,
 not for all traffic. Use the supplied point and neighborhood when present; that is a
 meaningful reduction in scope and risk for two of the larger Phase 0 stories.
+
+## 7. `$offset` paging silently loses and duplicates rows ⚠️ found while building S-B1
+
+Measured 2026-09-18 against `gnap-fj3t`, two consecutive full scans of the same ~4,078-row
+window, seconds apart:
+
+| Paging | Fetched | Distinct written | Duplicates | Missed |
+|---|---|---|---|---|
+| `$order=data_loaded_at ASC` + `$limit`/`$offset` | 4,078 | 4,077 | 12 | 11 |
+| Keyset on `(data_loaded_at, id)` | 4,078 | 4,078 | 0 | 0 |
+
+Two causes, both structural rather than intermittent:
+
+1. **Thousands of rows share one `data_loaded_at`** — it is a batch publication timestamp,
+   not a per-row one — so ordering by it alone is not a total order, and the database is
+   free to return tied rows in a different order on each request.
+2. Rows published mid-scan shift every later page, so an offset window steps over records.
+
+The misses are the dangerous half: duplicates are caught by the idempotency key, but a
+skipped record is simply never seen, and the gap is invisible without S-B5's detection.
+
+**Page by keyset — `(time > t) OR (time = t AND id > i)` — never by offset**, on any DataSF
+feed. Applies equally to S-B2 and to the historical backfill in S-B5.

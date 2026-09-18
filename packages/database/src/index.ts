@@ -247,3 +247,4 @@ export function sourceConfigurations(db: Database): SourceConfigurationRow[] {
     .query<SourceConfigurationRow, []>("SELECT * FROM source_configuration ORDER BY source")
     .all();
 }
+export * from "./ingest.ts";

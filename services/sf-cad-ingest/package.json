@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@scantron/database": "workspace:*",
-    "@scantron/observability": "workspace:*"
+    "@scantron/observability": "workspace:*",
+    "@scantron/incident-schema": "workspace:*",
+    "@scantron/sf-domain": "workspace:*",
+    "@scantron/event-taxonomy": "workspace:*"
   }
 }

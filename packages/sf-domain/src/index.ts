@@ -4,6 +4,7 @@
  */
 
 export * from "./geo.ts";
+export * from "./time.ts";
 
 /** Matches the bbox the mockups project against (`mockups/live.template.html`). */
 export const SF_BBOX = {
@@ -12,8 +13,6 @@ export const SF_BBOX = {
   south: 37.705,
   north: 37.812,
 };
-
-export const SF_TIMEZONE = "America/Los_Angeles";
 
 export function isWithinSF(lat: number, lng: number): boolean {
   return (

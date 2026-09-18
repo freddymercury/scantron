@@ -8,10 +8,13 @@
 
 import type { Database } from "bun:sqlite";
 
+import { INCIDENT_TYPES } from "@scantron/incident-schema";
+
 import type { ObservationListRow } from "../internal/queries.ts";
+import { expandQuery } from "./expand.ts";
 import { createJevClient, type JevClient } from "./jev.ts";
 import type { AskQuery } from "./parse.ts";
-import { rerank, type RerankResult } from "./rerank.ts";
+import { planRetrieval, rerank, type RerankResult } from "./rerank.ts";
 import { searchObservations } from "./search.ts";
 
 export interface RankedObservation {
@@ -19,6 +22,32 @@ export interface RankedObservation {
   score: number;
   /** Why this one surfaced, in the words shown to the reader. */
   reasons: string[];
+}
+
+export interface RetrievalExpansion {
+  types: string[];
+  rawCodes: string[];
+  /** Reader-facing words for what the question was expanded to. */
+  matched: string[];
+}
+
+/**
+ * What the question expands to, before anything is retrieved: our own vocabulary first
+ * (category phrases, colloquial forms, the agency's own labels), then — if Jev is
+ * available — its judgement of which kinds of call the question is about.
+ */
+export async function expandForRetrieval(
+  db: Database,
+  query: AskQuery,
+  client: JevClient,
+): Promise<RetrievalExpansion> {
+  const expansion = expandQuery(db, query.question);
+  const plan = await planRetrieval(client, query.question, INCIDENT_TYPES);
+  return {
+    types: [...new Set([...expansion.types, ...plan.types])],
+    rawCodes: expansion.rawCodes,
+    matched: [...expansion.matched, ...(plan.reason === undefined ? [] : [plan.reason])],
+  };
 }
 
 export interface AskAnswer {
@@ -48,14 +77,38 @@ export async function runSearchFallback(
   client: JevClient = createJevClient(),
 ): Promise<RerankResult> {
   const text = query.unresolved.join(" ");
-  const hits = searchObservations(db, text, {
+
+  // Retrieval is two steps before ranking is one. First the question is expanded through
+  // vocabulary we own — category phrases, colloquial forms, the agency's own labels — so
+  // that "gunshots" reaches SHOTS FIRED without sharing a word with it.
+  const expansion = expandQuery(db, query.question);
+
+  // Then, if Jev is available, it judges which kinds of call the question is about. That
+  // is what gives recall a keyword index cannot: the judgement is about the sentence, and
+  // costs one small request with no candidates in it.
+  const plan = await planRetrieval(client, query.question, INCIDENT_TYPES);
+  const types = [...new Set([...expansion.types, ...plan.types])];
+
+  const scope = {
     ...(query.area === undefined ? {} : { neighborhood: query.area }),
     ...(query.windowMinutes > 0
       ? { from: new Date(now.getTime() - query.windowMinutes * 60_000).toISOString() }
       : {}),
+  };
+  const hits = searchObservations(db, text, {
+    ...scope,
+    types,
+    rawCodes: expansion.rawCodes,
     limit: 30,
   });
-  return rerank(client, query.question, hits);
+
+  const result = await rerank(client, query.question, hits);
+  result.expandedTo = [
+    ...expansion.matched,
+    ...(plan.reason === undefined ? [] : [plan.reason]),
+  ];
+  result.retrievedByCategory = hits.filter((hit) => hit.via === "category").length;
+  return result;
 }
 
 function conditions(query: AskQuery, now: Date): { sql: string; parameters: (string | number)[] } {

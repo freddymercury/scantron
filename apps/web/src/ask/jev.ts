@@ -161,6 +161,60 @@ export const QUERY_QUESTIONS: Record<string, JevQuestion> = {
   },
 };
 
+/**
+ * Step 2 of two-step retrieval: ask what *kind* of call the question is about, before
+ * deciding what to retrieve.
+ *
+ * One boolean per product type rather than a single choice, because a question can be
+ * about more than one ("break-in" is burglary and theft) and a forced single answer would
+ * throw half of it away. The questions are about the reader's sentence, never about the
+ * city — nothing here asks whether anywhere is dangerous.
+ */
+export function typeQuestions(types: readonly string[]): Record<string, JevQuestion> {
+  const questions: Record<string, JevQuestion> = {};
+  for (const type of types) {
+    questions[`type_${type}`] = {
+      type: "noul",
+      instructions: `Is the reader's \`query\` asking about ${TYPE_DESCRIPTIONS[type] ?? type} calls?`,
+      criteria: {
+        true: `The query describes ${TYPE_DESCRIPTIONS[type] ?? type}, in any wording`,
+        false: "The query is about something else, or names no kind of activity",
+      },
+    };
+  }
+  return questions;
+}
+
+/** Plain-language descriptions of the PRD §10 taxonomy, for the retrieval questions. */
+export const TYPE_DESCRIPTIONS: Readonly<Record<string, string>> = {
+  fire: "fire, smoke, or burning",
+  medical: "a medical emergency, injury, overdose, or ambulance",
+  collision: "a vehicle crash, a car hitting a person, or a hit and run",
+  assault: "one person attacking or fighting another",
+  weapon: "a gun, a knife, gunfire or shots being fired",
+  robbery: "something taken from a person by force or threat",
+  burglary: "someone breaking into a building or home",
+  theft: "something stolen, including from a vehicle",
+  disturbance: "noise, yelling, vandalism, or a nuisance",
+  missing_person: "a missing person",
+  hazard: "a gas leak, spill, hazardous material or unsafe condition",
+  rescue: "a rescue — water, height, entrapment, or extrication",
+  traffic: "a traffic stop, citation, or road obstruction",
+  // These two are catch-alls in the taxonomy, so their descriptions have to be narrow or
+  // they answer "yes" to everything — measured: public_safety scored 0.83 on "gunshots".
+  public_safety: "suspicious activity or a welfare concern that is not any of the other kinds",
+  police_activity: "routine police business such as alarms, prisoner transports or assists",
+  unknown: "something that fits none of the other kinds at all",
+};
+
+export function buildRetrievalRequest(query: string, types: readonly string[]): JevRequest {
+  return {
+    model: JEV_MODEL,
+    state: { query },
+    questions: { ...typeQuestions(types), ...QUERY_QUESTIONS },
+  };
+}
+
 export interface JevClientOptions {
   /** `JEV_API_KEY`. With none, the client reports itself unavailable and search stays lexical. */
   apiKey?: string | undefined;

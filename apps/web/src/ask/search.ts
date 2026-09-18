@@ -15,12 +15,18 @@ export interface SearchOptions {
   /** ISO-8601 lower bound on `occurred_at`. */
   from?: string | undefined;
   limit?: number;
+  /** Product types to retrieve regardless of wording (S-E4 query expansion). */
+  types?: readonly string[];
+  /** Agency codes to retrieve regardless of wording. */
+  rawCodes?: readonly string[];
 }
 
 export interface SearchHit {
   row: ObservationListRow;
-  /** FTS5 rank, negated so larger is better. */
+  /** FTS5 rank, negated so larger is better. Zero for a category-only match. */
   lexicalScore: number;
+  /** How this candidate got into the running — shown so retrieval explains itself. */
+  via: "keyword" | "category";
 }
 
 /**
@@ -52,30 +58,71 @@ export function searchObservations(
   text: string,
   options: SearchOptions = {},
 ): SearchHit[] {
-  const match = toMatchQuery(text);
-  if (!match) return [];
-
-  const clauses = ["observations_fts MATCH ?"];
-  const parameters: (string | number)[] = [match];
+  const limit = options.limit ?? 30;
+  const scope: string[] = [];
+  const scopeParameters: (string | number)[] = [];
   if (options.neighborhood) {
-    clauses.push("o.neighborhood = ?");
-    parameters.push(options.neighborhood);
+    scope.push("o.neighborhood = ?");
+    scopeParameters.push(options.neighborhood);
   }
   if (options.from) {
-    clauses.push("o.occurred_at >= ?");
-    parameters.push(options.from);
+    scope.push("o.occurred_at >= ?");
+    scopeParameters.push(options.from);
   }
-  parameters.push(options.limit ?? 30);
 
-  return db
-    .query<ObservationListRow & { rank: number }, (string | number)[]>(
-      `SELECT ${COLUMNS}, rank
-         FROM observations_fts
-         JOIN observations o ON o.id = observations_fts.id
-        WHERE ${clauses.join(" AND ")}
-        ORDER BY rank
-        LIMIT ?`,
-    )
-    .all(...parameters)
-    .map(({ rank, ...row }) => ({ row: row as ObservationListRow, lexicalScore: -rank }));
+  const hits = new Map<string, SearchHit>();
+
+  // 1. Keywords, as typed.
+  const match = toMatchQuery(text);
+  if (match) {
+    const clauses = ["observations_fts MATCH ?", ...scope];
+    const rows = db
+      .query<ObservationListRow & { rank: number }, (string | number)[]>(
+        `SELECT ${COLUMNS}, rank
+           FROM observations_fts
+           JOIN observations o ON o.id = observations_fts.id
+          WHERE ${clauses.join(" AND ")}
+          ORDER BY rank
+          LIMIT ?`,
+      )
+      .all(match, ...scopeParameters, limit);
+
+    for (const { rank, ...row } of rows) {
+      hits.set(row.id, { row: row as ObservationListRow, lexicalScore: -rank, via: "keyword" });
+    }
+  }
+
+  // 2. Types and agency codes the question was expanded to. This is the half that finds
+  //    `SHOTS FIRED` when the reader typed "gunshots" — no shared word required.
+  const categories: string[] = [];
+  const categoryParameters: (string | number)[] = [];
+  if (options.types && options.types.length > 0) {
+    categories.push(`o.type IN (${options.types.map(() => "?").join(", ")})`);
+    categoryParameters.push(...options.types);
+  }
+  if (options.rawCodes && options.rawCodes.length > 0) {
+    categories.push(`o.raw_type IN (${options.rawCodes.map(() => "?").join(", ")})`);
+    categoryParameters.push(...options.rawCodes);
+  }
+
+  if (categories.length > 0 && hits.size < limit) {
+    const clauses = [`(${categories.join(" OR ")})`, ...scope];
+    const rows = db
+      .query<ObservationListRow, (string | number)[]>(
+        `SELECT ${COLUMNS} FROM observations o
+          WHERE ${clauses.join(" AND ")}
+          ORDER BY o.occurred_at DESC
+          LIMIT ?`,
+      )
+      .all(...categoryParameters, ...scopeParameters, limit - hits.size);
+
+    for (const row of rows) {
+      if (hits.has(row.id)) continue;
+      // No FTS rank to inherit: a category match is a candidate the re-ranker orders, not
+      // one that arrives pre-ranked.
+      hits.set(row.id, { row, lexicalScore: 0, via: "category" });
+    }
+  }
+
+  return [...hits.values()].slice(0, limit);
 }

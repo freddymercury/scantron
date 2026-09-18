@@ -135,6 +135,38 @@ The route in is the grammar's own tail: words Tier 1 could not place are a *sear
 failure. "anything about a boarded up storefront on valencia" has no category in our
 taxonomy, and search finds the FIGHT W/WEAPONS call at Mission & Valencia anyway.
 
+### Retrieval is two steps, because ranking cannot fix recall
+
+The first version ranked well and retrieved badly. Measured on live data: **"gunshots"
+returned zero candidates** while `SHOTS FIRED` and `PERSON W/GUN` records sat in the
+database, because a stemmer does not connect the word a person uses to the words an agency
+writes — and a re-ranker cannot reorder an empty list.
+
+So a question is expanded into *types and agency codes* before anything is retrieved:
+
+1. **Our own vocabulary, deterministic.** The ask grammar's category phrases, a short list
+   of colloquial forms ("gunshots", "smashed", "not breathing"), and — the part that scales
+   — the agency's own labels in `event_taxonomy`, so "knife" reaches `PERSON W/KNIFE`
+   without anyone writing that mapping down.
+2. **Jev's judgement, optional.** One small request with no candidates in it: a boolean per
+   product type, "is the query asking about *fire* calls?". Multi-label rather than a single
+   choice, because "break-in" really is both burglary and theft. ~$0.08 per 1,000 plans.
+
+Two selection rules, both from measurement rather than taste:
+
+- **Relative, not absolute.** On "gunshots" the answers were weapon 0.98, public_safety
+  0.83, disturbance 0.66, medical 0.61. A flat 0.6 gate retrieves four categories for a
+  question about one, so a type is kept only if it is within 0.15 of the strongest, capped
+  at three.
+- **Catch-alls never widen a query.** `public_safety`, `police_activity` and `unknown`
+  score high on almost anything. Retrieved beside `medical`, `public_safety` buried
+  "person not breathing" under suspicious-person calls. They are used only when nothing
+  more specific was judged at all.
+
+Result, live: "gunshots" → weapon calls. "someone smashed a car window" → theft and
+disturbance, top hit `AUTO BOOST / STRIP`. "person not breathing" → medical. None of those
+three questions shares a word with the records it now finds.
+
 ## What the ranking claims
 
 "Most interesting" is a ranking we have to be able to defend, so every point it awards is

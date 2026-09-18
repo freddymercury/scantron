@@ -8,7 +8,7 @@
 
 import type { ObservationListRow } from "../internal/queries.ts";
 import type { JevClient, JevResponse } from "./jev.ts";
-import { buildSearchRequest, RELEVANCE_LEVELS } from "./jev.ts";
+import { buildRetrievalRequest, buildSearchRequest, RELEVANCE_LEVELS } from "./jev.ts";
 import type { SearchHit } from "./search.ts";
 
 /** Below these, the answer is ignored rather than partly believed. */
@@ -36,6 +36,10 @@ export interface RerankResult {
   wantsRecent?: boolean;
   wantsPlace?: boolean;
   latencyMs?: number;
+  /** What the question was expanded to before retrieval, in reader-facing words. */
+  expandedTo?: string[];
+  /** How many candidates came from a category match rather than a keyword match. */
+  retrievedByCategory?: number;
 }
 
 function normalizeLexical(hits: SearchHit[]): number[] {
@@ -109,3 +113,63 @@ export async function rerank(
 }
 
 export type { ObservationListRow };
+
+/** How far below the strongest judgement a type may sit and still be retrieved. */
+export const RETRIEVAL_SPREAD = 0.15;
+export const MAX_RETRIEVAL_TYPES = 3;
+
+/**
+ * Catch-all buckets in the taxonomy. They score high on almost anything — measured:
+ * `public_safety` came back 0.83 on "gunshots" — so widening a query with one alongside a
+ * specific type buries what was asked for under suspicious-person calls. They are retrieved
+ * only when nothing more specific was judged at all.
+ */
+export const CATCH_ALL_TYPES = new Set(["public_safety", "police_activity", "unknown"]);
+
+export interface RetrievalPlan {
+  /** Types Jev judged the question to be about, above the gate. */
+  types: string[];
+  /** Why, in the words shown to the reader. */
+  reason?: string;
+  latencyMs?: number;
+}
+
+/**
+ * Ask which kinds of call the question is about, *before* retrieving. This is what gives
+ * search recall it cannot get from keywords: "gunshots" retrieves weapon calls because the
+ * question was judged to be about weapons, not because any record contains that word.
+ */
+export async function planRetrieval(
+  client: JevClient,
+  query: string,
+  types: readonly string[],
+): Promise<RetrievalPlan> {
+  if (!client.available) return { types: [] };
+
+  const response = await client.ask(buildRetrievalRequest(query, types));
+  if (!response) return { types: [] };
+
+  // Relative to the strongest answer, not an absolute bar. Measured on "gunshots":
+  // weapon 0.98, public_safety 0.83, disturbance 0.66, medical 0.61 — a flat 0.6 gate
+  // retrieves four categories for a question that is about one. Keeping what is close to
+  // the top, capped at three, retrieves what was asked about.
+  const scored = types
+    .map((type) => {
+      const answer = response.answers[`type_${type}`];
+      return { type, noul: answer?.type === "noul" ? answer.noul : 0 };
+    })
+    .filter((entry) => entry.noul >= GATE.noul)
+    .sort((a, b) => b.noul - a.noul);
+
+  const specific = scored.filter((entry) => !CATCH_ALL_TYPES.has(entry.type));
+  const usable = specific.length > 0 ? specific : scored;
+
+  const top = usable[0]?.noul ?? 0;
+  const chosen = usable
+    .filter((entry) => entry.noul >= top - RETRIEVAL_SPREAD)
+    .slice(0, MAX_RETRIEVAL_TYPES)
+    .map((entry) => entry.type);
+  const plan: RetrievalPlan = { types: chosen, latencyMs: client.stats.lastMs };
+  if (chosen.length > 0) plan.reason = `judged to be about ${chosen.join(", ")} calls`;
+  return plan;
+}

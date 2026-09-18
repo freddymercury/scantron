@@ -214,3 +214,155 @@ test("query-level judgements are gated too", async () => {
   expect(result.wantsPlace).toBeUndefined();
   db.close();
 });
+
+test("expansion reaches records that share no word with the question", async () => {
+  const { expandQuery } = await import("../src/ask/expand.ts");
+  const db = createTestDatabase();
+  upsertObservation(
+    db,
+    observationToRow(
+      observation({
+        id: "obs_shots",
+        sourceRecordId: "9",
+        type: "weapon",
+        rawType: "216",
+        subtype: "SHOTS FIRED",
+      }),
+    ),
+  );
+
+  // The word "gunshots" appears nowhere in the record; a keyword search finds nothing.
+  expect(searchObservations(db, "gunshots")).toHaveLength(0);
+
+  const expansion = expandQuery(db, "gunshots");
+  expect(expansion.types).toContain("weapon");
+  expect(expansion.rawCodes).toContain("216");
+
+  const hits = searchObservations(db, "gunshots", {
+    types: expansion.types,
+    rawCodes: expansion.rawCodes,
+  });
+  expect(hits).toHaveLength(1);
+  expect(hits[0]?.row.id).toBe("obs_shots");
+  // And it says how it got there, rather than appearing by magic.
+  expect(hits[0]?.via).toBe("category");
+  expect(expansion.matched).toContain("gunfire");
+  db.close();
+});
+
+test("expansion uses the agency's own vocabulary, not a hand-written thesaurus", async () => {
+  const { expandQuery } = await import("../src/ask/expand.ts");
+  const { seedTaxonomy } = await import("@scantron/event-taxonomy");
+  const db = createTestDatabase();
+  seedTaxonomy(db);
+
+  // Nobody wrote "knife" into a synonym list; event_taxonomy carries PERSON W/KNIFE.
+  const expansion = expandQuery(db, "someone waving a knife around");
+  expect(expansion.rawCodes).toContain("222");
+  expect(expansion.matched.join(" ")).toContain("agency wording");
+  db.close();
+});
+
+test("the retrieval plan keeps what the question is about, not everything plausible", async () => {
+  const { planRetrieval, MAX_RETRIEVAL_TYPES, RETRIEVAL_SPREAD } = await import("../src/ask/rerank.ts");
+
+  // The shape of a real answer: one strong type and a tail of plausible ones. A flat gate
+  // would retrieve four categories for a question about one.
+  const answer = (nouls: Record<string, number>) =>
+    (async () =>
+      new Response(
+        JSON.stringify({
+          model: "jev-latest",
+          answers: Object.fromEntries(
+            Object.entries(nouls).map(([type, noul]) => [`type_${type}`, { type: "noul", noul }]),
+          ),
+        }),
+      )) as unknown as typeof fetch;
+
+  const types = ["weapon", "public_safety", "disturbance", "medical", "theft"];
+  const plan = await planRetrieval(
+    createJevClient({ apiKey: "test", fetchImpl: answer({ weapon: 0.98, public_safety: 0.66, disturbance: 0.62, medical: 0.61, theft: 0.1 }) }),
+    "gunshots",
+    types,
+  );
+  expect(plan.types).toEqual(["weapon"]);
+  expect(plan.reason).toContain("weapon");
+
+  // Genuinely close answers are all kept — "break-in" really is burglary and theft.
+  const both = await planRetrieval(
+    createJevClient({ apiKey: "test", fetchImpl: answer({ burglary: 0.93, theft: 0.9, weapon: 0.2 }) }),
+    "someone broke into a car",
+    ["burglary", "theft", "weapon"],
+  );
+  expect(both.types).toEqual(["burglary", "theft"]);
+
+  // And the cap holds even when everything scores high.
+  const many = await planRetrieval(
+    createJevClient({ apiKey: "test", fetchImpl: answer({ a: 0.95, b: 0.94, c: 0.93, d: 0.92 }) }),
+    "everything",
+    ["a", "b", "c", "d"],
+  );
+  expect(many.types).toHaveLength(3);
+  expect(MAX_RETRIEVAL_TYPES).toBe(3);
+  expect(RETRIEVAL_SPREAD).toBe(0.15);
+});
+
+test("with no key, expansion alone still fixes the zero-result case", async () => {
+  const { expandQuery } = await import("../src/ask/expand.ts");
+  const { planRetrieval } = await import("../src/ask/rerank.ts");
+  const db = createTestDatabase();
+  upsertObservation(
+    db,
+    observationToRow(
+      observation({ id: "obs_shots", sourceRecordId: "9", type: "weapon", rawType: "216", subtype: "SHOTS FIRED" }),
+    ),
+  );
+
+  const client = createJevClient({ apiKey: undefined });
+  const plan = await planRetrieval(client, "gunshots", ["weapon"]);
+  expect(plan.types).toEqual([]);
+
+  const expansion = expandQuery(db, "gunshots");
+  const hits = searchObservations(db, "gunshots", {
+    types: [...expansion.types, ...plan.types],
+    rawCodes: expansion.rawCodes,
+  });
+  // The deterministic half carries it on its own.
+  expect(hits).toHaveLength(1);
+  db.close();
+});
+
+test("a catch-all type never widens a query alongside a specific one", async () => {
+  const { planRetrieval, CATCH_ALL_TYPES } = await import("../src/ask/rerank.ts");
+  const fetchImpl = (async () =>
+    new Response(
+      JSON.stringify({
+        model: "jev-latest",
+        answers: {
+          type_medical: { type: "noul", noul: 0.9 },
+          type_public_safety: { type: "noul", noul: 0.83 },
+        },
+      }),
+    )) as unknown as typeof fetch;
+
+  // Measured behaviour: public_safety scores high on almost anything, and retrieving it
+  // beside `medical` buried the medical calls under suspicious-person calls.
+  const plan = await planRetrieval(createJevClient({ apiKey: "test", fetchImpl }), "person not breathing", [
+    "medical",
+    "public_safety",
+  ]);
+  expect(plan.types).toEqual(["medical"]);
+  expect([...CATCH_ALL_TYPES]).toContain("public_safety");
+
+  // With nothing specific judged, a catch-all is better than nothing.
+  const onlyCatchAll = (async () =>
+    new Response(
+      JSON.stringify({ model: "jev-latest", answers: { type_public_safety: { type: "noul", noul: 0.8 } } }),
+    )) as unknown as typeof fetch;
+  const fallback = await planRetrieval(
+    createJevClient({ apiKey: "test", fetchImpl: onlyCatchAll }),
+    "something odd going on",
+    ["public_safety"],
+  );
+  expect(fallback.types).toEqual(["public_safety"]);
+});

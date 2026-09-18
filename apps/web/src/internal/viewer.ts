@@ -14,7 +14,7 @@ import type { AppMetrics } from "@scantron/observability";
 import { createNonce, escapeHtml, securityHeaders } from "../security.ts";
 import { askBox, renderAnswer, renderExamples } from "../ask/render.ts";
 import { parseQuestion } from "../ask/parse.ts";
-import { runAsk, runSearchFallback } from "../ask/answer.ts";
+import { expandForRetrieval, runAsk, runSearchFallback } from "../ask/answer.ts";
 import { createJevClient } from "../ask/jev.ts";
 import { renderDetail } from "./detail.ts";
 import { renderMap } from "./map.ts";
@@ -618,10 +618,25 @@ export async function handleInternal(
       delete query.categoryLabel;
     }
 
+    const client = createJevClient();
+
+    // Words the grammar could not place still say what the question is about. Expanding
+    // them into types *before* the main query is what turns "gunshots somewhere downtown"
+    // into weapon calls in the Financial District, rather than everything that happened
+    // there plus a separate list of keyword hits.
+    let expansion: Awaited<ReturnType<typeof expandForRetrieval>> | undefined;
+    if (query.unresolved.length > 0 && !query.unanswerable && !query.categoryLabel) {
+      expansion = await expandForRetrieval(db, query, client);
+      if (expansion.types.length > 0) {
+        query.types = expansion.types as never;
+        query.rawCodes = expansion.rawCodes;
+        query.categoryLabel = `${query.unresolved.join(" ")} → ${expansion.types.join(", ")} calls`;
+      }
+    }
+
     const answer = runAsk(db, query);
-    // Words the grammar could not place are a search, not a dead end.
-    if (query.unresolved.length > 0 && !query.unanswerable) {
-      const client = createJevClient();
+    // Anything still unplaced is a keyword search, not a dead end.
+    if (query.unresolved.length > 0 && !query.unanswerable && !expansion?.types.length) {
       answer.search = await runSearchFallback(db, query, new Date(), client);
 
       const outcome = answer.search.reranked

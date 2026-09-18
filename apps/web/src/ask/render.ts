@@ -70,13 +70,22 @@ function searchSection(answer: AskAnswer, now: Date): string {
   if (search.hits.length === 0) {
     return `<div class="answer">
       <p><b>Nothing matched ${escapeHtml(answer.query.unresolved.join(" "))}.</b></p>
-      <p class="muted">Those words are not in the grammar, so they were searched for instead — in what the agency called each call, where it happened, and which units went.</p>
+      <p class="muted">Those words are not in the grammar, so they were searched for instead — in what the agency called each call, where it happened, which units went, and in the kinds of call the question appears to be about.</p>
     </div>`;
   }
 
+  const expansion =
+    search.expandedTo && search.expandedTo.length > 0
+      ? ` <span class="muted">Searched as ${escapeHtml(search.expandedTo.join("; "))}${
+          search.retrievedByCategory
+            ? `, which found ${search.retrievedByCategory} record${search.retrievedByCategory === 1 ? "" : "s"} that share no word with the question`
+            : ""
+        }.</span>`
+      : "";
+
   return `<div class="answer">
     <p><b>${search.hits.length} match${search.hits.length === 1 ? "" : "es"}</b> for
-      <b>${escapeHtml(answer.query.unresolved.join(" "))}</b>, which the grammar did not recognise, so they were searched for.
+      <b>${escapeHtml(answer.query.unresolved.join(" "))}</b>, which the grammar did not recognise, so they were searched for.${expansion}
       ${
         search.reranked
           ? `<span class="muted">Ranked semantically by Jev in ${Math.round(search.latencyMs ?? 0)} ms.</span>`
@@ -178,7 +187,8 @@ export function renderAnswer(answer: AskAnswer, now: Date = new Date()): string 
         ${answer.rows.map((observation) => row(observation, now)).join("")}
       </table>
       ${answer.total > answer.rows.length ? `<p class="muted">Showing the ${answer.rows.length} most recent of ${answer.total}.</p>` : ""}
-    </div>`;
+    </div>
+    ${searchSection(answer, now)}`;
 }
 
 function breakdown(answer: AskAnswer): string {

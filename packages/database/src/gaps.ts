@@ -37,11 +37,15 @@ export function recordGap(
   input: { source: string; from: Date; to: Date; note?: string },
   now: Date = new Date(),
 ): GapRow | undefined {
-  const id = `gap_${input.source}_${input.from.getTime()}`;
+  // The id includes the end as well as the start: re-detecting the same silence a minute
+  // later is the *same* start with a *later* end, which collided on the primary key while
+  // satisfying the (source, start, end) unique constraint — and an unhandled constraint
+  // error at startup killed the ingest process outright.
+  const id = `gap_${input.source}_${input.from.getTime()}_${input.to.getTime()}`;
   db.query(
     `INSERT INTO ingestion_gaps (id, source, gap_start, gap_end, detected_at, status, note)
      VALUES (?, ?, ?, ?, ?, 'open', ?)
-     ON CONFLICT (source, gap_start, gap_end) DO NOTHING`,
+     ON CONFLICT DO NOTHING`,
   ).run(
     id,
     input.source,
@@ -74,6 +78,17 @@ export function detectGap(
   const lastSuccess = new Date(row.last_success_at);
   const toleranceMs = row.poll_seconds * (options.pollMultiple ?? GAP_POLL_MULTIPLE) * 1000;
   if (now.getTime() - lastSuccess.getTime() <= toleranceMs) return undefined;
+
+  // One open gap per silence: re-detecting it every cycle would otherwise pile up a row a
+  // minute for as long as the source stays down.
+  const existing = db
+    .query<GapRow, [string, string]>(
+      `SELECT * FROM ingestion_gaps
+        WHERE source = ? AND gap_start = ? AND status IN ('open', 'filling')
+        ORDER BY gap_end DESC LIMIT 1`,
+    )
+    .get(source, lastSuccess.toISOString());
+  if (existing) return existing;
 
   return recordGap(
     db,

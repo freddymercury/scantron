@@ -241,3 +241,29 @@ test("backfill produces the same observation as live ingest for the same record"
   backfilled.db.close();
   live.db.close();
 });
+
+test("re-detecting the same silence does not create a second gap, or an error", () => {
+  const h = harness();
+  recordPollSuccess(h.db, "sf_police_cad", undefined, new Date("2026-09-18T00:00:00.000Z"));
+
+  const first = detectGap(h.db, "sf_police_cad", new Date("2026-09-18T04:00:00.000Z"));
+  // A minute later the same silence has a later end — which collided on the primary key
+  // while satisfying the unique constraint, and took the ingest process down with it.
+  const second = detectGap(h.db, "sf_police_cad", new Date("2026-09-18T04:01:00.000Z"));
+
+  expect(first?.id).toBe(second?.id as string);
+  expect(openGaps(h.db)).toHaveLength(1);
+  h.db.close();
+});
+
+test("recordGap is idempotent for an identical window", () => {
+  const h = harness();
+  const window = {
+    source: "sf_police_cad",
+    from: new Date("2026-09-18T00:00:00.000Z"),
+    to: new Date("2026-09-18T04:00:00.000Z"),
+  };
+  expect(recordGap(h.db, window)?.id).toBe(recordGap(h.db, window)?.id as string);
+  expect(openGaps(h.db)).toHaveLength(1);
+  h.db.close();
+});

@@ -203,13 +203,21 @@ export async function main(): Promise<void> {
 
   // Startup detection matters most: a crash or a long deploy is exactly the silence
   // nobody was watching, and it must not need an operator to notice.
+  //
+  // It is also the last thing that should be able to stop the service starting — a
+  // bookkeeping failure here once killed ingestion outright, which is precisely the
+  // outage it exists to report.
   for (const adapter of ADAPTERS) {
-    const gap = detectGap(db, adapter.source);
-    if (gap) {
-      log.error("gap.detected_at_startup", {
-        source: adapter.source,
-        result: `${gap.gap_start} → ${gap.gap_end}`,
-      });
+    try {
+      const gap = detectGap(db, adapter.source);
+      if (gap) {
+        log.error("gap.detected_at_startup", {
+          source: adapter.source,
+          result: `${gap.gap_start} → ${gap.gap_end}`,
+        });
+      }
+    } catch (error) {
+      log.error("gap.detection_failed", { source: adapter.source, error: errorMessage(error) });
     }
   }
   void fillOpenGaps({ db, client, metrics, log }).catch((error: unknown) =>

@@ -5,7 +5,9 @@ import { join } from "node:path";
 
 import {
   appliedMigrations,
+  databasePath,
   IN_MEMORY,
+  REPO_ROOT,
   loadMigrations,
   migrate,
   openDatabase,
@@ -112,4 +114,25 @@ test("two processes migrating at once do not collide", async () => {
   );
   expect(applied.length).toBe(new Set(applied).size);
   expect(applied.length).toBeGreaterThan(0);
+});
+
+test("a relative DATABASE_URL is anchored to the repo, not the working directory", () => {
+  const previous = process.env.DATABASE_URL;
+  try {
+    process.env.DATABASE_URL = "./data/scantron.db";
+    const resolved = databasePath();
+    expect(resolved.startsWith("/")).toBe(true);
+    expect(resolved.endsWith("/data/scantron.db")).toBe(true);
+    // Every process resolves to the same file, whatever directory it was started from.
+    expect(resolved).toBe(join(REPO_ROOT, "data", "scantron.db"));
+
+    process.env.DATABASE_URL = "/tmp/absolute.db";
+    expect(databasePath()).toBe("/tmp/absolute.db");
+
+    process.env.DATABASE_URL = IN_MEMORY;
+    expect(databasePath()).toBe(IN_MEMORY);
+  } finally {
+    if (previous === undefined) delete process.env.DATABASE_URL;
+    else process.env.DATABASE_URL = previous;
+  }
 });

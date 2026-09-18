@@ -9,7 +9,7 @@
 
 import { Database } from "bun:sqlite";
 import { mkdirSync, readdirSync, readFileSync, statSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, isAbsolute, join, resolve } from "node:path";
 
 export const DEFAULT_DATABASE_PATH = "./data/scantron.db";
 
@@ -62,8 +62,19 @@ function enableWal(db: Database, attempts = 20, sleepMs = 10): void {
   }
 }
 
+/** Repo root, derived from this file's location: packages/database/src → ../../.. */
+export const REPO_ROOT = resolve(import.meta.dir, "../../..");
+
+/**
+ * A *relative* `DATABASE_URL` is resolved against the repo root, not the current working
+ * directory. The services run from their own package directories, so a relative path
+ * silently gave each process its own database — one writer per file, all of them ingesting
+ * the same feeds into different places. One file is the whole design (ADR-003).
+ */
 export function databasePath(): string {
-  return process.env.DATABASE_URL?.trim() || DEFAULT_DATABASE_PATH;
+  const configured = process.env.DATABASE_URL?.trim() || DEFAULT_DATABASE_PATH;
+  if (configured === IN_MEMORY || isAbsolute(configured)) return configured;
+  return resolve(REPO_ROOT, configured);
 }
 
 export interface OpenOptions {

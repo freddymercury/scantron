@@ -56,6 +56,38 @@ export function recordSourcePayload(
 export type UpsertOutcome = "created" | "updated" | "unchanged";
 
 /**
+ * Columns downstream jobs own. Ingest never writes them on an update: normalization and
+ * geocoding fill them in, and a poll that re-read an unchanged source record would
+ * otherwise wipe them back to null and re-enqueue the same work — which is exactly what
+ * happened, at 4,110 "updates" per cycle over records nothing had changed.
+ */
+const DERIVED_COLUMNS = new Set<keyof ObservationRow>([
+  "type",
+  "type_confidence",
+  "severity",
+  "priority_rank",
+  "normalized_at",
+  "location_normalized",
+  "location_display_name",
+  "location_method",
+  "location_confidence",
+  "visibility",
+  "backfilled",
+]);
+
+/**
+ * Columns the source supplies when it has them and enrichment fills when it does not.
+ * A later poll may legitimately add a point the first one lacked, but must never blank one.
+ */
+const COALESCE_COLUMNS = new Set<keyof ObservationRow>([
+  "lat",
+  "lng",
+  "neighborhood",
+  "address",
+  "intersection",
+]);
+
+/**
  * Upsert on the idempotency key. `unchanged` is reported rather than written, so a poll
  * cycle that re-reads a static snapshot does not churn `last_updated` timestamps or
  * enqueue work that has nothing to do.
@@ -78,14 +110,24 @@ export function upsertObservation(db: Database, row: ObservationRow): UpsertOutc
   }
 
   // `ingested_at` is ours, not the source's, so it is excluded from the comparison —
-  // otherwise every poll would look like a change.
-  const comparable = columns.filter((column) => column !== "ingested_at" && column !== "id");
-  const same = comparable.every((column) => existing[column] === row[column]);
-  if (same) return "unchanged";
+  // otherwise every poll would look like a change. Derived columns are excluded because
+  // the source has nothing to say about them.
+  const sourceColumns = columns.filter(
+    (column) =>
+      column !== "ingested_at" && column !== "id" && !DERIVED_COLUMNS.has(column),
+  );
+  const changed = sourceColumns.filter((column) => {
+    if (COALESCE_COLUMNS.has(column)) {
+      // Absent in this poll is not a change; present and different is.
+      return row[column] !== null && existing[column] !== row[column];
+    }
+    return existing[column] !== row[column];
+  });
+  if (changed.length === 0) return "unchanged";
 
-  const assignments = comparable.map((column) => `${String(column)} = $${String(column)}`);
+  const assignments = changed.map((column) => `${String(column)} = $${String(column)}`);
   db.query(
-    `UPDATE observations SET ${assignments.join(", ")}
+    `UPDATE observations SET ${assignments.join(", ")}, ingested_at = $ingested_at
       WHERE source = $source AND source_record_id = $source_record_id`,
   ).run(named({ ...row, id: existing.id }));
   return "updated";

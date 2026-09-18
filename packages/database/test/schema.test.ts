@@ -5,7 +5,7 @@ import {
   type ObservationRow,
 } from "@scantron/incident-schema";
 import { createTestDatabase } from "../src/testing.ts";
-import { neighborhoodRows, replaceNeighborhoods } from "../src/index.ts";
+import { neighborhoodRows, replaceNeighborhoods, upsertObservation } from "../src/index.ts";
 
 const PRD_37_TABLES = [
   "observations",
@@ -203,5 +203,65 @@ test("loading neighborhoods twice replaces rather than duplicates", () => {
   const rows = neighborhoodRows(db);
   expect(rows).toHaveLength(1);
   expect(rows[0]?.loaded_at).toBe("2026-09-19T00:00:00.000Z");
+  db.close();
+});
+
+test("a re-poll of an unchanged record does not wipe what normalization added", () => {
+  const db = createTestDatabase();
+  insertObservation(db, anObservationRow());
+
+  // Normalization and geocoding fill in their own columns.
+  db.query(
+    `UPDATE observations
+        SET type = 'collision', type_confidence = 0.9, location_normalized = '19th Ave & Irving St',
+            location_method = 'source_coordinates', normalized_at = '2026-09-18T02:00:00.000Z'
+      WHERE id = 'obs_1'`,
+  ).run();
+
+  // The next poll re-reads the same source record, which knows nothing about any of that.
+  const outcome = upsertObservation(db, anObservationRow({ id: "obs_ignored" }));
+
+  expect(outcome).toBe("unchanged");
+  const stored = db
+    .query<{ type: string; location_normalized: string; location_method: string }, []>(
+      "SELECT type, location_normalized, location_method FROM observations",
+    )
+    .get();
+  expect(stored?.type).toBe("collision");
+  expect(stored?.location_normalized).toBe("19th Ave & Irving St");
+  expect(stored?.location_method).toBe("source_coordinates");
+  db.close();
+});
+
+test("a genuine source change still updates, without touching derived columns", () => {
+  const db = createTestDatabase();
+  insertObservation(db, anObservationRow());
+  db.query("UPDATE observations SET type = 'collision', location_method = 'intersection_lookup'").run();
+
+  const outcome = upsertObservation(db, anObservationRow({ raw_type: "216", subtype: "SHOTS FIRED" }));
+
+  expect(outcome).toBe("updated");
+  const stored = db
+    .query<{ raw_type: string; type: string; location_method: string }, []>(
+      "SELECT raw_type, type, location_method FROM observations",
+    )
+    .get();
+  expect(stored?.raw_type).toBe("216");
+  // The new type is normalization's job, not ingest's — it is re-enqueued, not guessed.
+  expect(stored?.type).toBe("collision");
+  expect(stored?.location_method).toBe("intersection_lookup");
+  db.close();
+});
+
+test("a later poll may add a point it previously lacked, but never blanks one", () => {
+  const db = createTestDatabase();
+  insertObservation(db, anObservationRow({ lat: null, lng: null }));
+
+  expect(upsertObservation(db, anObservationRow({ lat: 37.78, lng: -122.41 }))).toBe("updated");
+  expect(db.query<{ lat: number }, []>("SELECT lat FROM observations").get()?.lat).toBe(37.78);
+
+  // The feed drops the point on a later poll; ours stays.
+  expect(upsertObservation(db, anObservationRow({ lat: null, lng: null }))).toBe("unchanged");
+  expect(db.query<{ lat: number }, []>("SELECT lat FROM observations").get()?.lat).toBe(37.78);
   db.close();
 });

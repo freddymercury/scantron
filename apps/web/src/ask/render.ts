@@ -63,6 +63,45 @@ function row(observation: AskAnswer["rows"][number], now: Date): string {
   </tr>`;
 }
 
+function searchSection(answer: AskAnswer, now: Date): string {
+  const search = answer.search;
+  if (!search) return "";
+
+  if (search.hits.length === 0) {
+    return `<div class="answer">
+      <p><b>Nothing matched ${escapeHtml(answer.query.unresolved.join(" "))}.</b></p>
+      <p class="muted">Those words are not in the grammar, so they were searched for instead — in what the agency called each call, where it happened, and which units went.</p>
+    </div>`;
+  }
+
+  return `<div class="answer">
+    <p><b>${search.hits.length} match${search.hits.length === 1 ? "" : "es"}</b> for
+      <b>${escapeHtml(answer.query.unresolved.join(" "))}</b>, which the grammar did not recognise, so they were searched for.
+      ${
+        search.reranked
+          ? `<span class="muted">Ranked semantically by Jev in ${Math.round(search.latencyMs ?? 0)} ms.</span>`
+          : `<span class="muted">${escapeHtml(search.fallbackReason ?? "")}.</span>`
+      }
+    </p>
+    <table>
+      <tr><th>when</th><th>reported as</th><th>where</th><th>neighborhood</th>${search.reranked ? "<th>match</th>" : ""}<th></th></tr>
+      ${search.hits
+        .slice(0, 20)
+        .map(
+          (hit) => `<tr>
+            <td>${escapeHtml(relativeTime(hit.row.occurred_at, now))}</td>
+            <td>${escapeHtml(hit.row.subtype ?? hit.row.type ?? "unknown")}</td>
+            <td>${escapeHtml(hit.row.location_normalized ?? hit.row.location_raw ?? "—")}</td>
+            <td>${escapeHtml(hit.row.neighborhood ?? "—")}</td>
+            ${search.reranked ? `<td class="muted">${escapeHtml(hit.relevanceLabel ?? "not scored")}</td>` : ""}
+            <td><a href="${INTERNAL_PREFIX}/observation/${encodeURIComponent(hit.row.id)}">open</a></td>
+          </tr>`,
+        )
+        .join("")}
+    </table>
+  </div>`;
+}
+
 export function renderAnswer(answer: AskAnswer, now: Date = new Date()): string {
   const { query } = answer;
 
@@ -85,8 +124,8 @@ export function renderAnswer(answer: AskAnswer, now: Date = new Date()): string 
       <div class="answer">
         <p><b>No ${escapeHtml(subject)} were reported in ${escapeHtml(scope)} in ${escapeHtml(query.windowLabel)}.</b></p>
         <p class="muted">That means nothing was dispatched and published — not that nothing happened. The police feed publishes on a ~30 minute delay, and sensitive calls are published without a location.</p>
-        ${query.unresolved.length > 0 ? `<p class="muted">Ignored: ${escapeHtml(query.unresolved.join(", "))}</p>` : ""}
-      </div>`;
+        </div>
+      ${searchSection(answer, now)}`;
   }
 
   const trend =
@@ -100,7 +139,8 @@ export function renderAnswer(answer: AskAnswer, now: Date = new Date()): string 
       <div class="answer">
         <p><b>${answer.total} ${escapeHtml(subject)}</b> in ${escapeHtml(scope)} in ${escapeHtml(query.windowLabel)}.${trend}</p>
         ${breakdown(answer)}
-      </div>`;
+      </div>
+      ${searchSection(answer, now)}`;
   }
 
   if (query.intent === "highlight") {
@@ -121,7 +161,8 @@ export function renderAnswer(answer: AskAnswer, now: Date = new Date()): string 
           .join("")}
         <p class="muted">Ranked by what the agency called it, how urgently it was dispatched, how many units went, and whether a second agency responded nearby. It is a ranking of dispatch activity, not of harm.</p>
         ${breakdown(answer)}
-      </div>`;
+      </div>
+      ${searchSection(answer, now)}`;
   }
 
   return `${askBox(query.question)}

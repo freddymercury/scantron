@@ -67,7 +67,12 @@ test("all tables are STRICT, so declared types are enforced", () => {
     .query<{ name: string; sql: string }, []>(
       "SELECT name, sql FROM sqlite_master WHERE type = 'table' AND sql IS NOT NULL",
     )
-    .all();
+    .all()
+    // FTS5 virtual tables and their shadow tables cannot be STRICT — the extension owns
+    // their storage. Everything we declare ourselves must be.
+    .filter(({ sql }) => !sql.includes("VIRTUAL TABLE"))
+    .filter(({ name }) => !name.startsWith("observations_fts"));
+
   for (const { name, sql } of definitions) {
     expect(`${name}: ${sql.includes("STRICT")}`).toBe(`${name}: true`);
   }

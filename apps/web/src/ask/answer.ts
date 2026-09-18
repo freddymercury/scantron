@@ -9,7 +9,10 @@
 import type { Database } from "bun:sqlite";
 
 import type { ObservationListRow } from "../internal/queries.ts";
+import { createJevClient, type JevClient } from "./jev.ts";
 import type { AskQuery } from "./parse.ts";
+import { rerank, type RerankResult } from "./rerank.ts";
+import { searchObservations } from "./search.ts";
 
 export interface RankedObservation {
   row: ObservationListRow;
@@ -29,6 +32,30 @@ export interface AskAnswer {
   withheldLocations: number;
   /** Full-window comparison for context: same window length, immediately before. */
   previousTotal: number;
+  /** Present when the question fell through the grammar and was answered by search. */
+  search?: RerankResult;
+}
+
+/**
+ * The grammar answers structure — a category, an area, a window. Words it could not place
+ * are a *search*, not a failure: "something about a car being broken into on Valencia" has
+ * no category in our taxonomy but is perfectly findable.
+ */
+export async function runSearchFallback(
+  db: Database,
+  query: AskQuery,
+  now: Date = new Date(),
+  client: JevClient = createJevClient(),
+): Promise<RerankResult> {
+  const text = query.unresolved.join(" ");
+  const hits = searchObservations(db, text, {
+    ...(query.area === undefined ? {} : { neighborhood: query.area }),
+    ...(query.windowMinutes > 0
+      ? { from: new Date(now.getTime() - query.windowMinutes * 60_000).toISOString() }
+      : {}),
+    limit: 30,
+  });
+  return rerank(client, query.question, hits);
 }
 
 function conditions(query: AskQuery, now: Date): { sql: string; parameters: (string | number)[] } {

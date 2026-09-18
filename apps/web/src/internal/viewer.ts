@@ -12,7 +12,7 @@ import type { Database } from "bun:sqlite";
 import { createNonce, escapeHtml, securityHeaders } from "../security.ts";
 import { askBox, renderAnswer, renderExamples } from "../ask/render.ts";
 import { parseQuestion } from "../ask/parse.ts";
-import { runAsk } from "../ask/answer.ts";
+import { runAsk, runSearchFallback } from "../ask/answer.ts";
 import { renderDetail } from "./detail.ts";
 import { renderMap } from "./map.ts";
 import { INTERNAL_PREFIX } from "./paths.ts";
@@ -615,6 +615,10 @@ export async function handleInternal(
     }
 
     const answer = runAsk(db, query);
+    // Words the grammar could not place are a search, not a dead end.
+    if (query.unresolved.length > 0 && !query.unanswerable) {
+      answer.search = await runSearchFallback(db, query);
+    }
     return new Response(page(nonce, "ask", renderAnswer(answer)), {
       headers: {
         "content-type": "text/html; charset=utf-8",

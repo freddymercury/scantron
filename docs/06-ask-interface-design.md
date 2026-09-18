@@ -76,6 +76,40 @@ can be run over the same corpus of questions and diffed. That diff is the covera
 where the grammar needs extending, and it keeps Tier 2 from ever becoming load-bearing for
 questions Tier 1 already answers.
 
+## Where Jev sits
+
+A second model shape turned up that the tiered design did not anticipate: **Jev**
+(TypeSafe `systemone`), whose output modality is *decisions*, not text. You send a JSON
+state and a set of typed questions — a `score` over ordered levels, a `choice` from an enum
+you supply, a boolean — and it answers with probability distributions, fast enough
+(~150 ms for a 35-question fan-out, per its own demos) to ride along with a keystroke.
+
+That makes it admissible here in a way a text model is not, and the reason is worth being
+precise about: **Jev cannot emit a sentence a reader sees, because sentences are not in its
+output alphabet.** The Factor 4 boundary this codebase enforces with a validator is
+enforced by the protocol instead. It is used for one job — ordering search results — and it
+is shown only what a *published* record would show: what the agency called it, where,
+which units, when. No source free-text, no raw payload, no agency record ids. A test
+asserts that list of fields exactly.
+
+Search is two passes, and the first is the one that has to work:
+
+1. **Lexical retrieval, local.** SQLite FTS5 over what the agency called each call, where
+   it happened, and which units went. Sub-millisecond, zero dependencies, always on.
+2. **Semantic re-rank, optional.** One fan-out request scoring each candidate against the
+   question, plus three query-level questions. Gated by confidence — below the gate an
+   answer changes nothing rather than being half-applied — and bounded by a deadline
+   enforced on our side, not the provider's. **A late answer is dropped**, because a
+   re-rank that lands after the reader has moved on reorders results they were already
+   reading.
+
+With no `JEV_API_KEY` the second pass does not happen and search is lexical, which the UI
+says in those words rather than pretending the ordering was semantic.
+
+The route in is the grammar's own tail: words Tier 1 could not place are a *search*, not a
+failure. "anything about a boarded up storefront on valencia" has no category in our
+taxonomy, and search finds the FIGHT W/WEAPONS call at Mission & Valencia anyway.
+
 ## What the ranking claims
 
 "Most interesting" is a ranking we have to be able to defend, so every point it awards is

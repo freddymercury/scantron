@@ -72,6 +72,23 @@ export const ENV_VARS: readonly EnvVar[] = [
     fallback: "3102",
     description: "Port for incident-correlator /metrics and /health",
   },
+  {
+    name: "JEV_API_KEY",
+    required: false,
+    description: "Optional Jev key for semantic search re-rank; unset means lexical ranking only",
+  },
+  {
+    name: "JEV_BASE_URL",
+    required: false,
+    fallback: "https://api.typesafe.ai/v1/systemone",
+    description: "Jev endpoint; TypeSafe direct, or an OpenRouter-compatible gateway",
+  },
+  {
+    name: "JEV_TIMEOUT_MS",
+    required: false,
+    fallback: "400",
+    description: "Deadline for the re-rank; a late answer is dropped, not waited for",
+  },
   { name: "LOG_LEVEL", required: false, fallback: "info", description: "debug | info | warn | error" },
 ] as const;
 

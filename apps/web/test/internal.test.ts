@@ -3,7 +3,15 @@ import { enqueue, claim, fail as failJob, upsertObservation, ensureSourceConfigu
 import { createTestDatabase } from "@scantron/database/testing";
 import { observationToRow, type Observation } from "@scantron/incident-schema";
 
-import { evaluateGate, handleInternal, isAuthorized, parseFilter } from "../src/internal/viewer.ts";
+import {
+  describeWindow,
+  evaluateGate,
+  handleInternal,
+  isAuthorized,
+  parseFilter,
+  TIME_WINDOWS,
+  windowStart,
+} from "../src/internal/viewer.ts";
 import { windowCounters, failedJobs, requeueJob } from "../src/internal/queries.ts";
 
 const KEY = "test-internal-key";
@@ -102,15 +110,42 @@ test("the page shows raw payload beside the normalized observation", async () =>
 });
 
 test("filters are parsed from the query string", () => {
-  const url = new URL("http://localhost/internal?source=sf_fire_cad&type=fire&geocoded=no&unmapped=1&from=2026-09-18T00:00:00Z");
+  const url = new URL(
+    "http://localhost/internal?source=sf_fire_cad&type=fire&neighborhood=Mission&geocoded=no&unmapped=1&from=2026-09-18T00:00:00Z",
+  );
   expect(parseFilter(url)).toMatchObject({
     source: "sf_fire_cad",
     type: "fire",
+    neighborhood: "Mission",
     geocoded: "no",
     unmappedOnly: true,
+    // An explicit `from` wins over the preset, so a pinned window survives a reload.
     from: "2026-09-18T00:00:00Z",
   });
-  expect(parseFilter(new URL("http://localhost/internal"))).toEqual({ limit: 50 });
+});
+
+test("the default window is the last 24 hours, and presets resolve to timestamps", () => {
+  const now = new Date("2026-09-18T12:00:00.000Z");
+  const plain = parseFilter(new URL("http://localhost/internal"), now);
+  expect(plain.since).toBe("24h");
+  expect(plain.from).toBe("2026-09-17T12:00:00.000Z");
+
+  const shift = parseFilter(new URL("http://localhost/internal?since=8h"), now);
+  expect(shift.from).toBe("2026-09-18T04:00:00.000Z");
+
+  const quarter = parseFilter(new URL("http://localhost/internal?since=90d"), now);
+  expect(quarter.from).toBe("2026-06-20T12:00:00.000Z");
+
+  // "everything" means no lower bound at all, not a very large one.
+  expect(parseFilter(new URL("http://localhost/internal?since=all"), now).from).toBeUndefined();
+  expect(windowStart("nonsense", now)).toBeUndefined();
+});
+
+test("the time windows span the units this data is actually discussed in", () => {
+  const values = TIME_WINDOWS.map((window) => window.value);
+  // Minutes because a call develops over minutes; months because a trend question spans them.
+  expect(values).toEqual(["15m", "1h", "4h", "8h", "24h", "3d", "7d", "30d", "90d", "all"]);
+  expect(describeWindow("8h")).toBe("last shift (8 hours)");
 });
 
 test("counters report what would expose a failure, not what flatters", () => {
@@ -304,4 +339,56 @@ test("the page carries a theme toggle whose script runs under the nonce", async 
   // No unsafe-inline escape hatch was added to make the toggle work.
   expect(policy).not.toContain("unsafe-inline");
   db.close();
+});
+
+test("selecting a neighborhood filters the rows and zooms the map", async () => {
+  const db = seeded();
+  upsertObservation(
+    db,
+    observationToRow(
+      observation({
+        id: "obs_sunset",
+        sourceRecordId: "3",
+        location: { normalized: "19th Ave & Irving St", latitude: 37.7636, longitude: -122.4772, neighborhood: "Sunset/Parkside" },
+      }),
+    ),
+  );
+  db.query(
+    `INSERT INTO neighborhoods (name, geometry, min_lat, min_lng, max_lat, max_lng, source, loaded_at)
+     VALUES ('Mission', '{"type":"Polygon","coordinates":[[[-122.43,37.74],[-122.40,37.74],[-122.40,37.77],[-122.43,37.77],[-122.43,37.74]]]}',
+             37.74, -122.43, 37.77, -122.40, 'test', '2026-09-18T00:00:00.000Z')`,
+  ).run();
+
+  const response = await handleInternal(
+    request("/internal?since=all&neighborhood=Mission", { headers: { "x-scantron-internal-key": KEY } }),
+    { db },
+  );
+  const html = (await response?.text()) ?? "";
+
+  // Only the Mission observation is plotted and listed.
+  expect((html.match(/<circle /g) ?? [])).toHaveLength(1);
+  expect(html).toContain("24th St &amp; Mission St");
+  expect(html).not.toContain("19th Ave &amp; Irving St");
+
+  // The map is zoomed to the neighborhood rather than the whole city.
+  expect(html).not.toContain(`viewBox="0 0 760 560"`);
+  expect(html).toContain('class="hood focused"');
+  db.close();
+});
+
+test("zooming keeps the projection and shrinks what is drawn in user units", async () => {
+  const { viewBoxFor, MAP_WIDTH } = await import("../src/internal/map.ts");
+
+  const whole = viewBoxFor(undefined);
+  expect(whole.viewBox).toBe(`0 0 760 560`);
+  expect(whole.scale).toBe(1);
+
+  const mission = viewBoxFor({ min_lat: 37.74, min_lng: -122.43, max_lat: 37.77, max_lng: -122.4 });
+  const [x, y, width] = mission.viewBox.split(" ").map(Number);
+  expect(width as number).toBeLessThan(MAP_WIDTH);
+  expect(x as number).toBeGreaterThan(0);
+  expect(y as number).toBeGreaterThan(0);
+  // Circles are in user units, so they must shrink with the view or a zoomed neighborhood
+  // becomes a field of blobs.
+  expect(mission.scale).toBeLessThan(1);
 });

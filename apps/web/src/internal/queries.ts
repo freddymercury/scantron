@@ -11,6 +11,7 @@ import type { Database } from "bun:sqlite";
 export interface ObservationFilter {
   source?: string;
   type?: string;
+  neighborhood?: string;
   from?: string;
   to?: string;
   /** "yes" | "no" — has coordinates. */
@@ -55,6 +56,10 @@ function conditions(filter: ObservationFilter): { sql: string; parameters: (stri
   if (filter.type) {
     clauses.push("type = ?");
     parameters.push(filter.type);
+  }
+  if (filter.neighborhood) {
+    clauses.push("neighborhood = ?");
+    parameters.push(filter.neighborhood);
   }
   if (filter.from) {
     clauses.push("occurred_at >= ?");
@@ -312,4 +317,32 @@ export interface NeighborhoodShape {
 
 export function neighborhoodShapes(db: Database): NeighborhoodShape[] {
   return db.query<NeighborhoodShape, []>("SELECT name, geometry FROM neighborhoods").all();
+}
+
+export interface NeighborhoodBounds {
+  name: string;
+  min_lat: number;
+  min_lng: number;
+  max_lat: number;
+  max_lng: number;
+}
+
+export function neighborhoodBounds(db: Database, name: string): NeighborhoodBounds | undefined {
+  return (
+    db
+      .query<NeighborhoodBounds, [string]>(
+        "SELECT name, min_lat, min_lng, max_lat, max_lng FROM neighborhoods WHERE name = ?",
+      )
+      .get(name) ?? undefined
+  );
+}
+
+/** Neighborhoods that have actually been seen in the data, with counts. */
+export function neighborhoodsSeen(db: Database): { neighborhood: string; n: number }[] {
+  return db
+    .query<{ neighborhood: string; n: number }, []>(
+      `SELECT neighborhood, count(*) AS n FROM observations
+        WHERE neighborhood IS NOT NULL GROUP BY neighborhood ORDER BY neighborhood`,
+    )
+    .all();
 }

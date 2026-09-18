@@ -46,11 +46,61 @@ const SOURCE_COLOURS: Record<string, string> = {
   sf_ems_cad: "var(--ems)",
 };
 
-export function renderMap(points: MapPoint[], shapes: NeighborhoodShape[]): string {
+export interface MapBounds {
+  min_lat: number;
+  min_lng: number;
+  max_lat: number;
+  max_lng: number;
+}
+
+export interface MapOptions {
+  /** Zoom to these bounds instead of the whole city. */
+  focus?: MapBounds | undefined;
+  /** Drawn heavier than its neighbours, so the focused area reads as the subject. */
+  focusName?: string | undefined;
+}
+
+/**
+ * Zooming is a viewBox change, not a reprojection: the same arithmetic places every point,
+ * and the browser does the scaling. 8% padding keeps a neighborhood off the edges.
+ */
+export function viewBoxFor(focus: MapBounds | undefined): {
+  viewBox: string;
+  scale: number;
+} {
+  if (!focus) return { viewBox: `0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`, scale: 1 };
+
+  const topLeft = project(focus.max_lat, focus.min_lng);
+  const bottomRight = project(focus.min_lat, focus.max_lng);
+  const width = Math.max(bottomRight.x - topLeft.x, 1);
+  const height = Math.max(bottomRight.y - topLeft.y, 1);
+  const padX = width * 0.08;
+  const padY = height * 0.08;
+
+  return {
+    viewBox: `${(topLeft.x - padX).toFixed(1)} ${(topLeft.y - padY).toFixed(1)} ${(width + padX * 2).toFixed(1)} ${(height + padY * 2).toFixed(1)}`,
+    // Circles and strokes are in user units, so they must shrink as the view zooms in or
+    // a zoomed neighborhood turns into a field of blobs.
+    scale: Math.min((width + padX * 2) / MAP_WIDTH, (height + padY * 2) / MAP_HEIGHT),
+  };
+}
+
+export function renderMap(
+  points: MapPoint[],
+  shapes: NeighborhoodShape[],
+  options: MapOptions = {},
+): string {
+  const { viewBox, scale } = viewBoxFor(options.focus);
+  const radius = Math.max(0.6, 2.2 * scale);
+  const strokeWidth = Math.max(0.2, 0.7 * scale);
+
   const outlines = shapes
     .map((shape) => {
       const path = geometryPath(JSON.parse(shape.geometry) as GeoJsonGeometry);
-      return `<path d="${path}" class="hood"><title>${escapeHtml(shape.name)}</title></path>`;
+      const focused = options.focusName === shape.name;
+      return `<path d="${path}" class="hood${focused ? " focused" : ""}" stroke-width="${(
+        focused ? strokeWidth * 2 : strokeWidth
+      ).toFixed(2)}"><title>${escapeHtml(shape.name)}</title></path>`;
     })
     .join("");
 
@@ -58,14 +108,15 @@ export function renderMap(points: MapPoint[], shapes: NeighborhoodShape[]): stri
     .map((point) => {
       const { x, y } = project(point.lat, point.lng);
       const colour = SOURCE_COLOURS[point.source] ?? "var(--other)";
-      return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.2" fill="${colour}"><title>${escapeHtml(
+      return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${radius.toFixed(2)}" fill="${colour}"><title>${escapeHtml(
         `${point.type ?? "unknown"} · ${point.source}`,
       )}</title></circle>`;
     })
     .join("");
 
-  return `<svg viewBox="0 0 ${MAP_WIDTH} ${MAP_HEIGHT}" class="map" role="img"
-    aria-label="${points.length} located observations plotted over San Francisco">
+  const subject = options.focusName ? escapeHtml(options.focusName) : "San Francisco";
+  return `<svg viewBox="${viewBox}" class="map" role="img"
+    aria-label="${points.length} located observations plotted over ${subject}">
     <g class="hoods">${outlines}</g>
     <g class="points">${circles}</g>
   </svg>`;

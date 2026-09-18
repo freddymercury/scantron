@@ -15,7 +15,9 @@ import {
   failedJobs,
   listObservations,
   mapPoints,
+  neighborhoodBounds,
   neighborhoodShapes,
+  neighborhoodsSeen,
   rawPayloads,
   requeueJob,
   sourceCoverage,
@@ -27,6 +29,34 @@ import {
 } from "./queries.ts";
 
 export const INTERNAL_PREFIX = "/internal";
+
+/**
+ * Time windows for dispatch data. The short end is minutes because a call develops over
+ * minutes; the long end is months because that is the span a trend question covers. In
+ * between, `8h` is a shift and `24h` is "today so far" — the units people actually use
+ * when talking about this, rather than a uniform ladder of round numbers.
+ */
+export const TIME_WINDOWS: readonly { value: string; label: string; minutes: number }[] = [
+  { value: "15m", label: "last 15 minutes", minutes: 15 },
+  { value: "1h", label: "last hour", minutes: 60 },
+  { value: "4h", label: "last 4 hours", minutes: 4 * 60 },
+  { value: "8h", label: "last shift (8 hours)", minutes: 8 * 60 },
+  { value: "24h", label: "last 24 hours", minutes: 24 * 60 },
+  { value: "3d", label: "last 3 days", minutes: 3 * 24 * 60 },
+  { value: "7d", label: "last week", minutes: 7 * 24 * 60 },
+  { value: "30d", label: "last month", minutes: 30 * 24 * 60 },
+  { value: "90d", label: "last 3 months", minutes: 90 * 24 * 60 },
+  { value: "all", label: "everything", minutes: 0 },
+];
+
+export const DEFAULT_WINDOW = "24h";
+
+/** `since` → an absolute lower bound, so every query downstream deals in timestamps. */
+export function windowStart(value: string | undefined, now: Date = new Date()): Date | undefined {
+  const window = TIME_WINDOWS.find((candidate) => candidate.value === value);
+  if (!window || window.minutes === 0) return undefined;
+  return new Date(now.getTime() - window.minutes * 60_000);
+}
 
 export function internalKey(): string | undefined {
   return process.env.INTERNAL_API_KEY?.trim() || undefined;
@@ -139,6 +169,10 @@ const THEME_SCRIPT = `
   })();
 `;
 
+export function describeWindow(since: string): string {
+  return TIME_WINDOWS.find((window) => window.value === since)?.label ?? since;
+}
+
 function counterBlock(counters: WindowCounters): string {
   const cells: [string, string][] = [
     ["observations", String(counters.total)],
@@ -210,18 +244,31 @@ export function evaluateGate(counters: WindowCounters, now: Date = new Date()): 
   };
 }
 
-function filterForm(filter: ObservationFilter, sources: string[], types: string[]): string {
-  const option = (value: string, selected: string | undefined) =>
-    `<option value="${escapeHtml(value)}"${value === selected ? " selected" : ""}>${escapeHtml(value || "any")}</option>`;
+function filterForm(
+  filter: ObservationFilter & { since: string },
+  sources: string[],
+  types: string[],
+  neighborhoods: { neighborhood: string; n: number }[],
+): string {
+  const option = (value: string, selected: string | undefined, label = value || "any") =>
+    `<option value="${escapeHtml(value)}"${value === selected ? " selected" : ""}>${escapeHtml(label)}</option>`;
 
   return `<form method="get">
+    <label>since<select name="since">${TIME_WINDOWS.map((window) =>
+      option(window.value, filter.since, window.label),
+    ).join("")}</select></label>
+    <label>neighborhood<select name="neighborhood">${[
+      option("", filter.neighborhood, "anywhere"),
+      ...neighborhoods.map((row) =>
+        option(row.neighborhood, filter.neighborhood, `${row.neighborhood} (${row.n})`),
+      ),
+    ].join("")}</select></label>
     <label>source<select name="source">${["", ...sources].map((value) => option(value, filter.source)).join("")}</select></label>
     <label>type<select name="type">${["", ...types].map((value) => option(value, filter.type)).join("")}</select></label>
-    <label>from<input type="text" name="from" value="${escapeHtml(filter.from ?? "")}" placeholder="2026-09-18T00:00:00Z"></label>
-    <label>to<input type="text" name="to" value="${escapeHtml(filter.to ?? "")}" placeholder="ISO-8601 UTC"></label>
     <label>geocoded<select name="geocoded">${["", "yes", "no"].map((value) => option(value, filter.geocoded)).join("")}</select></label>
     <label>unmapped only<input type="checkbox" name="unmapped" value="1"${filter.unmappedOnly ? " checked" : ""}></label>
     <button type="submit">apply</button>
+    ${filter.neighborhood || filter.source || filter.type || filter.since !== DEFAULT_WINDOW ? `<a href="${INTERNAL_PREFIX}">reset</a>` : ""}
   </form>`;
 }
 
@@ -273,14 +320,21 @@ function observationRow(db: Database, row: ObservationListRow): string {
   </tr>`;
 }
 
-export function parseFilter(url: URL): ObservationFilter {
-  const filter: ObservationFilter = { limit: 50 };
+export function parseFilter(url: URL, now: Date = new Date()): ObservationFilter & { since: string } {
+  const since = url.searchParams.get("since")?.trim() || DEFAULT_WINDOW;
+  const filter: ObservationFilter & { since: string } = { limit: 50, since };
   const take = (name: string) => url.searchParams.get(name)?.trim() || undefined;
 
   const source = take("source");
   if (source) filter.source = source;
   const type = take("type");
   if (type) filter.type = type;
+  const neighborhood = take("neighborhood");
+  if (neighborhood) filter.neighborhood = neighborhood;
+
+  // An explicit `from` wins over the preset, so a pinned window survives a reload.
+  const start = windowStart(since, now);
+  if (start) filter.from = start.toISOString();
   const from = take("from");
   if (from) filter.from = from;
   const to = take("to");
@@ -303,6 +357,8 @@ export function renderViewer(db: Database, url: URL, nonce: string): string {
   const failed = failedJobs(db);
   const points = mapPoints(db, filter);
   const shapes = neighborhoodShapes(db);
+  const neighborhoods = neighborhoodsSeen(db);
+  const focus = filter.neighborhood ? neighborhoodBounds(db, filter.neighborhood) : undefined;
 
   const sources = coverage.map((row) => row.source);
   const types = db
@@ -343,10 +399,17 @@ ${counterBlock(counters)}
     .join("")}
 </table>
 
-${filterForm(filter, sources, types)}
+${filterForm(filter, sources, types, neighborhoods)}
 
-<h2>map <span class="muted">${points.length} located of ${counters.total} — ${(counters.total - counters.geocoded).toLocaleString()} have no point, almost all of them sensitive calls SFPD publishes without a location</span></h2>
-${renderMap(points, shapes)}
+<h2>map <span class="muted">${filter.neighborhood ? `${escapeHtml(filter.neighborhood)} · ` : ""}${points.length} located of ${counters.total} · ${describeWindow(filter.since)}${
+    counters.total - counters.geocoded > 0
+      ? ` — ${counters.total - counters.geocoded} have no point, almost all sensitive calls SFPD publishes without a location`
+      : ""
+  }</span></h2>
+${renderMap(points, shapes, {
+  ...(focus ? { focus } : {}),
+  ...(filter.neighborhood ? { focusName: filter.neighborhood } : {}),
+})}
 <p class="legend"><span class="police">police</span><span class="fire">fire</span><span class="ems">EMS</span></p>
 
 <table>

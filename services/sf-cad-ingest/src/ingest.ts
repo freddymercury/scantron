@@ -22,9 +22,10 @@ import {
   upsertObservation,
 } from "@scantron/database";
 import { observationToRow, rowToObservation, type Observation } from "@scantron/incident-schema";
+import { recordUnits } from "@scantron/database";
 import type { AppMetrics, Logger } from "@scantron/observability";
 import { errorMessage } from "@scantron/observability";
-import { toSfNaiveString } from "@scantron/sf-domain";
+import { scrubPersonIdentifiers, toSfNaiveString } from "@scantron/sf-domain";
 
 import { MalformedRecordError, type SourceAdapter } from "./adapter.ts";
 import type { SocrataClient } from "./socrata.ts";
@@ -147,11 +148,23 @@ export async function runIngestCycle<TRecord extends Record<string, unknown>>(
       continue;
     }
 
+    // Person-identifying fields are dropped here, before anything is stored — S-C4, and
+    // the reason it happens at the adapter rather than at publication is that a field we
+    // never wrote cannot leak.
+    const scrubbed = scrubPersonIdentifiers(record);
+    if (scrubbed.dropped.length > 0) {
+      metrics.observationsFailed.increment({ source: adapter.source, reason: "person_fields_dropped" });
+      log.warn("record.person_fields_dropped", {
+        source: adapter.source,
+        count: scrubbed.dropped.length,
+      });
+    }
+
     // Every row keeps its own payload, even when several describe one call.
     const { isNew } = recordSourcePayload(db, {
       source: adapter.source,
       sourceRecordId: String(record[adapter.idField] ?? mapped.observation.sourceRecordId),
-      payload: record,
+      payload: scrubbed.value,
       fetchedAt: ingestedAt,
     });
     if (!isNew) metrics.duplicateSourceRecords.increment({ source: adapter.source });
@@ -182,6 +195,17 @@ export async function runIngestCycle<TRecord extends Record<string, unknown>>(
       // Units seen in an earlier cycle must survive this one; a later cycle's window can
       // contain only some of a call's rows.
       if (storedRow) observation = adapter.merge(rowToObservation(storedRow), observation);
+    }
+
+    // Canonicalize units and register them, so unit overlap can act as a correlation
+    // signal (S-D2) and the UI can name who is responding.
+    if (observation.units && observation.units.length > 0) {
+      const unitTypes = unitTypesFrom(observation);
+      const parsed = recordUnits(db, observation.units, observation.ingestedAt, {
+        unitTypes,
+        source: adapter.source,
+      });
+      observation = { ...observation, units: parsed.map((unit) => unit.designator).sort() };
     }
 
     const outcome = upsertObservation(db, observationToRow(observation));
@@ -233,4 +257,15 @@ export async function runIngestCycle<TRecord extends Record<string, unknown>>(
   });
 
   return result;
+}
+
+/** The per-unit `unit_type` the fire feed records in metadata, keyed by raw designator. */
+function unitTypesFrom(observation: Observation): Record<string, string | undefined> {
+  const timestamps = observation.metadata?.unit_timestamps as
+    | Record<string, { unit_type?: string }>
+    | undefined;
+  if (!timestamps) return {};
+  return Object.fromEntries(
+    Object.entries(timestamps).map(([unit, value]) => [unit, value?.unit_type]),
+  );
 }

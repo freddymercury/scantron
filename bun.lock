@@ -25,6 +25,15 @@
         "@scantron/sf-domain": "workspace:*",
       },
     },
+    "packages/correlation": {
+      "name": "@scantron/correlation",
+      "version": "0.0.0",
+      "dependencies": {
+        "@scantron/database": "workspace:*",
+        "@scantron/incident-schema": "workspace:*",
+        "@scantron/sf-domain": "workspace:*",
+      },
+    },
     "packages/database": {
       "name": "@scantron/database",
       "version": "0.0.0",
@@ -89,6 +98,8 @@
     },
   },
   "packages": {
+    "@scantron/correlation": ["@scantron/correlation@workspace:packages/correlation"],
+
     "@scantron/database": ["@scantron/database@workspace:packages/database"],
 
     "@scantron/event-taxonomy": ["@scantron/event-taxonomy@workspace:packages/event-taxonomy"],

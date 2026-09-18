@@ -1,0 +1,14 @@
+{
+  "name": "@scantron/correlation",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "test": "bun test" },
+  "dependencies": {
+    "@scantron/database": "workspace:*",
+    "@scantron/incident-schema": "workspace:*",
+    "@scantron/sf-domain": "workspace:*"
+  }
+}

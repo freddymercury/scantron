@@ -26,6 +26,7 @@
       "@scantron/location-normalizer/geocode": ["packages/location-normalizer/src/geocode.ts"],
       "@scantron/sf-domain": ["packages/sf-domain/src/index.ts"],
       "@scantron/event-taxonomy": ["packages/event-taxonomy/src/index.ts"],
+      "@scantron/correlation": ["packages/correlation/src/index.ts"],
       "@scantron/database": ["packages/database/src/index.ts"],
       "@scantron/database/testing": ["packages/database/src/testing.ts"],
       "@scantron/observability": ["packages/observability/src/index.ts"]

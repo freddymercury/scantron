@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lescan — SF Incident Intelligence (mockup)</title>
+<style>
+  :root{
+    --bg:#0e1116; --panel:#151a22; --panel-2:#1b212b; --line:#252d3a;
+    --txt:#e6eaf2; --muted:#8b97ab; --dim:#5f6b7f;
+    --police:#5b8def; --fire:#ef6c4d; --ems:#3fb984; --other:#9b8bef;
+    --warn:#e0b341; --active:#ef6c4d;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+    font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  header{display:flex;align-items:center;gap:16px;padding:10px 16px;
+    border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:20}
+  .logo{font-weight:700;letter-spacing:.5px}
+  .logo span{color:var(--muted);font-weight:400;font-size:12px;margin-left:8px}
+  .search{flex:1;max-width:420px}
+  .search input{width:100%;padding:7px 10px;border-radius:7px;border:1px solid var(--line);
+    background:var(--panel-2);color:var(--txt)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--panel-2);
+    color:var(--muted);cursor:pointer;font-size:12px;user-select:none}
+  .chip.on{background:#233047;border-color:#38507a;color:#cfe0ff}
+  .search{position:relative}
+  .chip.near{white-space:nowrap}
+  .sugg{position:absolute;top:36px;left:0;right:0;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:8px;overflow:hidden;z-index:30;display:none}
+  .sugg.on{display:block}
+  .sugg div{padding:7px 10px;cursor:pointer;color:var(--muted);font-size:13px}
+  .sugg div:hover{background:#233047;color:#cfe0ff}
+
+  .answer{margin:10px 12px;padding:14px;border:1px solid #2c405f;background:#141b26;border-radius:10px}
+  .answer .q{color:var(--dim);font-size:12px;margin-bottom:6px}
+  .answer .a{font-size:15px;line-height:1.5;color:#e9eefb}
+  .answer .a b{color:#fff;font-weight:600}
+  .breakdown{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;padding-top:11px;border-top:1px solid var(--line)}
+  .breakdown div{font-size:12px;color:var(--muted)}
+  .breakdown b{display:block;font-size:19px;color:var(--txt);font-weight:600}
+  .baseline{margin-top:10px;font-size:12px;color:var(--muted)}
+  .baseline .q{color:#b7ecd3}
+  .baseline .busy{color:#ffd0c2}
+  .wins{display:flex;gap:5px;margin:11px 0 0}
+  .wins span{font-size:11.5px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);
+    background:var(--panel-2);color:var(--muted);cursor:pointer}
+  .wins span.on{background:#233047;border-color:#38507a;color:#cfe0ff}
+  .chart{display:flex;align-items:flex-end;gap:2px;height:52px;margin-top:12px;padding-top:11px;
+    border-top:1px solid var(--line)}
+  .chart i{flex:1;background:#3c5a8f;border-radius:2px 2px 0 0;min-height:2px;position:relative}
+  .chart i:hover{opacity:.75}
+  .xaxis{display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim);margin-top:5px}
+  .delta{margin-top:10px;font-size:12px;color:var(--muted)}
+  .delta b.up{color:#ffb9a3}.delta b.down{color:#9fe3c4}
+  .caveat{margin-top:9px;font-size:11px;color:var(--dim);border-left:2px solid #3a3320;padding-left:8px}
+  .clear{float:right;color:var(--dim);cursor:pointer;font-size:12px}
+  .clear:hover{color:var(--txt)}
+  .today{color:var(--muted);font-size:12px;white-space:nowrap}
+  .asof{color:var(--dim);font-size:11.5px;margin-top:6px}
+  .spacer{flex:1}
+  .live{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--ems);box-shadow:0 0 0 0 rgba(63,185,132,.6);
+    animation:p 2s infinite}
+  @keyframes p{0%{box-shadow:0 0 0 0 rgba(63,185,132,.5)}70%{box-shadow:0 0 0 8px rgba(63,185,132,0)}100%{box-shadow:0 0 0 0 rgba(63,185,132,0)}}
+
+  main{display:grid;grid-template-columns:380px 1fr 400px;height:calc(100vh - 53px)}
+  @media(max-width:1100px){main{grid-template-columns:1fr}.map,.detail{display:none}}
+
+  /* FEED */
+  .feed{border-right:1px solid var(--line);overflow:auto;background:var(--panel)}
+  .feed h2,.detail h2{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);
+    padding:12px 16px 6px;margin:0}
+  .card{padding:12px 16px;border-bottom:1px solid var(--line);cursor:pointer;display:grid;
+    grid-template-columns:34px 1fr;gap:10px}
+  .card:hover{background:var(--panel-2)}
+  .card.sel{background:#1c2432;box-shadow:inset 3px 0 0 var(--police)}
+  .ico{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-size:15px;
+    background:#222a36}
+  .t{font-weight:600}
+  .meta{color:var(--muted);font-size:12.5px}
+  .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .badge{font-size:11px;padding:2px 7px;border-radius:5px;border:1px solid var(--line);color:var(--muted)}
+  .badge.active{color:#ffd0c2;border-color:#5b3226;background:#2b1a15}
+  .badge.resolved{color:#9fb3c9;background:#1b2430}
+  .badge.reported{color:#e8d49a;border-color:#4a3f1d;background:#2a2417}
+  .badge.multi{color:#bcd7ff;border-color:#2c405f;background:#18202c}
+  .badge.confirmed{color:#b7ecd3;border-color:#25503d;background:#15261f}
+  .ago{color:var(--dim);font-size:12px}
+  .new{animation:flash 1.6s ease-out}
+  @keyframes flash{from{background:#243350}to{background:transparent}}
+
+  /* MAP */
+  .map{position:relative;overflow:hidden;background:#0b0f14}
+  .map svg{width:100%;height:100%;display:block}
+  .mk{cursor:pointer}
+  .mk circle.core{stroke:#0b0f14;stroke-width:1.5}
+  .mk circle.halo{fill-opacity:.14}
+  .maplabel{position:absolute;left:12px;bottom:10px;color:var(--dim);font-size:11px}
+  .legend{position:absolute;right:12px;top:12px;background:rgba(21,26,34,.92);border:1px solid var(--line);
+    border-radius:8px;padding:8px 10px;font-size:12px;color:var(--muted)}
+  .legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+
+  /* DETAIL */
+  .detail{border-left:1px solid var(--line);overflow:auto;background:var(--panel)}
+  .dhead{padding:14px 16px;border-bottom:1px solid var(--line)}
+  .dhead h3{margin:2px 0 6px;font-size:18px}
+  .kv{display:grid;grid-template-columns:120px 1fr;gap:4px 10px;padding:12px 16px;font-size:13px;
+    border-bottom:1px solid var(--line)}
+  .kv div:nth-child(odd){color:var(--muted)}
+  .sect{padding:12px 16px;border-bottom:1px solid var(--line)}
+  .sect h4{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin:0 0 10px}
+  .summary{background:var(--panel-2);border:1px solid var(--line);border-left:3px solid var(--police);
+    padding:10px 12px;border-radius:0 8px 8px 0;color:#d7e0ee}
+  .summary small{display:block;color:var(--dim);margin-top:6px;font-size:11px}
+  .tl{list-style:none;margin:0;padding:0 0 0 14px;border-left:1px solid var(--line)}
+  .tl li{position:relative;padding:0 0 14px 14px}
+  .tl li::before{content:"";position:absolute;left:-19px;top:5px;width:9px;height:9px;border-radius:50%;
+    background:var(--panel);border:2px solid var(--police)}
+  .tl time{display:block;color:var(--muted);font-size:12px}
+  .src{color:var(--dim);font-size:11px;font-family:ui-monospace,Menlo,monospace;cursor:help}
+  .units{display:flex;gap:6px;flex-wrap:wrap}
+  .unit{font-family:ui-monospace,Menlo,monospace;font-size:12px;padding:3px 8px;border-radius:6px;
+    background:var(--panel-2);border:1px solid var(--line)}
+  .note{color:var(--muted);font-size:12px}
+  .corr{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--muted);
+    background:#11161d;border:1px dashed var(--line);border-radius:8px;padding:10px;white-space:pre}
+  .toggle{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer}
+  footer{padding:10px 16px;color:var(--dim);font-size:11px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">LESCAN <span>San Francisco · mockup</span></div>
+  <div class="today" id="today"></div>
+  <div class="search">
+    <input id="ask" placeholder="Ask: what&#39;s happening in my neighborhood?" autocomplete="off" />
+    <div class="sugg" id="sugg"></div>
+  </div>
+  <div class="chip near" id="nearme">📍 Near me</div>
+  <div class="chips" id="filters">
+    <div class="chip on" data-f="police">Police</div>
+    <div class="chip on" data-f="fire">Fire</div>
+    <div class="chip on" data-f="ems">EMS</div>
+    <div class="chip on" data-f="active">Active</div>
+    <div class="chip" data-f="resolved">Recently resolved</div>
+    <div class="chip" data-f="24h">Last 24h</div>
+  </div>
+  <div class="spacer"></div>
+  <label class="toggle"><input type="checkbox" id="internal"/> internal view</label>
+  <div class="live"><span class="dot"></span> live · SSE connected</div>
+</header>
+
+<main>
+  <!-- FEED -->
+  <section class="feed">
+    <h2>Incident feed</h2>
+    <div id="cards"></div>
+    <footer>Publication delay: +5 min for police-activity category · 24 incidents from 611 observations in the last hour</footer>
+  </section>
+
+  <!-- MAP -->
+  <section class="map">
+    <svg viewBox="0 0 800 700" id="map">
+      <defs>
+        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M40 0H0V40" fill="none" stroke="#161d27" stroke-width="1"/>
+        </pattern>
+      </defs>
+      <rect width="800" height="700" fill="#0b0f14"/>
+      <rect width="800" height="700" fill="url(#grid)"/>
+      <!-- stylized land / water -->
+      <path d="M0 0 H640 L700 90 L720 260 L690 420 L640 700 H0 Z" fill="#111721" stroke="#1d2531"/>
+      <path d="M0 470 L250 470 L300 700 L0 700 Z" fill="#0f151d"/>
+      <g stroke="#1b2430" stroke-width="6" stroke-linecap="round">
+        <path d="M60 120 L640 60"/><path d="M40 300 L660 250"/><path d="M30 470 L640 430"/>
+        <path d="M170 20 L210 690"/><path d="M400 10 L440 690"/><path d="M600 20 L640 690"/>
+      </g>
+      <g fill="#33415a" font-size="11" font-family="system-ui">
+        <text x="70" y="180">Richmond</text><text x="90" y="400">Sunset</text>
+        <text x="300" y="220">Western Addition</text><text x="470" y="330">Mission</text>
+        <text x="560" y="150">North Beach</text><text x="520" y="250">SoMa</text>
+        <text x="300" y="640">Ingleside</text>
+      </g>
+      <g id="markers"></g>
+    </svg>
+    <div class="legend">
+      <div><i style="background:#5b8def"></i>Police</div>
+      <div><i style="background:#ef6c4d"></i>Fire</div>
+      <div><i style="background:#3fb984"></i>EMS / Medical</div>
+      <div style="margin-top:6px;color:#5f6b7f">halo = age · ring = active</div>
+    </div>
+    <div class="maplabel">markers show approximate location · tactical positions are never plotted</div>
+  </section>
+
+  <!-- DETAIL -->
+  <aside class="detail" id="detail"></aside>
+</main>
+
+<script>
+const now = new Date('2026-09-17T21:48:00-07:00');
+const mins = m => new Date(now.getTime() - m*60000);
+const fmt = d => d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+const fdate = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+const fdatel = d => d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+const daysAgo = n => new Date(now.getTime()-n*864e5);
+const fmtS = d => d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',second:'2-digit'});
+const ago = d => { const m = Math.round((now-d)/60000); return m<1?'just now':m+' min ago'; };
+
+const INC = [
+ {id:'sf_01K7A…9F', icon:'🔥', cat:'fire', title:'Structure Fire', type:'Fire',
+  loc:'22nd St & Mission St', hood:'Mission District', x:470,y:352, status:'active',
+  agencies:['fire','ems','police'], verif:'official-response-confirmed', first:mins(6), upd:mins(1),
+  units:['E07','T07','B02','RC2','Medic 84'], sources:3, obs:11,
+  summary:'Fire crews are responding to a reported structure fire on the 2300 block of Mission Street. Three engines, a truck and a battalion chief are on scene. Police are assisting with a street closure. No injuries have been reported in dispatch data.',
+  tl:[[mins(6),'Fire CAD record received — STRUCTURE FIRE','sf_fire_cad · obs 8fd2…'],
+      [mins(6),'E07, T07 dispatched','sf_fire_cad · obs 8fd3…'],
+      [mins(4),'Second alarm requested','sf_fire_cad · obs 8fe1…'],
+      [mins(3),'Police CAD record received — ASSIST FIRE DEPT','sf_police_cad · obs 91a0…'],
+      [mins(2),'Medic 84 dispatched','sf_fire_cad · obs 91c4…'],
+      [mins(1),'Street closure reported at 22nd/Mission','sf_police_cad · obs 91f7…']],
+  corr:'candidate  sf_police_cad:P-249913\nlocation 0.94  time 0.98  type 0.71  units 0.00  text 0.40\nscore 0.87  ≥ 0.85 → auto-merge'},
+
+ {id:'sf_01K7A…2C', icon:'🚑', cat:'ems', title:'Medical Emergency', type:'Medical',
+  loc:'Judah St & 46th Ave', hood:'Outer Sunset', x:95,y:430, status:'active',
+  agencies:['ems'], verif:'reported', first:mins(9), upd:mins(3),
+  units:['Medic 18'], sources:1, obs:2,
+  summary:'A medical response is under way near Judah Street and 46th Avenue. One medic unit was dispatched at 9:39 PM. No further detail is available from dispatch data.',
+  tl:[[mins(9),'EMS CAD record received — MEDICAL INCIDENT','sf_ems_cad · obs 5ab1…'],
+      [mins(3),'Medic 18 dispatched','sf_ems_cad · obs 5ad9…']],
+  corr:'no candidates within 250 m / 8 min → new incident'},
+
+ {id:'sf_01K7A…7B', icon:'🚓', cat:'police', title:'Assault / Medical Response', type:'Assault',
+  loc:'19th Ave & Irving St', hood:'Inner Sunset', x:150,y:392, status:'active',
+  agencies:['police','ems'], verif:'multi-source', first:mins(5), upd:mins(2),
+  units:['3A12','Medic 18'], sources:2, obs:5,
+  summary:'Police and medical units are responding to a reported assault near 19th Avenue and Irving Street. The incident was first reported at approximately 9:43 PM. Dispatch data confirms a response; it does not confirm what occurred.',
+  tl:[[mins(5),'Police CAD record received — ASSAULT / BATTERY','sf_police_cad · obs a10c…'],
+      [mins(5),'3A12 dispatched','sf_police_cad · obs a10d…'],
+      [mins(4),'Fire CAD record received — MEDICAL INCIDENT, same intersection','sf_fire_cad · obs a13e…'],
+      [mins(3),'Medical assistance requested','sf_fire_cad · obs a141…'],
+      [mins(2),'Medic 18 dispatched','sf_fire_cad · obs a15b…']],
+  corr:'candidate  sf_fire_cad:F-88120\nlocation 1.00  time 0.96  type 0.55  units 0.00  text 0.30\nscore 0.86  ≥ 0.85 → auto-merge'},
+
+ {id:'sf_01K7A…4D', icon:'🚗', cat:'police', title:'Vehicle Collision', type:'Collision',
+  loc:'Geary Blvd & 25th Ave', hood:'Outer Richmond', x:120,y:250, status:'dispatched',
+  agencies:['police','ems'], verif:'multi-source', first:mins(14), upd:mins(8),
+  units:['RA22','Medic 41'], sources:2, obs:4,
+  summary:'Police and medics were dispatched to a reported vehicle collision at Geary Boulevard and 25th Avenue at approximately 9:34 PM.',
+  tl:[[mins(14),'Police CAD record received — TRAFFIC COLLISION','sf_police_cad · obs c001…'],
+      [mins(12),'RA22 dispatched','sf_police_cad · obs c014…'],
+      [mins(8),'Medic 41 dispatched','sf_ems_cad · obs c088…']],
+  corr:'candidate  sf_ems_cad:E-4412\nlocation 0.97  time 0.81  type 0.66  units 0.00  text 0.22\nscore 0.79  0.65–0.84 → probable match (logged, merged after 2nd signal)'},
+
+ {id:'sf_01K7A…1A', icon:'🔫', cat:'police', title:'Shots Fired — later reported unfounded',
+  type:'Weapon', loc:'3rd St & Palou Ave', hood:'Bayview', x:600,y:470, status:'resolved',
+  agencies:['police'], verif:'reported', first:mins(52), upd:mins(21), resolved:mins(21),
+  units:['3B08','3B11'], sources:1, obs:6,
+  summary:'An initial report of shots fired near 3rd Street and Palou Avenue was updated by dispatch to fireworks / unfounded at 9:27 PM. The original report is preserved in the timeline.',
+  tl:[[mins(52),'Police CAD record received — SHOTS FIRED','sf_police_cad · obs d100…'],
+      [mins(50),'3B08, 3B11 dispatched','sf_police_cad · obs d104…'],
+      [mins(21),'Dispatch reclassified: FIREWORKS / UNFOUNDED','sf_police_cad · obs d1f0…'],
+      [mins(21),'Incident closed','sf_police_cad · obs d1f1…']],
+  corr:'correction applied — primaryType Weapon → Public Safety; prior state retained'}
+];
+
+const HOODS = ['Mission District','Outer Sunset','Inner Sunset','Outer Richmond','Bayview','SoMa'];
+// mock "typical for this hood at this hour", for the is-this-unusual line
+const BASELINE = {'Mission District':4.1,'Outer Sunset':1.2,'Inner Sunset':1.4,
+                  'Outer Richmond':1.8,'Bayview':3.2,'SoMa':5.0};
+const MY_HOOD = 'Inner Sunset'; // stands in for geolocation
+let scope = null, askedAs = null;
+
+function resolveHood(q){
+  const t = q.toLowerCase().trim();
+  if(!t) return null;
+  if(/my neighborhood|near me|around me|here/.test(t)) return MY_HOOD;
+  const alias = {'mission':'Mission District','the mission':'Mission District','soma':'SoMa',
+    'south of market':'SoMa','sunset':'Outer Sunset','inner sunset':'Inner Sunset',
+    'outer sunset':'Outer Sunset','richmond':'Outer Richmond','bayview':'Bayview'};
+  for(const k of Object.keys(alias)) if(t.includes(k)) return alias[k];
+  for(const h of HOODS) if(t.includes(h.toLowerCase())) return h;
+  return null;
+}
+
+const WINDOWS=[['3h','3 hours'],['24h','24 hours'],['7d','7 days'],['30d','30 days'],['90d','90 days']];
+const WDAYS={'3h':0,'24h':1,'7d':7,'30d':30,'90d':90};
+let win='3h';
+
+// deterministic mock daily history per neighborhood
+function hist(hood,days){
+  const base=BASELINE[hood]||2, seed=[...hood].reduce((a,c)=>a+c.charCodeAt(0),0);
+  const out=[];
+  for(let d=days-1;d>=0;d--){
+    const r=Math.abs(Math.sin(seed*13.7+d*2.3));
+    const dow=new Date(now.getTime()-d*864e5).getDay();
+    const weekend=(dow===0||dow===6)?1.18:1;
+    out.push(Math.max(0,Math.round(base*2.4*weekend*(0.55+r*0.95))));
+  }
+  return out;
+}
+const CATSPLIT={police:.58,ems:.27,fire:.09,other:.06};
+
+function answerLong(hood){
+  const days=WDAYS[win], h=hist(hood,days), prior=hist(hood+'~',days);
+  const tot=h.reduce((a,b)=>a+b,0), pri=prior.reduce((a,b)=>a+b,0);
+  const pct=Math.round((tot-pri)/Math.max(1,pri)*100);
+  const perDay=(tot/days).toFixed(1), max=Math.max(...h);
+  const cats=Object.entries(CATSPLIT).map(([k,v])=>[k,Math.round(tot*v)]);
+  const label={police:'police',ems:'medical',fire:'fire',other:'other'};
+  const bucket=days>30?7:1; // weekly bars for 90d
+  const bars=[], barDates=[];
+  for(let i=0;i<h.length;i+=bucket){ bars.push(h.slice(i,i+bucket).reduce((a,b)=>a+b,0));
+    barDates.push(fdate(daysAgo(days-1-i)) + (bucket>1?` – ${fdate(daysAgo(Math.max(0,days-i-bucket)))}`:'')); }
+  const bmax=Math.max(...bars);
+  return `<div class="answer">
+    <span class="clear" id="clr">clear ✕</span>
+    <div class="q">${askedAs}</div>
+    <div class="a"><b>${tot}</b> incidents reported in <b>${hood}</b> over the last
+      <b>${WDAYS[win]} days</b> (${fdate(daysAgo(days-1))} – ${fdate(now)}) — an average of
+      <b>${perDay}</b> per day, with a busiest day of <b>${max}</b>.</div>
+    <div class="breakdown">${cats.map(([k,v])=>`<div><b>${v}</b>${label[k]}</div>`).join('')}</div>
+    <div class="chart">${bars.map((v,i)=>`<i style="height:${Math.max(4,v/bmax*52)}px"
+      title="${barDates[i]}: ${v} incidents"></i>`).join('')}</div>
+    <div class="xaxis"><span>${fdate(daysAgo(days-1))}</span>
+      <span>${bucket>1?'weekly totals':'daily totals'}</span><span>${fdate(now)} (today)</span></div>
+    <div class="delta">vs the prior ${days} days:
+      <b class="${pct>=0?'up':'down'}">${pct>=0?'+':''}${pct}%</b> (${pri} → ${tot}).</div>
+    <div class="caveat">Counts are reported dispatch incidents, not confirmed outcomes or crime
+      statistics. Periods before 2026-08-01 predate the current correlation model and are not
+      directly comparable.</div>
+    ${winChips()}
+  </div>`;
+}
+function winChips(){
+  return `<div class="wins">${WINDOWS.map(([k,l])=>
+    `<span class="${k===win?'on':''}" data-w="${k}">${l}</span>`).join('')}</div>`;
+}
+
+function answerFor(hood){
+  if(WDAYS[win]>=7) return answerLong(hood);
+  const list = INC.filter(i=>i.hood===hood);
+  const active = list.filter(i=>i.status!=='resolved');
+  const byCat = {police:0,fire:0,ems:0};
+  list.forEach(i=>byCat[i.cat]++);
+  const base = BASELINE[hood]||2, quiet = list.length <= base;
+  let a;
+  if(!list.length){
+    a = `No incidents have been reported in <b>${hood}</b> in the last 3 hours.`;
+  } else {
+    const top = active[0]||list[0];
+    a = `<b>${list.length}</b> incident${list.length>1?'s':''} reported in <b>${hood}</b> in the last 3 hours, `
+      + `<b>${active.length}</b> still active. The most recent is a ${top.title.toLowerCase()} at ${top.loc}, `
+      + `reported ${ago(top.first)}.`;
+  }
+  return `<div class="answer">
+    <span class="clear" id="clr">clear ✕</span>
+    <div class="q">${askedAs}</div>
+    <div class="a">${a}</div>
+    <div class="asof">as of ${fdatel(now)}, ${fmt(now)} · last 3 hours</div>
+    <div class="breakdown">
+      <div><b>${active.length}</b>active now</div>
+      <div><b>${byCat.police}</b>police</div>
+      <div><b>${byCat.fire}</b>fire</div>
+      <div><b>${byCat.ems}</b>medical</div>
+    </div>
+    <div class="baseline">${list.length
+      ? `<span class="${quiet?'q':'busy'}">${quiet?'About typical':'Busier than usual'}</span>
+         for ${hood} at this hour (typical: ~${base} in 3 hours).`
+      : `Typical for this hour is ~${base} incidents in 3 hours.`}
+      · Counts reflect dispatch records, not confirmed outcomes.</div>
+    ${winChips()}
+  </div>`;
+}
+
+const catColor = {police:'#5b8def',fire:'#ef6c4d',ems:'#3fb984',other:'#9b8bef'};
+const vLabel = {'reported':'Reported','multi-source':'Multi-source','official-response-confirmed':'Response confirmed'};
+const vClass = {'reported':'reported','multi-source':'multi','official-response-confirmed':'confirmed'};
+let sel = INC[2].id;
+
+function agencyDots(a){return a.map(x=>`<span class="badge">${{police:'SFPD',fire:'SFFD',ems:'EMS'}[x]||x}</span>`).join(' ')}
+
+function renderFeed(){
+  const list = scope ? INC.filter(i=>i.hood===scope) : INC;
+  const hdr = (scope && WDAYS[win]>=7)
+    ? `<h2 style="padding-top:14px">Most recent in ${scope}</h2>` : '';
+  document.getElementById('cards').innerHTML =
+    (scope ? answerFor(scope) : '') + hdr + list.map(i=>`
+    <div class="card ${i.id===sel?'sel':''}" data-id="${i.id}">
+      <div class="ico">${i.icon}</div>
+      <div>
+        <div class="t">${i.title}</div>
+        <div class="meta">${i.loc} · ${i.hood}</div>
+        <div class="row">
+          <span class="badge ${i.status==='resolved'?'resolved':'active'}">${i.status}</span>
+          <span class="badge ${vClass[i.verif]}">${vLabel[i.verif]}</span>
+          ${agencyDots(i.agencies)}
+          <span class="ago">${fdate(i.upd)} ${fmt(i.upd)} · ${ago(i.upd)}</span>
+        </div>
+      </div>
+    </div>`).join('');
+  document.querySelectorAll('.card').forEach(c=>c.onclick=()=>{sel=c.dataset.id;renderFeed();renderDetail();renderMap();});
+  const clr=document.getElementById('clr');
+  if(clr) clr.onclick=()=>{scope=null;win='3h';document.getElementById('ask').value='';renderFeed();renderMap();};
+  document.querySelectorAll('.wins span').forEach(w=>w.onclick=()=>{win=w.dataset.w;renderFeed();renderMap();});
+}
+
+function renderMap(){
+  document.getElementById('markers').innerHTML = INC.map(i=>{
+    const dim = scope && i.hood!==scope;
+    const c=dim?'#33415a':catColor[i.cat], age=Math.min(30,(now-i.upd)/60000);
+    const r=9+(30-age)/3;
+    return `<g class="mk" data-id="${i.id}">
+      <circle class="halo" cx="${i.x}" cy="${i.y}" r="${r+12}" fill="${c}"/>
+      <circle class="core" cx="${i.x}" cy="${i.y}" r="${i.id===sel?10:7}" fill="${c}"
+        ${i.status!=='resolved'?`stroke="${c}" stroke-width="2"`:'opacity=".55"'}/>
+      ${i.id===sel?`<text x="${i.x+16}" y="${i.y+4}" fill="#cfe0ff" font-size="12">${i.title}</text>`:''}
+    </g>`;}).join('');
+  document.querySelectorAll('.mk').forEach(m=>m.onclick=()=>{sel=m.dataset.id;renderFeed();renderDetail();renderMap();});
+}
+
+function renderDetail(){
+  const i = INC.find(x=>x.id===sel);
+  const internal = document.getElementById('internal').checked;
+  document.getElementById('detail').innerHTML = `
+    <div class="dhead">
+      <div class="meta">${i.type} · ${i.hood}</div>
+      <h3>${i.icon} ${i.title}</h3>
+      <div class="row">
+        <span class="badge ${i.status==='resolved'?'resolved':'active'}">${i.status}</span>
+        <span class="badge ${vClass[i.verif]}">${vLabel[i.verif]}</span>
+        ${agencyDots(i.agencies)}
+      </div>
+    </div>
+    <div class="kv">
+      <div>Location</div><div>${i.loc}</div>
+      <div>Neighborhood</div><div>${i.hood}</div>
+      <div>First reported</div><div>${fdatel(i.first)}, ${fmt(i.first)}</div>
+      <div>Last updated</div><div>${fdatel(i.upd)}, ${fmt(i.upd)} · ${ago(i.upd)}</div>
+      ${i.resolved?`<div>Resolved</div><div>${fdatel(i.resolved)}, ${fmt(i.resolved)}</div>`:''}
+      <div>Sources</div><div>${i.sources} independent · ${i.obs} observations</div>
+      <div>Incident ID</div><div class="src">${i.id}</div>
+    </div>
+    <div class="sect">
+      <h4>Summary</h4>
+      <div class="summary">${i.summary}
+        <small>Machine-generated from structured dispatch records. Not an official statement.</small></div>
+    </div>
+    <div class="sect">
+      <h4>Responding units</h4>
+      <div class="units">${i.units.map(u=>`<span class="unit">${u}</span>`).join('')}</div>
+    </div>
+    <div class="sect">
+      <h4>Timeline</h4>
+      <ul class="tl">${i.tl.map(([t,txt,src])=>`<li>
+        <time>${fdate(t)} · ${fmtS(t)}</time>${txt}${internal?`<div class="src">${src}</div>`:''}</li>`).join('')}</ul>
+      <div class="note">Every entry traces to a source observation.</div>
+    </div>
+    ${internal?`<div class="sect"><h4>Correlation (internal)</h4><div class="corr">${i.corr}</div></div>`:''}
+    <div class="sect note">
+      Dispatch information is preliminary and can change. This page reflects what agencies reported,
+      not confirmed outcomes. Call 911 for emergencies.
+    </div>`;
+}
+
+const askEl = document.getElementById('ask'), suggEl = document.getElementById('sugg');
+const EXAMPLES = ["what's happening in my neighborhood?","any activity in the Mission?",
+                  "fires in the Sunset over the last 30 days","how busy has Bayview been in the last 90 days?",
+                  "what's going on in SoMa this week?"];
+function resolveWindow(q){
+  const t=q.toLowerCase();
+  if(/90 days|three months|3 months|quarter/.test(t)) return '90d';
+  if(/30 days|last month|past month/.test(t)) return '30d';
+  if(/7 days|last week|this week|past week/.test(t)) return '7d';
+  if(/24 hours|today|yesterday|last night/.test(t)) return '24h';
+  return '3h';
+}
+function runAsk(q){
+  const h = resolveHood(q);
+  win = resolveWindow(q);
+  askedAs = q;
+  suggEl.classList.remove('on');
+  if(!h){ scope=null; renderFeed(); renderMap();
+    document.getElementById('cards').insertAdjacentHTML('afterbegin',
+      `<div class="answer"><div class="q">${q}</div><div class="a">I couldn't match that to a
+       San Francisco neighborhood. Try a neighborhood name, an intersection, or "near me".</div></div>`);
+    return; }
+  scope=h; renderFeed(); renderMap();
+}
+askEl.onfocus=()=>{suggEl.innerHTML=EXAMPLES.map(e=>`<div>${e}</div>`).join('');suggEl.classList.add('on');
+  suggEl.querySelectorAll('div').forEach(d=>d.onmousedown=()=>{askEl.value=d.textContent;runAsk(d.textContent);});};
+askEl.onblur=()=>setTimeout(()=>suggEl.classList.remove('on'),150);
+askEl.onkeydown=e=>{if(e.key==='Enter')runAsk(askEl.value);};
+document.getElementById('nearme').onclick=()=>{askEl.value="what's happening in my neighborhood?";
+  runAsk(askEl.value);};
+
+document.getElementById('internal').onchange=renderDetail;
+document.querySelectorAll('#filters .chip').forEach(c=>c.onclick=()=>c.classList.toggle('on'));
+
+document.getElementById('today').textContent = fdatel(now) + ', ' + fmt(now);
+renderFeed();renderMap();renderDetail();
+
+// simulated live update
+setTimeout(()=>{
+  INC.unshift({id:'sf_01K7B…0X',icon:'🚨',cat:'police',title:'Police Activity',type:'Police Activity',
+    loc:'Market St & 5th St',hood:'SoMa',x:520,y:275,status:'reported',agencies:['police'],
+    verif:'reported',first:mins(0),upd:mins(0),units:['3C21'],sources:1,obs:1,
+    summary:'A police response was dispatched near Market Street and 5th Street moments ago. Details are limited.',
+    tl:[[mins(0),'Police CAD record received — POLICE ACTIVITY','sf_police_cad · obs f001…']],
+    corr:'no candidates within 250 m / 8 min → new incident'});
+  renderFeed();renderMap();
+  document.querySelector('.card').classList.add('new');
+},3500);
+</script>
+</body>
+</html>

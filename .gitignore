@@ -1,0 +1,8 @@
+node_modules/
+.env
+.env.local
+*.db
+*.db-wal
+*.db-shm
+.DS_Store
+mockups/build/snapshot.json

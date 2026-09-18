@@ -1,0 +1,286 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Lescan — REAL SF dispatch data</title>
+<style>
+:root{--bg:#0e1116;--panel:#151a22;--panel-2:#1b212b;--line:#252d3a;--txt:#e6eaf2;
+--muted:#8b97ab;--dim:#5f6b7f;--police:#5b8def;--fire:#ef6c4d;--ems:#3fb984;}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);
+font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+header{display:flex;align-items:center;gap:14px;padding:9px 16px;border-bottom:1px solid var(--line);
+background:var(--panel);flex-wrap:wrap}
+.logo{font-weight:700}.logo span{color:var(--muted);font-weight:400;font-size:12px;margin-left:8px}
+.real{background:#15261f;border:1px solid #25503d;color:#b7ecd3;font-size:11px;padding:3px 9px;border-radius:999px}
+.stat{color:var(--muted);font-size:12px}.stat b{color:var(--txt)}
+.spacer{flex:1}
+.chip{padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--panel-2);
+color:var(--muted);cursor:pointer;font-size:12px;user-select:none}
+.chip.on{background:#233047;border-color:#38507a;color:#cfe0ff}
+.winbar{display:flex;align-items:center;gap:6px;padding:7px 16px;background:#11161d;
+border-bottom:1px solid var(--line);flex-wrap:wrap}
+.wl{color:var(--dim);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin-right:4px}
+.w{font-size:11.5px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);
+background:var(--panel-2);color:var(--muted);cursor:pointer;font-variant-numeric:tabular-nums}
+.w.on{background:#233047;border-color:#38507a;color:#cfe0ff}
+.w.hist.on{background:#2a2417;border-color:#4a3f1d;color:#e8d49a}
+.wsep{color:var(--dim);font-size:10.5px;margin:0 4px}
+.wnote{color:var(--dim);font-size:11px;margin-left:auto}
+.hist-pane{padding:16px}
+.hist-pane h3{margin:0 0 4px;font-size:15px}
+.big{font-size:30px;font-weight:600;letter-spacing:-.5px}
+.hrow{display:flex;gap:22px;margin:14px 0 4px;flex-wrap:wrap}
+.hrow div small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.hchart{display:flex;align-items:flex-end;gap:1px;height:90px;margin:16px 0 0;
+padding-top:12px;border-top:1px solid var(--line)}
+.hchart i{flex:1;background:#3c5a8f;border-radius:2px 2px 0 0;min-height:2px}
+.hchart i.wk{background:#4a6ea8}
+.hx{display:flex;justify-content:space-between;color:var(--dim);font-size:10.5px;margin-top:6px}
+.ttable{width:100%;border-collapse:collapse;margin-top:16px;font-size:12.5px}
+.ttable td{padding:5px 0;border-bottom:1px solid var(--line);color:var(--muted)}
+.ttable td:last-child{text-align:right;color:var(--txt);font-variant-numeric:tabular-nums}
+.warn{margin-top:16px;padding:10px 12px;background:#2a2417;border:1px solid #4a3f1d;
+border-radius:8px;color:#e8d49a;font-size:12px;line-height:1.5}
+main{display:grid;grid-template-columns:400px 1fr 420px;height:calc(100vh - 128px)}
+.feed{border-right:1px solid var(--line);overflow:auto;background:var(--panel)}
+.bar{padding:9px 16px;border-bottom:1px solid var(--line);color:var(--dim);font-size:11.5px;
+background:#11161d;position:sticky;top:0;z-index:5}
+.card{padding:11px 16px;border-bottom:1px solid var(--line);cursor:pointer;display:grid;
+grid-template-columns:8px 1fr;gap:10px}
+.card:hover{background:var(--panel-2)}.card.sel{background:#1c2432}
+.pip{width:8px;height:8px;border-radius:50%;margin-top:6px}
+.t{font-weight:600;font-size:13.5px}.meta{color:var(--muted);font-size:12px}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;align-items:center}
+.badge{font-size:10.5px;padding:2px 6px;border-radius:4px;border:1px solid var(--line);color:var(--muted)}
+.badge.merge{color:#cfe0ff;border-color:#38507a;background:#1b2536}
+.badge.prob{color:#e8d49a;border-color:#4a3f1d;background:#2a2417}
+.ago{color:var(--dim);font-size:11.5px;font-variant-numeric:tabular-nums}
+.daysep{padding:9px 16px 7px;background:#11161d;border-bottom:1px solid var(--line);
+border-top:1px solid var(--line);color:#cfe0ff;font-size:11px;font-weight:600;
+letter-spacing:.09em;text-transform:uppercase;position:sticky;top:31px;z-index:4}
+.map{position:relative;background:#0b0f14;overflow:hidden}
+.map svg{width:100%;height:100%}
+.detail{border-left:1px solid var(--line);overflow:auto;background:var(--panel);padding-bottom:40px}
+.dh{padding:14px 16px;border-bottom:1px solid var(--line)}.dh h3{margin:3px 0 7px;font-size:17px}
+.kv{display:grid;grid-template-columns:128px 1fr;gap:4px 10px;padding:12px 16px;font-size:12.5px;
+border-bottom:1px solid var(--line)}.kv div:nth-child(odd){color:var(--muted)}
+.sect{padding:12px 16px;border-bottom:1px solid var(--line)}
+.sect h4{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin:0 0 9px}
+.tl{list-style:none;margin:0;padding:0 0 0 13px;border-left:1px solid var(--line)}
+.tl li{position:relative;padding:0 0 12px 13px;font-size:13px}
+.tl li::before{content:"";position:absolute;left:-18px;top:5px;width:8px;height:8px;border-radius:50%;
+background:var(--panel);border:2px solid var(--police)}
+.tl time{display:block;color:var(--muted);font-size:11.5px}
+.src{color:var(--dim);font-size:10.5px;font-family:ui-monospace,Menlo,monospace}
+.unit{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;padding:2px 7px;border-radius:5px;
+background:var(--panel-2);border:1px solid var(--line);margin:0 4px 4px 0;display:inline-block}
+.corr{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--muted);background:#11161d;
+border:1px dashed #38507a;border-radius:8px;padding:10px;white-space:pre-wrap;line-height:1.6}
+.note{color:var(--dim);font-size:11.5px}
+footer{padding:8px 16px;border-top:1px solid var(--line);background:var(--panel);
+color:var(--dim);font-size:11px;display:flex;gap:16px;flex-wrap:wrap}
+</style></head><body>
+<header>
+ <div class="logo">LESCAN <span>San Francisco</span></div>
+ <div class="real">● REAL DATA · DataSF</div>
+ <div class="stat" id="win" style="color:#cfe0ff"></div>
+ <div class="stat" id="stats"></div>
+ <div class="spacer"></div>
+ <div class="chip on" data-f="police">Police</div>
+ <div class="chip on" data-f="fire">Fire</div>
+ <div class="chip on" data-f="ems">EMS</div>
+ <div class="chip" data-f="merged">Multi-source only</div>
+ <div class="chip" data-f="sens">Show restricted</div>
+</header>
+<div class="winbar">
+ <span class="wl">Time window</span>
+ <span class="w" data-w="1">1h</span><span class="w" data-w="3">3h</span>
+ <span class="w on" data-w="6">6h</span><span class="w" data-w="12">12h</span>
+ <span class="w" data-w="24">24h</span><span class="w" data-w="48">48h</span>
+ <span class="wsep">│ historical (rollups)</span>
+ <span class="w hist" data-w="168">7d</span><span class="w hist" data-w="720">30d</span>
+ <span class="w hist" data-w="2160">90d</span>
+ <span class="wnote" id="wnote"></span>
+</div>
+<main>
+ <section class="feed"><div class="bar" id="bar"></div><div id="cards"></div></section>
+ <section class="map"><svg id="map" viewBox="0 0 900 780"></svg></section>
+ <aside class="detail" id="detail"></aside>
+</main>
+<footer id="foot"></footer>
+<script>
+const DATA = /*__DATA__*/null;
+const CAT={police:'#5b8def',fire:'#ef6c4d',ems:'#3fb984'};
+const AGL={police:'SFPD',fire:'SFFD',ems:'EMS'};
+const T=s=>s?new Date(s):null;
+const hm=s=>T(s).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+const hms=s=>T(s).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',second:'2-digit'});
+const fd =s=>T(s).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+const fdl=s=>T(s).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+const dkey=s=>T(s).toDateString();
+const END=new Date(DATA.window[1]);
+const ago=s=>{const m=Math.round((END-T(s))/60000);
+  return m<60?m+' min':Math.floor(m/60)+'h '+(m%60)+'m';};
+let F={police:1,fire:1,ems:1,merged:0,sens:0}, sel=null, WH=6;   // window in hours
+const isHist=()=>WH>48;
+const cutoff=()=>new Date(END.getTime()-WH*3600*1000);
+
+// real lat/lng -> svg (SF bounds)
+const B={w:-122.5170,e:-122.3570,s:37.7050,n:37.8120};
+const px=i=>({x:(i.lng-B.w)/(B.e-B.w)*900, y:(1-(i.lat-B.s)/(B.n-B.s))*780});
+
+const vis=i=>F[i.ag[0]] && (F.sens||!i.s) && (!F.merged||i.o.length>1) && T(i.l)>=cutoff();
+function list(){return DATA.incidents.filter(vis);}
+
+function stats(){
+ const C=DATA.counts, L=isHist()?[]:list();
+ document.getElementById('wnote').textContent = isHist()
+  ? 'detailed incidents exist only for the last 48h — longer windows use daily rollups'
+  : `showing ${cutoff().toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})} → window end`;
+ document.getElementById('stats').innerHTML =
+  `<b>${C.police_rows+C.fire_unit_rows}</b> raw source rows → <b>${C.observations}</b> observations → `+
+  `<b>${C.incidents}</b> incidents`;
+ document.getElementById('win').textContent =
+  `${fdl(DATA.window[0])}, ${hm(DATA.window[0])} → ${fdl(DATA.window[1])}, ${hm(DATA.window[1])}`;
+ document.getElementById('bar').innerHTML = isHist()
+  ? `historical view · daily rollups from dataset 2zdj-bwza (12 years of history)`
+  : `${L.length} shown · <b style="color:#cfe0ff">${C.multi_source}</b> multi-source · `+
+  `<b style="color:#cfe0ff">${C.cross_agency}</b> cross-agency merges · ${C.probable} probable (0.65–0.84) · `+
+  `<b style="color:#e8d49a">${C.sensitive}</b> restricted${F.sens?' (shown)':' (hidden)'}`;
+ document.getElementById('foot').innerHTML =
+  `<span>Window: ${DATA.window[0].replace('T',' ')} → ${DATA.window[1].replace('T',' ')} (America/Los_Angeles)</span>`+
+  `<span>Sources: gnap-fj3t (police, real-time) · nuek-vuh3 (fire/EMS, ~19h lag)</span>`+
+  `<span>Built ${DATA.generated.slice(0,16).replace('T',' ')}</span>`;
+}
+function renderFeed(){
+ const L=list().slice(0,400);
+ let day=null;
+ document.getElementById('cards').innerHTML=L.map(i=>{
+  let sep='';
+  if(dkey(i.l)!==day){day=dkey(i.l);
+   sep=`<div class="daysep">${fdl(i.l)}</div>`;}
+  return sep+`
+  <div class="card ${i.id===sel?'sel':''}" data-id="${i.id}">
+   <div class="pip" style="background:${CAT[i.ag[0]]}"></div>
+   <div><div class="t">${i.t}${i.s?' 🔒':''}</div>
+    <div class="meta">${i.loc||'—'}${i.h?' · '+i.h:''}</div>
+    <div class="row">${i.ag.map(a=>`<span class="badge">${AGL[a]}</span>`).join('')}
+     ${i.o.length>1?`<span class="badge merge">${i.o.length} sources</span>`:''}
+     ${i.p?`<span class="badge prob">probable ${i.p}</span>`:''}
+     <span class="ago">${fd(i.l)} · ${hm(i.l)}</span></div></div></div>`}).join('');
+ document.querySelectorAll('.card').forEach(c=>c.onclick=()=>{sel=c.dataset.id;draw();});
+}
+function renderMap(){
+ const L=list().filter(i=>i.lat);
+ document.getElementById('map').innerHTML=
+  `<rect width="900" height="780" fill="#0b0f14"/>`+
+  L.map(i=>{const p=px(i),r=i.o.length>1?6:3.2;
+   return `<circle class="mk" data-id="${i.id}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${i.id===sel?8:r}"
+    fill="${CAT[i.ag[0]]}" fill-opacity="${i.id===sel?1:.62}" ${i.o.length>1?'stroke="#cfe0ff" stroke-width="1.2"':''}
+    style="cursor:pointer"><title>${i.t} — ${i.loc||''}</title></circle>`}).join('')+
+  `<text x="14" y="770" fill="#3a4658" font-size="11">${L.length} geocoded of ${list().length} shown · real coordinates</text>`;
+ document.querySelectorAll('.mk').forEach(m=>m.onclick=()=>{sel=m.dataset.id;draw();});
+}
+function renderDetail(){
+ const i=DATA.incidents.find(x=>x.id===sel);
+ const d=document.getElementById('detail');
+ if(!i){d.innerHTML='<div class="sect note">Select an incident.</div>';return;}
+ const ev=[];
+ i.o.forEach(o=>{
+  const L={sf_police_cad:'SFPD',sf_fire_cad:'SFFD',sf_ems_cad:'EMS'}[o.src];
+  ev.push([o.t,`${L} call received — ${o.raw||'—'}`,o.src+' · '+o.sid]);
+  if(o.ro&&o.ro!==o.raw) ev.push([o.t,`⚠ reclassified: ${o.ro} → ${o.raw}`,o.src+' · '+o.sid]);
+  if(o.d) ev.push([o.d,`${L} unit dispatched${o.un.length?' ('+o.un.join(', ')+')':''}`,o.src+' · '+o.sid]);
+  if(o.sc) ev.push([o.sc,'Unit on scene',o.src+' · '+o.sid]);
+  if(o.al&&+o.al>1) ev.push([o.t,`${o.al} alarms`,o.src+' · '+o.sid]);
+  if(o.c) ev.push([o.c,`Call closed${o.dp?' — disposition '+o.dp:''}`,o.src+' · '+o.sid]);});
+ ev.sort((a,b)=>a[0]<b[0]?-1:1);
+ const DISP={HAN:'Handled',GOA:'Gone on arrival',UTL:'Unable to locate',NOM:'No merit',
+  REP:'Report taken',CIT:'Citation',ARR:'Arrest',ADV:'Advised',ND:'No disposition'};
+ const dp=i.o.map(o=>o.dp).filter(Boolean)[0];
+ d.innerHTML=`
+  <div class="dh"><div class="meta">${i.t}${i.h?' · '+i.h:''}</div>
+   <h3>${i.loc||'Unknown location'}</h3>
+   <div class="row">${i.ag.map(a=>`<span class="badge">${AGL[a]}</span>`).join('')}
+    ${i.o.length>1?`<span class="badge merge">${i.o.length} sources · ${i.ag.length>1?'cross-agency':'same-agency'}</span>`:'<span class="badge">single source</span>'}
+    ${i.s?'<span class="badge prob">🔒 sensitive_call</span>':''}</div></div>
+  <div class="kv">
+   <div>Type</div><div>${i.t}</div>
+   <div>Neighborhood</div><div>${i.h||'—'}</div>
+   <div>First received</div><div>${fdl(i.f)}<br><b>${hms(i.f)}</b></div>
+   <div>Last activity</div><div>${fdl(i.l)}<br><b>${hms(i.l)}</b>${
+     dkey(i.f)!==dkey(i.l)?' <span class="badge prob">spans midnight</span>':''}</div>
+   <div>Disposition</div><div>${dp?(DISP[dp]||dp)+` <span class="src">(${dp})</span>`:'— still open'}</div>
+   <div>Coordinates</div><div class="src">${i.lat?i.lat.toFixed(5)+', '+i.lng.toFixed(5):'not geocoded'}</div>
+   <div>CAD numbers</div><div class="src">${i.o.map(o=>o.sid).join(', ')}</div></div>
+  <div class="sect"><h4>Timeline — ${ev.length} entries from ${i.o.length} source record${i.o.length>1?'s':''}</h4>
+   <ul class="tl">${(()=>{let d=null;return ev.map(([t,x,s])=>{
+     const nd=dkey(t)!==d; d=dkey(t);
+     return `<li><time>${nd?`<b style="color:#cfe0ff">${fd(t)}</b> · `:''}${hms(t)}</time>${x}<div class="src">${s}</div></li>`;
+   }).join('')})()}</ul></div>
+  ${i.u.length?`<div class="sect"><h4>Units</h4>${i.u.map(u=>`<span class="unit">${u}</span>`).join('')}</div>`:''}
+  ${i.sc&&i.sc.length?`<div class="sect"><h4>Correlation (why these merged)</h4><div class="corr">${
+    i.sc.map(s=>`${s.src} : ${s.sid}
+  location  ${s.loc}   (${s.dist} m apart)
+  time      ${s.time}
+  type      ${s.typ}
+  applied   ${(s.applied||[]).join(' + ')}   ← renormalized over available features
+  SCORE     ${s.score}  ≥ 0.85 → auto-merge`).join('\n\n')}</div></div>`:''}
+  <div class="sect note">Preliminary dispatch information from DataSF. Not confirmed outcomes.
+   ${i.s?'<br><br>🔒 SFPD flagged this call <b>sensitive_call = true</b>. Under S-E1 it would be <b>restricted</b> and never published.':''}</div>`;
+}
+function renderHist(){
+ const days=Math.round(WH/24), R=DATA.rollup;
+ const all=R.daily.map(r=>({d:r.d.slice(0,10),n:+r.n}));
+ const rows=all.slice(-days), tot=rows.reduce((a,b)=>a+b.n,0);
+ const prior=all.slice(-days*2,-days), pri=prior.reduce((a,b)=>a+b.n,0);
+ const pct=pri?Math.round((tot-pri)/pri*100):null;
+ const per=(tot/rows.length).toFixed(0);
+ const busiest=rows.reduce((a,b)=>b.n>a.n?b:a,rows[0]);
+ const bucket=days>30?7:1;
+ const bars=[],lbl=[];
+ for(let i=0;i<rows.length;i+=bucket){const c=rows.slice(i,i+bucket);
+  bars.push(c.reduce((a,b)=>a+b.n,0)); lbl.push(c[0].d);}
+ const bmax=Math.max(...bars);
+ const key={168:'7d',720:'30d',2160:'90d'}[WH];
+ const tt=(R.types[key]||[]).slice(0,12);
+ const fmtd=x=>new Date(x+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
+ document.getElementById('cards').innerHTML=`<div class="hist-pane">
+  <h3>Police dispatch activity — last ${days} days</h3>
+  <div class="note">${fmtd(rows[0].d)} – ${fmtd(rows[rows.length-1].d)} · citywide</div>
+  <div class="hrow">
+   <div><span class="big">${tot.toLocaleString()}</span><small>calls dispatched</small></div>
+   <div><span class="big">${(+per).toLocaleString()}</span><small>per day</small></div>
+   <div><span class="big">${busiest.n.toLocaleString()}</span><small>busiest · ${fmtd(busiest.d)}</small></div>
+   ${pct!==null?`<div><span class="big" style="color:${pct>=0?'#ffb9a3':'#9fe3c4'}">${pct>=0?'+':''}${pct}%</span>
+     <small>vs prior ${days}d (${pri.toLocaleString()})</small></div>`
+    :`<div><span class="big" style="color:#5f6b7f">—</span>
+     <small>no prior ${days}d to compare<br>history starts ${fmtd(all[0].d)}</small></div>`}
+  </div>
+  <div class="hchart">${bars.map((v,i)=>`<i class="${bucket>1?'wk':''}"
+    style="height:${Math.max(3,v/bmax*90)}px" title="${fmtd(lbl[i])}: ${v.toLocaleString()} calls"></i>`).join('')}</div>
+  <div class="hx"><span>${fmtd(rows[0].d)}</span><span>${bucket>1?'weekly totals':'daily totals'}</span>
+   <span>${fmtd(rows[rows.length-1].d)}</span></div>
+  <table class="ttable">${tt.map(r=>`<tr><td>${r.t}</td><td>${(+r.n).toLocaleString()}</td></tr>`).join('')}</table>
+  <div class="warn"><b>Why this view is different.</b> The real-time feed (gnap-fj3t) retains only
+   ~48 hours, so windows beyond that cannot show individual incidents — they come from the
+   historical dataset (2zdj-bwza, 7.9M rows since 2014) as daily rollups. This is exactly the
+   S-H6 / S-H7 split, and it means <b>a gap in your own ingestion is only recoverable from the
+   historical feed, which lags ~1 day.</b></div>
+ </div>`;
+ document.getElementById('map').innerHTML=`<rect width="900" height="780" fill="#0b0f14"/>
+  <text x="450" y="390" fill="#3a4658" font-size="13" text-anchor="middle">
+   Map shows individual incidents — available for windows up to 48h</text>`;
+ document.getElementById('detail').innerHTML=`<div class="sect note">
+  Historical rollups are citywide daily counts. Per-incident detail is not retained by the
+  real-time source beyond 48 hours.</div>`;
+}
+function draw(){stats();
+ if(isHist()){renderHist();}
+ else{renderFeed();renderMap();renderDetail();}}
+document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{
+ F[c.dataset.f]=F[c.dataset.f]?0:1;c.classList.toggle('on');draw();});
+document.querySelectorAll('.w').forEach(w=>w.onclick=()=>{
+ WH=+w.dataset.w; sel=null;
+ document.querySelectorAll('.w').forEach(x=>x.classList.remove('on'));
+ w.classList.add('on'); draw();});
+draw();
+</script></body></html>

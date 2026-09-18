@@ -4,6 +4,13 @@
   "private": true,
   "type": "module",
   "main": "src/index.ts",
-  "exports": { ".": "./src/index.ts" },
-  "scripts": { "test": "bun test" }
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@scantron/sf-domain": "workspace:*"
+  }
 }

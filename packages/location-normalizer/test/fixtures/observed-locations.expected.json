@@ -1,0 +1,2080 @@
+[
+ {
+  "raw": "01ST ST \\ MISSION ST",
+  "kind": "intersection",
+  "canonical": "1st St & Mission St",
+  "streets": [
+   "1st St",
+   "Mission St"
+  ]
+ },
+ {
+  "raw": "02ND ST/MARKET ST",
+  "kind": "intersection",
+  "canonical": "2nd St & Market St",
+  "streets": [
+   "2nd St",
+   "Market St"
+  ]
+ },
+ {
+  "raw": "03RD AVE/CLEMENT ST",
+  "kind": "intersection",
+  "canonical": "3rd Ave & Clement St",
+  "streets": [
+   "3rd Ave",
+   "Clement St"
+  ]
+ },
+ {
+  "raw": "03RD ST/CARROLL AVE",
+  "kind": "intersection",
+  "canonical": "3rd St & Carroll Ave",
+  "streets": [
+   "3rd St",
+   "Carroll Ave"
+  ]
+ },
+ {
+  "raw": "03RD ST/LONG BRIDGE VARA",
+  "kind": "intersection",
+  "canonical": "3rd St & Long Bridge Vara",
+  "streets": [
+   "3rd St",
+   "Long Bridge Vara"
+  ]
+ },
+ {
+  "raw": "07TH AVE/JUDAH ST",
+  "kind": "intersection",
+  "canonical": "7th Ave & Judah St",
+  "streets": [
+   "7th Ave",
+   "Judah St"
+  ]
+ },
+ {
+  "raw": "07TH ST \\ CHARLES J BRENHAM PL \\ MARKET ST",
+  "kind": "intersection",
+  "canonical": "7th St & Charles J Brenham Pl & Market St",
+  "streets": [
+   "7th St",
+   "Charles J Brenham Pl",
+   "Market St"
+  ]
+ },
+ {
+  "raw": "08TH AVE \\ CALIFORNIA ST",
+  "kind": "intersection",
+  "canonical": "8th Ave & California St",
+  "streets": [
+   "8th Ave",
+   "California St"
+  ]
+ },
+ {
+  "raw": "08TH AVE \\ GEARY BLVD",
+  "kind": "intersection",
+  "canonical": "8th Ave & Geary Blvd",
+  "streets": [
+   "8th Ave",
+   "Geary Blvd"
+  ]
+ },
+ {
+  "raw": "08TH AVE/LINARES AVE",
+  "kind": "intersection",
+  "canonical": "8th Ave & Linares Ave",
+  "streets": [
+   "8th Ave",
+   "Linares Ave"
+  ]
+ },
+ {
+  "raw": "08TH ST \\ BRANNAN ST",
+  "kind": "intersection",
+  "canonical": "8th St & Brannan St",
+  "streets": [
+   "8th St",
+   "Brannan St"
+  ]
+ },
+ {
+  "raw": "08TH ST \\ STEVENSON ST",
+  "kind": "intersection",
+  "canonical": "8th St & Stevenson St",
+  "streets": [
+   "8th St",
+   "Stevenson St"
+  ]
+ },
+ {
+  "raw": "09TH ST \\ SHERIDAN ST",
+  "kind": "intersection",
+  "canonical": "9th St & Sheridan St",
+  "streets": [
+   "9th St",
+   "Sheridan St"
+  ]
+ },
+ {
+  "raw": "09TH ST/NATOMA ST",
+  "kind": "intersection",
+  "canonical": "9th St & Natoma St",
+  "streets": [
+   "9th St",
+   "Natoma St"
+  ]
+ },
+ {
+  "raw": "11TH ST \\ KISSLING ST",
+  "kind": "intersection",
+  "canonical": "11th St & Kissling St",
+  "streets": [
+   "11th St",
+   "Kissling St"
+  ]
+ },
+ {
+  "raw": "11TH ST \\ MINNA ST",
+  "kind": "intersection",
+  "canonical": "11th St & Minna St",
+  "streets": [
+   "11th St",
+   "Minna St"
+  ]
+ },
+ {
+  "raw": "11TH ST/MINNA ST",
+  "kind": "intersection",
+  "canonical": "11th St & Minna St",
+  "streets": [
+   "11th St",
+   "Minna St"
+  ]
+ },
+ {
+  "raw": "12TH AVE \\ IRVING ST",
+  "kind": "intersection",
+  "canonical": "12th Ave & Irving St",
+  "streets": [
+   "12th Ave",
+   "Irving St"
+  ]
+ },
+ {
+  "raw": "12TH ST/MISSION ST/OTIS ST/SOUTH VAN NESS AVE",
+  "kind": "intersection",
+  "canonical": "12th St & Mission St & Otis St & South Van Ness Ave",
+  "streets": [
+   "12th St",
+   "Mission St",
+   "Otis St",
+   "South Van Ness Ave"
+  ]
+ },
+ {
+  "raw": "14TH ST \\ MISSION ST",
+  "kind": "intersection",
+  "canonical": "14th St & Mission St",
+  "streets": [
+   "14th St",
+   "Mission St"
+  ]
+ },
+ {
+  "raw": "14TH ST \\ RAMONA AVE",
+  "kind": "intersection",
+  "canonical": "14th St & Ramona Ave",
+  "streets": [
+   "14th St",
+   "Ramona Ave"
+  ]
+ },
+ {
+  "raw": "15TH ST \\ ALBION ST",
+  "kind": "intersection",
+  "canonical": "15th St & Albion St",
+  "streets": [
+   "15th St",
+   "Albion St"
+  ]
+ },
+ {
+  "raw": "15TH ST \\ CALEDONIA ST",
+  "kind": "intersection",
+  "canonical": "15th St & Caledonia St",
+  "streets": [
+   "15th St",
+   "Caledonia St"
+  ]
+ },
+ {
+  "raw": "15TH ST/ALBION ST",
+  "kind": "intersection",
+  "canonical": "15th St & Albion St",
+  "streets": [
+   "15th St",
+   "Albion St"
+  ]
+ },
+ {
+  "raw": "15TH ST/RAMONA AVE",
+  "kind": "intersection",
+  "canonical": "15th St & Ramona Ave",
+  "streets": [
+   "15th St",
+   "Ramona Ave"
+  ]
+ },
+ {
+  "raw": "16TH ST \\ MARKET ST \\ NOE ST",
+  "kind": "intersection",
+  "canonical": "16th St & Market St & Noe St",
+  "streets": [
+   "16th St",
+   "Market St",
+   "Noe St"
+  ]
+ },
+ {
+  "raw": "17TH ST \\ HOFF ST",
+  "kind": "intersection",
+  "canonical": "17th St & Hoff St",
+  "streets": [
+   "17th St",
+   "Hoff St"
+  ]
+ },
+ {
+  "raw": "17TH ST/CASTRO ST/MARKET ST",
+  "kind": "intersection",
+  "canonical": "17th St & Castro St & Market St",
+  "streets": [
+   "17th St",
+   "Castro St",
+   "Market St"
+  ]
+ },
+ {
+  "raw": "18TH AVE \\ ANZA ST",
+  "kind": "intersection",
+  "canonical": "18th Ave & Anza St",
+  "streets": [
+   "18th Ave",
+   "Anza St"
+  ]
+ },
+ {
+  "raw": "18TH AVE/FULTON ST",
+  "kind": "intersection",
+  "canonical": "18th Ave & Fulton St",
+  "streets": [
+   "18th Ave",
+   "Fulton St"
+  ]
+ },
+ {
+  "raw": "18TH ST \\ GUERRERO ST",
+  "kind": "intersection",
+  "canonical": "18th St & Guerrero St",
+  "streets": [
+   "18th St",
+   "Guerrero St"
+  ]
+ },
+ {
+  "raw": "18TH ST \\ MISSION ST",
+  "kind": "intersection",
+  "canonical": "18th St & Mission St",
+  "streets": [
+   "18th St",
+   "Mission St"
+  ]
+ },
+ {
+  "raw": "18TH ST \\ SANCHEZ ST",
+  "kind": "intersection",
+  "canonical": "18th St & Sanchez St",
+  "streets": [
+   "18th St",
+   "Sanchez St"
+  ]
+ },
+ {
+  "raw": "19TH AVE \\ MONTICELLO ST",
+  "kind": "intersection",
+  "canonical": "19th Ave & Monticello St",
+  "streets": [
+   "19th Ave",
+   "Monticello St"
+  ]
+ },
+ {
+  "raw": "19TH ST \\ CAPP ST",
+  "kind": "intersection",
+  "canonical": "19th St & Capp St",
+  "streets": [
+   "19th St",
+   "Capp St"
+  ]
+ },
+ {
+  "raw": "20TH ST \\ FOLSOM ST",
+  "kind": "intersection",
+  "canonical": "20th St & Folsom St",
+  "streets": [
+   "20th St",
+   "Folsom St"
+  ]
+ },
+ {
+  "raw": "20TH ST/MISSOURI ST",
+  "kind": "intersection",
+  "canonical": "20th St & Missouri St",
+  "streets": [
+   "20th St",
+   "Missouri St"
+  ]
+ },
+ {
+  "raw": "21ST ST \\ POTRERO AVE",
+  "kind": "intersection",
+  "canonical": "21st St & Potrero Ave",
+  "streets": [
+   "21st St",
+   "Potrero Ave"
+  ]
+ },
+ {
+  "raw": "21ST ST/TREAT AVE",
+  "kind": "intersection",
+  "canonical": "21st St & Treat Ave",
+  "streets": [
+   "21st St",
+   "Treat Ave"
+  ]
+ },
+ {
+  "raw": "22ND AVE \\ BALBOA ST",
+  "kind": "intersection",
+  "canonical": "22nd Ave & Balboa St",
+  "streets": [
+   "22nd Ave",
+   "Balboa St"
+  ]
+ },
+ {
+  "raw": "22ND ST \\ FLORIDA ST",
+  "kind": "intersection",
+  "canonical": "22nd St & Florida St",
+  "streets": [
+   "22nd St",
+   "Florida St"
+  ]
+ },
+ {
+  "raw": "22ND ST \\ VALENCIA ST",
+  "kind": "intersection",
+  "canonical": "22nd St & Valencia St",
+  "streets": [
+   "22nd St",
+   "Valencia St"
+  ]
+ },
+ {
+  "raw": "23RD AVE \\ GEARY BLVD",
+  "kind": "intersection",
+  "canonical": "23rd Ave & Geary Blvd",
+  "streets": [
+   "23rd Ave",
+   "Geary Blvd"
+  ]
+ },
+ {
+  "raw": "23RD AVE \\ IRVING ST",
+  "kind": "intersection",
+  "canonical": "23rd Ave & Irving St",
+  "streets": [
+   "23rd Ave",
+   "Irving St"
+  ]
+ },
+ {
+  "raw": "23RD ST \\ SANCHEZ ST",
+  "kind": "intersection",
+  "canonical": "23rd St & Sanchez St",
+  "streets": [
+   "23rd St",
+   "Sanchez St"
+  ]
+ },
+ {
+  "raw": "23RD ST/CAPP ST",
+  "kind": "intersection",
+  "canonical": "23rd St & Capp St",
+  "streets": [
+   "23rd St",
+   "Capp St"
+  ]
+ },
+ {
+  "raw": "23RD ST/RHODE ISLAND ST",
+  "kind": "intersection",
+  "canonical": "23rd St & Rhode Island St",
+  "streets": [
+   "23rd St",
+   "Rhode Island St"
+  ]
+ },
+ {
+  "raw": "24TH ST/CHATTANOOGA ST",
+  "kind": "intersection",
+  "canonical": "24th St & Chattanooga St",
+  "streets": [
+   "24th St",
+   "Chattanooga St"
+  ]
+ },
+ {
+  "raw": "25TH AVE \\ CROSSOVER DR \\ FULTON ST",
+  "kind": "intersection",
+  "canonical": "25th Ave & Crossover Dr & Fulton St",
+  "streets": [
+   "25th Ave",
+   "Crossover Dr",
+   "Fulton St"
+  ]
+ },
+ {
+  "raw": "25TH AVE/CALIFORNIA ST",
+  "kind": "intersection",
+  "canonical": "25th Ave & California St",
+  "streets": [
+   "25th Ave",
+   "California St"
+  ]
+ },
+ {
+  "raw": "25TH ST \\ HARRISON ST",
+  "kind": "intersection",
+  "canonical": "25th St & Harrison St",
+  "streets": [
+   "25th St",
+   "Harrison St"
+  ]
+ },
+ {
+  "raw": "25TH ST/DAKOTA ST/TEXAS ST",
+  "kind": "intersection",
+  "canonical": "25th St & Dakota St & Texas St",
+  "streets": [
+   "25th St",
+   "Dakota St",
+   "Texas St"
+  ]
+ },
+ {
+  "raw": "33RD AVE/ANZA ST",
+  "kind": "intersection",
+  "canonical": "33rd Ave & Anza St",
+  "streets": [
+   "33rd Ave",
+   "Anza St"
+  ]
+ },
+ {
+  "raw": "39TH AVE \\ RIVERA ST",
+  "kind": "intersection",
+  "canonical": "39th Ave & Rivera St",
+  "streets": [
+   "39th Ave",
+   "Rivera St"
+  ]
+ },
+ {
+  "raw": "42ND AVE \\ RIVERA ST",
+  "kind": "intersection",
+  "canonical": "42nd Ave & Rivera St",
+  "streets": [
+   "42nd Ave",
+   "Rivera St"
+  ]
+ },
+ {
+  "raw": "46TH AVE \\ KIRKHAM ST",
+  "kind": "intersection",
+  "canonical": "46th Ave & Kirkham St",
+  "streets": [
+   "46th Ave",
+   "Kirkham St"
+  ]
+ },
+ {
+  "raw": "47TH AVE \\ JUDAH ST",
+  "kind": "intersection",
+  "canonical": "47th Ave & Judah St",
+  "streets": [
+   "47th Ave",
+   "Judah St"
+  ]
+ },
+ {
+  "raw": "48TH AVE/ANZA ST",
+  "kind": "intersection",
+  "canonical": "48th Ave & Anza St",
+  "streets": [
+   "48th Ave",
+   "Anza St"
+  ]
+ },
+ {
+  "raw": "ADAIR ST \\ SOUTH VAN NESS AVE",
+  "kind": "intersection",
+  "canonical": "Adair St & South Van Ness Ave",
+  "streets": [
+   "Adair St",
+   "South Van Ness Ave"
+  ]
+ },
+ {
+  "raw": "ALAMEDA ST \\ POTRERO AVE",
+  "kind": "intersection",
+  "canonical": "Alameda St & Potrero Ave",
+  "streets": [
+   "Alameda St",
+   "Potrero Ave"
+  ]
+ },
+ {
+  "raw": "AMBROSE BIERCE ST \\ ANNIE ST",
+  "kind": "intersection",
+  "canonical": "Ambrose Bierce St & Annie St",
+  "streets": [
+   "Ambrose Bierce St",
+   "Annie St"
+  ]
+ },
+ {
+  "raw": "ANDERSON ST \\ JARBOE AVE",
+  "kind": "intersection",
+  "canonical": "Anderson St & Jarboe Ave",
+  "streets": [
+   "Anderson St",
+   "Jarboe Ave"
+  ]
+ },
+ {
+  "raw": "ANNIE ST/MISSION ST",
+  "kind": "intersection",
+  "canonical": "Annie St & Mission St",
+  "streets": [
+   "Annie St",
+   "Mission St"
+  ]
+ },
+ {
+  "raw": "APOLLO ST \\ WILLIAMS AVE",
+  "kind": "intersection",
+  "canonical": "Apollo St & Williams Ave",
+  "streets": [
+   "Apollo St",
+   "Williams Ave"
+  ]
+ },
+ {
+  "raw": "ASHBURY ST \\ PIEDMONT ST",
+  "kind": "intersection",
+  "canonical": "Ashbury St & Piedmont St",
+  "streets": [
+   "Ashbury St",
+   "Piedmont St"
+  ]
+ },
+ {
+  "raw": "AVALON AVE \\ FELTON ST \\ PERU AVE",
+  "kind": "intersection",
+  "canonical": "Avalon Ave & Felton St & Peru Ave",
+  "streets": [
+   "Avalon Ave",
+   "Felton St",
+   "Peru Ave"
+  ]
+ },
+ {
+  "raw": "AVALON AVE \\ MOSCOW ST",
+  "kind": "intersection",
+  "canonical": "Avalon Ave & Moscow St",
+  "streets": [
+   "Avalon Ave",
+   "Moscow St"
+  ]
+ },
+ {
+  "raw": "AVERY ST \\ POST ST",
+  "kind": "intersection",
+  "canonical": "Avery St & Post St",
+  "streets": [
+   "Avery St",
+   "Post St"
+  ]
+ },
+ {
+  "raw": "BADEN ST \\ MONTEREY BLVD",
+  "kind": "intersection",
+  "canonical": "Baden St & Monterey Blvd",
+  "streets": [
+   "Baden St",
+   "Monterey Blvd"
+  ]
+ },
+ {
+  "raw": "BADEN ST \\ SAN JOSE AVE",
+  "kind": "intersection",
+  "canonical": "Baden St & San Jose Ave",
+  "streets": [
+   "Baden St",
+   "San Jose Ave"
+  ]
+ },
+ {
+  "raw": "BAKER ST \\ BEACH ST",
+  "kind": "intersection",
+  "canonical": "Baker St & Beach St",
+  "streets": [
+   "Baker St",
+   "Beach St"
+  ]
+ },
+ {
+  "raw": "BAKER ST \\ GREENWICH ST",
+  "kind": "intersection",
+  "canonical": "Baker St & Greenwich St",
+  "streets": [
+   "Baker St",
+   "Greenwich St"
+  ]
+ },
+ {
+  "raw": "BAKER ST \\ JACKSON ST",
+  "kind": "intersection",
+  "canonical": "Baker St & Jackson St",
+  "streets": [
+   "Baker St",
+   "Jackson St"
+  ]
+ },
+ {
+  "raw": "BATTERY ST/LOMBARD ST/THE EMBARCADERO",
+  "kind": "intersection",
+  "canonical": "Battery St & Lombard St & The Embarcadero",
+  "streets": [
+   "Battery St",
+   "Lombard St",
+   "The Embarcadero"
+  ]
+ },
+ {
+  "raw": "BAY ST \\ LAGUNA ST",
+  "kind": "intersection",
+  "canonical": "Bay St & Laguna St",
+  "streets": [
+   "Bay St",
+   "Laguna St"
+  ]
+ },
+ {
+  "raw": "BAY ST/LAGUNA ST",
+  "kind": "intersection",
+  "canonical": "Bay St & Laguna St",
+  "streets": [
+   "Bay St",
+   "Laguna St"
+  ]
+ },
+ {
+  "raw": "BAYSIDE VILLAGE PL/DELANCEY ST",
+  "kind": "intersection",
+  "canonical": "Bayside Village Pl & Delancey St",
+  "streets": [
+   "Bayside Village Pl",
+   "Delancey St"
+  ]
+ },
+ {
+  "raw": "BEACH ST/LEAVENWORTH ST",
+  "kind": "intersection",
+  "canonical": "Beach St & Leavenworth St",
+  "streets": [
+   "Beach St",
+   "Leavenworth St"
+  ]
+ },
+ {
+  "raw": "BERNICE RODGERS WAY \\ JOHN F KENNEDY DR",
+  "kind": "intersection",
+  "canonical": "Bernice Rodgers Way & John F Kennedy Dr",
+  "streets": [
+   "Bernice Rodgers Way",
+   "John F Kennedy Dr"
+  ]
+ },
+ {
+  "raw": "BOSWORTH ST/CHILTON AVE",
+  "kind": "intersection",
+  "canonical": "Bosworth St & Chilton Ave",
+  "streets": [
+   "Bosworth St",
+   "Chilton Ave"
+  ]
+ },
+ {
+  "raw": "BOSWORTH ST/DIAMOND ST",
+  "kind": "intersection",
+  "canonical": "Bosworth St & Diamond St",
+  "streets": [
+   "Bosworth St",
+   "Diamond St"
+  ]
+ },
+ {
+  "raw": "BRADY ST/MARKET ST",
+  "kind": "intersection",
+  "canonical": "Brady St & Market St",
+  "streets": [
+   "Brady St",
+   "Market St"
+  ]
+ },
+ {
+  "raw": "BUCHANAN ST \\ JACKSON ST",
+  "kind": "intersection",
+  "canonical": "Buchanan St & Jackson St",
+  "streets": [
+   "Buchanan St",
+   "Jackson St"
+  ]
+ },
+ {
+  "raw": "BUCHANAN ST \\ PAGE ST",
+  "kind": "intersection",
+  "canonical": "Buchanan St & Page St",
+  "streets": [
+   "Buchanan St",
+   "Page St"
+  ]
+ },
+ {
+  "raw": "BUCHANAN ST \\ POST ST",
+  "kind": "intersection",
+  "canonical": "Buchanan St & Post St",
+  "streets": [
+   "Buchanan St",
+   "Post St"
+  ]
+ },
+ {
+  "raw": "BUCHANAN ST/PINE ST",
+  "kind": "intersection",
+  "canonical": "Buchanan St & Pine St",
+  "streets": [
+   "Buchanan St",
+   "Pine St"
+  ]
+ },
+ {
+  "raw": "BURROWS ST \\ SAN BRUNO AVE",
+  "kind": "intersection",
+  "canonical": "Burrows St & San Bruno Ave",
+  "streets": [
+   "Burrows St",
+   "San Bruno Ave"
+  ]
+ },
+ {
+  "raw": "BUSH ST \\ STOCKTON ST",
+  "kind": "intersection",
+  "canonical": "Bush St & Stockton St",
+  "streets": [
+   "Bush St",
+   "Stockton St"
+  ]
+ },
+ {
+  "raw": "BUSH ST \\ TAYLOR ST",
+  "kind": "intersection",
+  "canonical": "Bush St & Taylor St",
+  "streets": [
+   "Bush St",
+   "Taylor St"
+  ]
+ },
+ {
+  "raw": "CABRILLO ST \\ GREAT HWY",
+  "kind": "intersection",
+  "canonical": "Cabrillo St & Great Highway",
+  "streets": [
+   "Cabrillo St",
+   "Great Highway"
+  ]
+ },
+ {
+  "raw": "CALIFORNIA ST \\ DAVIS ST",
+  "kind": "intersection",
+  "canonical": "California St & Davis St",
+  "streets": [
+   "California St",
+   "Davis St"
+  ]
+ },
+ {
+  "raw": "CALIFORNIA ST \\ LAGUNA ST",
+  "kind": "intersection",
+  "canonical": "California St & Laguna St",
+  "streets": [
+   "California St",
+   "Laguna St"
+  ]
+ },
+ {
+  "raw": "CALIFORNIA ST \\ SPRUCE ST",
+  "kind": "intersection",
+  "canonical": "California St & Spruce St",
+  "streets": [
+   "California St",
+   "Spruce St"
+  ]
+ },
+ {
+  "raw": "CALIFORNIA ST/POLK ST",
+  "kind": "intersection",
+  "canonical": "California St & Polk St",
+  "streets": [
+   "California St",
+   "Polk St"
+  ]
+ },
+ {
+  "raw": "CALL BOX: 1201 LARKIN ST,SF",
+  "kind": "address",
+  "canonical": "1201 Larkin St",
+  "streets": [
+   "Larkin St"
+  ],
+  "addressNumber": 1201
+ },
+ {
+  "raw": "CALL BOX: 18TH ST/MISSION ST",
+  "kind": "intersection",
+  "canonical": "18th St & Mission St",
+  "streets": [
+   "18th St",
+   "Mission St"
+  ]
+ },
+ {
+  "raw": "CALL BOX: 2ND ST/MISSION ST,SF",
+  "kind": "intersection",
+  "canonical": "2nd St & Mission St",
+  "streets": [
+   "2nd St",
+   "Mission St"
+  ]
+ },
+ {
+  "raw": "CALL BOX: 3RD ST/4TH ST,SF",
+  "kind": "intersection",
+  "canonical": "3rd St & 4th St",
+  "streets": [
+   "3rd St",
+   "4th St"
+  ]
+ },
+ {
+  "raw": "CALL BOX: JOHN MUIR DR/SKYLINE BL",
+  "kind": "intersection",
+  "canonical": "John Muir Dr & Skyline Bl",
+  "streets": [
+   "John Muir Dr",
+   "Skyline Bl"
+  ]
+ },
+ {
+  "raw": "CALL BOX: LEAVENWORTH ST/JEFFERSON ST",
+  "kind": "intersection",
+  "canonical": "Jefferson St & Leavenworth St",
+  "streets": [
+   "Jefferson St",
+   "Leavenworth St"
+  ]
+ },
+ {
+  "raw": "CALL BOX: ST LUKES HOSPITAL",
+  "kind": "landmark",
+  "canonical": "St Lukes Hospital",
+  "streets": []
+ },
+ {
+  "raw": "CALL BOX: WARFIELD THEATER",
+  "kind": "landmark",
+  "canonical": "Warfield Theater",
+  "streets": []
+ },
+ {
+  "raw": "CAMBON DR \\ CASTELO AVE \\ UNNAMED 088",
+  "kind": "intersection",
+  "canonical": "Cambon Dr & Castelo Ave & Unnamed 088",
+  "streets": [
+   "Cambon Dr",
+   "Castelo Ave",
+   "Unnamed 088"
+  ]
+ },
+ {
+  "raw": "CAMPTON PL/STOCKTON ST",
+  "kind": "intersection",
+  "canonical": "Campton Pl & Stockton St",
+  "streets": [
+   "Campton Pl",
+   "Stockton St"
+  ]
+ },
+ {
+  "raw": "CASTLE MANOR AVE \\ MAYNARD ST \\ MISSION ST",
+  "kind": "intersection",
+  "canonical": "Castle Manor Ave & Maynard St & Mission St",
+  "streets": [
+   "Castle Manor Ave",
+   "Maynard St",
+   "Mission St"
+  ]
+ },
+ {
+  "raw": "CATHERINE CT \\ MISSION ST",
+  "kind": "intersection",
+  "canonical": "Catherine Ct & Mission St",
+  "streets": [
+   "Catherine Ct",
+   "Mission St"
+  ]
+ },
+ {
+  "raw": "CAYUGA AVE/REGENT ST",
+  "kind": "intersection",
+  "canonical": "Cayuga Ave & Regent St",
+  "streets": [
+   "Cayuga Ave",
+   "Regent St"
+  ]
+ },
+ {
+  "raw": "CESAR CHAVEZ ST \\ FLORIDA ST",
+  "kind": "intersection",
+  "canonical": "Cesar Chavez St & Florida St",
+  "streets": [
+   "Cesar Chavez St",
+   "Florida St"
+  ]
+ },
+ {
+  "raw": "CESAR CHAVEZ ST \\ SOUTH VAN NESS AVE",
+  "kind": "intersection",
+  "canonical": "Cesar Chavez St & South Van Ness Ave",
+  "streets": [
+   "Cesar Chavez St",
+   "South Van Ness Ave"
+  ]
+ },
+ {
+  "raw": "CESAR CHAVEZ ST/MISSISSIPPI ST",
+  "kind": "intersection",
+  "canonical": "Cesar Chavez St & Mississippi St",
+  "streets": [
+   "Cesar Chavez St",
+   "Mississippi St"
+  ]
+ },
+ {
+  "raw": "CHERRY ST \\ JACKSON ST",
+  "kind": "intersection",
+  "canonical": "Cherry St & Jackson St",
+  "streets": [
+   "Cherry St",
+   "Jackson St"
+  ]
+ },
+ {
+  "raw": "CHESTER AVE/PAYSON ST",
+  "kind": "intersection",
+  "canonical": "Chester Ave & Payson St",
+  "streets": [
+   "Chester Ave",
+   "Payson St"
+  ]
+ },
+ {
+  "raw": "CHESTNUT ST \\ STEINER ST",
+  "kind": "intersection",
+  "canonical": "Chestnut St & Steiner St",
+  "streets": [
+   "Chestnut St",
+   "Steiner St"
+  ]
+ },
+ {
+  "raw": "CLARION ALY \\ VALENCIA ST",
+  "kind": "intersection",
+  "canonical": "Clarion Aly & Valencia St",
+  "streets": [
+   "Clarion Aly",
+   "Valencia St"
+  ]
+ },
+ {
+  "raw": "CLEMENTINA ST \\ SUMNER ST",
+  "kind": "intersection",
+  "canonical": "Clementina St & Sumner St",
+  "streets": [
+   "Clementina St",
+   "Sumner St"
+  ]
+ },
+ {
+  "raw": "COLE ST \\ HAIGHT ST",
+  "kind": "intersection",
+  "canonical": "Cole St & Haight St",
+  "streets": [
+   "Cole St",
+   "Haight St"
+  ]
+ },
+ {
+  "raw": "COLE ST \\ PARNASSUS AVE",
+  "kind": "intersection",
+  "canonical": "Cole St & Parnassus Ave",
+  "streets": [
+   "Cole St",
+   "Parnassus Ave"
+  ]
+ },
+ {
+  "raw": "COLLEGE TER/MISSION ST",
+  "kind": "intersection",
+  "canonical": "College Ter & Mission St",
+  "streets": [
+   "College Ter",
+   "Mission St"
+  ]
+ },
+ {
+  "raw": "COSO AVE \\ PROSPECT AVE",
+  "kind": "intersection",
+  "canonical": "Coso Ave & Prospect Ave",
+  "streets": [
+   "Coso Ave",
+   "Prospect Ave"
+  ]
+ },
+ {
+  "raw": "CYRIL MAGNIN ST/ELLIS ST",
+  "kind": "intersection",
+  "canonical": "Cyril Magnin St & Ellis St",
+  "streets": [
+   "Cyril Magnin St",
+   "Ellis St"
+  ]
+ },
+ {
+  "raw": "DEL MONTE ST \\ OTTAWA AVE",
+  "kind": "intersection",
+  "canonical": "Del Monte St & Ottawa Ave",
+  "streets": [
+   "Del Monte St",
+   "Ottawa Ave"
+  ]
+ },
+ {
+  "raw": "DEMING ST \\ URANUS TER",
+  "kind": "intersection",
+  "canonical": "Deming St & Uranus Ter",
+  "streets": [
+   "Deming St",
+   "Uranus Ter"
+  ]
+ },
+ {
+  "raw": "DIAMOND ST/JERSEY ST",
+  "kind": "intersection",
+  "canonical": "Diamond St & Jersey St",
+  "streets": [
+   "Diamond St",
+   "Jersey St"
+  ]
+ },
+ {
+  "raw": "DIVISADERO ST \\ GEARY BLVD",
+  "kind": "intersection",
+  "canonical": "Divisadero St & Geary Blvd",
+  "streets": [
+   "Divisadero St",
+   "Geary Blvd"
+  ]
+ },
+ {
+  "raw": "DIVISADERO ST \\ OFARRELL ST",
+  "kind": "intersection",
+  "canonical": "Divisadero St & O'Farrell St",
+  "streets": [
+   "Divisadero St",
+   "O'Farrell St"
+  ]
+ },
+ {
+  "raw": "DRUMM ST/SACRAMENTO ST",
+  "kind": "intersection",
+  "canonical": "Drumm St & Sacramento St",
+  "streets": [
+   "Drumm St",
+   "Sacramento St"
+  ]
+ },
+ {
+  "raw": "EDDY ST \\ TAYLOR ST",
+  "kind": "intersection",
+  "canonical": "Eddy St & Taylor St",
+  "streets": [
+   "Eddy St",
+   "Taylor St"
+  ]
+ },
+ {
+  "raw": "EDIE RD/GIRARD RD",
+  "kind": "intersection",
+  "canonical": "Edie Rd & Girard Rd",
+  "streets": [
+   "Edie Rd",
+   "Girard Rd"
+  ]
+ },
+ {
+  "raw": "EDINBURGH ST \\ EXCELSIOR AVE",
+  "kind": "intersection",
+  "canonical": "Edinburgh St & Excelsior Ave",
+  "streets": [
+   "Edinburgh St",
+   "Excelsior Ave"
+  ]
+ },
+ {
+  "raw": "EDNA ST/MANGELS AVE",
+  "kind": "intersection",
+  "canonical": "Edna St & Mangels Ave",
+  "streets": [
+   "Edna St",
+   "Mangels Ave"
+  ]
+ },
+ {
+  "raw": "ELLIS ST \\ POWELL ST",
+  "kind": "intersection",
+  "canonical": "Ellis St & Powell St",
+  "streets": [
+   "Ellis St",
+   "Powell St"
+  ]
+ },
+ {
+  "raw": "ELLIS ST \\ TAYLOR ST",
+  "kind": "intersection",
+  "canonical": "Ellis St & Taylor St",
+  "streets": [
+   "Ellis St",
+   "Taylor St"
+  ]
+ },
+ {
+  "raw": "ELLIS ST/JONES ST",
+  "kind": "intersection",
+  "canonical": "Ellis St & Jones St",
+  "streets": [
+   "Ellis St",
+   "Jones St"
+  ]
+ },
+ {
+  "raw": "ELLIS ST/LARKIN ST",
+  "kind": "intersection",
+  "canonical": "Ellis St & Larkin St",
+  "streets": [
+   "Ellis St",
+   "Larkin St"
+  ]
+ },
+ {
+  "raw": "ENTERPRISE ST \\ FOLSOM ST",
+  "kind": "intersection",
+  "canonical": "Enterprise St & Folsom St",
+  "streets": [
+   "Enterprise St",
+   "Folsom St"
+  ]
+ },
+ {
+  "raw": "ERKSON CT/POST ST",
+  "kind": "intersection",
+  "canonical": "Erkson Ct & Post St",
+  "streets": [
+   "Erkson Ct",
+   "Post St"
+  ]
+ },
+ {
+  "raw": "ESPANOLA ST/MATTHEW CT",
+  "kind": "intersection",
+  "canonical": "Espanola St & Matthew Ct",
+  "streets": [
+   "Espanola St",
+   "Matthew Ct"
+  ]
+ },
+ {
+  "raw": "EVERGLADE DR/OCEAN AVE",
+  "kind": "intersection",
+  "canonical": "Everglade Dr & Ocean Ave",
+  "streets": [
+   "Everglade Dr",
+   "Ocean Ave"
+  ]
+ },
+ {
+  "raw": "FALMOUTH ST \\ SHIPLEY ST",
+  "kind": "intersection",
+  "canonical": "Falmouth St & Shipley St",
+  "streets": [
+   "Falmouth St",
+   "Shipley St"
+  ]
+ },
+ {
+  "raw": "FELL ST/STEINER ST",
+  "kind": "intersection",
+  "canonical": "Fell St & Steiner St",
+  "streets": [
+   "Fell St",
+   "Steiner St"
+  ]
+ },
+ {
+  "raw": "FILBERT ST \\ MASON ST",
+  "kind": "intersection",
+  "canonical": "Filbert St & Mason St",
+  "streets": [
+   "Filbert St",
+   "Mason St"
+  ]
+ },
+ {
+  "raw": "FILBERT ST \\ SCOTT ST",
+  "kind": "intersection",
+  "canonical": "Filbert St & Scott St",
+  "streets": [
+   "Filbert St",
+   "Scott St"
+  ]
+ },
+ {
+  "raw": "FILLMORE ST \\ TURK ST",
+  "kind": "intersection",
+  "canonical": "Fillmore St & Turk St",
+  "streets": [
+   "Fillmore St",
+   "Turk St"
+  ]
+ },
+ {
+  "raw": "FILLMORE ST/GERMANIA ST",
+  "kind": "intersection",
+  "canonical": "Fillmore St & Germania St",
+  "streets": [
+   "Fillmore St",
+   "Germania St"
+  ]
+ },
+ {
+  "raw": "FILLMORE ST/GOLDEN GATE AVE",
+  "kind": "intersection",
+  "canonical": "Fillmore St & Golden Gate Ave",
+  "streets": [
+   "Fillmore St",
+   "Golden Gate Ave"
+  ]
+ },
+ {
+  "raw": "FITZGERALD AVE \\ JENNINGS ST",
+  "kind": "intersection",
+  "canonical": "Fitzgerald Ave & Jennings St",
+  "streets": [
+   "Fitzgerald Ave",
+   "Jennings St"
+  ]
+ },
+ {
+  "raw": "FLOOD AVE \\ FRIDA KAHLO WAY",
+  "kind": "intersection",
+  "canonical": "Flood Ave & Frida Kahlo Way",
+  "streets": [
+   "Flood Ave",
+   "Frida Kahlo Way"
+  ]
+ },
+ {
+  "raw": "FORT MILEY 6/FORT MILEY 7",
+  "kind": "intersection",
+  "canonical": "Fort Miley 6 & Fort Miley 7",
+  "streets": [
+   "Fort Miley 6",
+   "Fort Miley 7"
+  ]
+ },
+ {
+  "raw": "FRANCISCO ST \\ FRANKLIN ST",
+  "kind": "intersection",
+  "canonical": "Francisco St & Franklin St",
+  "streets": [
+   "Francisco St",
+   "Franklin St"
+  ]
+ },
+ {
+  "raw": "FRANCISCO ST \\ TAYLOR ST",
+  "kind": "intersection",
+  "canonical": "Francisco St & Taylor St",
+  "streets": [
+   "Francisco St",
+   "Taylor St"
+  ]
+ },
+ {
+  "raw": "FRANCISCO ST/KEARNY ST",
+  "kind": "intersection",
+  "canonical": "Francisco St & Kearny St",
+  "streets": [
+   "Francisco St",
+   "Kearny St"
+  ]
+ },
+ {
+  "raw": "FRANKLIN ST \\ FULTON ST",
+  "kind": "intersection",
+  "canonical": "Franklin St & Fulton St",
+  "streets": [
+   "Franklin St",
+   "Fulton St"
+  ]
+ },
+ {
+  "raw": "FRANKLIN ST/SACRAMENTO ST",
+  "kind": "intersection",
+  "canonical": "Franklin St & Sacramento St",
+  "streets": [
+   "Franklin St",
+   "Sacramento St"
+  ]
+ },
+ {
+  "raw": "FREMONT ST \\ FRONT ST \\ MARKET ST",
+  "kind": "intersection",
+  "canonical": "Fremont St & Front St & Market St",
+  "streets": [
+   "Fremont St",
+   "Front St",
+   "Market St"
+  ]
+ },
+ {
+  "raw": "GEARY BLVD \\ GEARY ST \\ VAN NESS AVE",
+  "kind": "intersection",
+  "canonical": "Geary Blvd & Geary St & Van Ness Ave",
+  "streets": [
+   "Geary Blvd",
+   "Geary St",
+   "Van Ness Ave"
+  ]
+ },
+ {
+  "raw": "GEARY BLVD \\ GOUGH ST \\ PETER YORKE WAY \\ STARR KING WAY",
+  "kind": "intersection",
+  "canonical": "Geary Blvd & Gough St & Peter Yorke Way & Starr King Way",
+  "streets": [
+   "Geary Blvd",
+   "Gough St",
+   "Peter Yorke Way",
+   "Starr King Way"
+  ]
+ },
+ {
+  "raw": "GEARY ST \\ HYDE ST",
+  "kind": "intersection",
+  "canonical": "Geary St & Hyde St",
+  "streets": [
+   "Geary St",
+   "Hyde St"
+  ]
+ },
+ {
+  "raw": "GEARY ST/HYDE ST",
+  "kind": "intersection",
+  "canonical": "Geary St & Hyde St",
+  "streets": [
+   "Geary St",
+   "Hyde St"
+  ]
+ },
+ {
+  "raw": "GEARY ST/POLK ST",
+  "kind": "intersection",
+  "canonical": "Geary St & Polk St",
+  "streets": [
+   "Geary St",
+   "Polk St"
+  ]
+ },
+ {
+  "raw": "GENEVA AVE/PARQUE DR",
+  "kind": "intersection",
+  "canonical": "Geneva Ave & Parque Dr",
+  "streets": [
+   "Geneva Ave",
+   "Parque Dr"
+  ]
+ },
+ {
+  "raw": "GLADSTONE DR/MAYNARD ST",
+  "kind": "intersection",
+  "canonical": "Gladstone Dr & Maynard St",
+  "streets": [
+   "Gladstone Dr",
+   "Maynard St"
+  ]
+ },
+ {
+  "raw": "GOLDEN GATE AVE/LARKIN ST",
+  "kind": "intersection",
+  "canonical": "Golden Gate Ave & Larkin St",
+  "streets": [
+   "Golden Gate Ave",
+   "Larkin St"
+  ]
+ },
+ {
+  "raw": "GRANT AVE \\ VALLEJO ST",
+  "kind": "intersection",
+  "canonical": "Grant Ave & Vallejo St",
+  "streets": [
+   "Grant Ave",
+   "Vallejo St"
+  ]
+ },
+ {
+  "raw": "GREEN ST \\ JASPER PL",
+  "kind": "intersection",
+  "canonical": "Green St & Jasper Pl",
+  "streets": [
+   "Green St",
+   "Jasper Pl"
+  ]
+ },
+ {
+  "raw": "HAHN ST/HARMONIA ST",
+  "kind": "intersection",
+  "canonical": "Hahn St & Harmonia St",
+  "streets": [
+   "Hahn St",
+   "Harmonia St"
+  ]
+ },
+ {
+  "raw": "HAIGHT ST \\ PIERCE ST",
+  "kind": "intersection",
+  "canonical": "Haight St & Pierce St",
+  "streets": [
+   "Haight St",
+   "Pierce St"
+  ]
+ },
+ {
+  "raw": "HARRISON ST \\ SHERMAN ST",
+  "kind": "intersection",
+  "canonical": "Harrison St & Sherman St",
+  "streets": [
+   "Harrison St",
+   "Sherman St"
+  ]
+ },
+ {
+  "raw": "HAWES ST \\ PALOU AVE",
+  "kind": "intersection",
+  "canonical": "Hawes St & Palou Ave",
+  "streets": [
+   "Hawes St",
+   "Palou Ave"
+  ]
+ },
+ {
+  "raw": "HAWES ST \\ SHAFTER AVE",
+  "kind": "intersection",
+  "canonical": "Hawes St & Shafter Ave",
+  "streets": [
+   "Hawes St",
+   "Shafter Ave"
+  ]
+ },
+ {
+  "raw": "HAWKINS LN \\ JAKEY CT",
+  "kind": "intersection",
+  "canonical": "Hawkins Ln & Jakey Ct",
+  "streets": [
+   "Hawkins Ln",
+   "Jakey Ct"
+  ]
+ },
+ {
+  "raw": "HOWARD ST \\ MARY ST",
+  "kind": "intersection",
+  "canonical": "Howard St & Mary St",
+  "streets": [
+   "Howard St",
+   "Mary St"
+  ]
+ },
+ {
+  "raw": "HYDE ST \\ JEFFERSON ST",
+  "kind": "intersection",
+  "canonical": "Hyde St & Jefferson St",
+  "streets": [
+   "Hyde St",
+   "Jefferson St"
+  ]
+ },
+ {
+  "raw": "HYDE ST \\ OFARRELL ST",
+  "kind": "intersection",
+  "canonical": "Hyde St & O'Farrell St",
+  "streets": [
+   "Hyde St",
+   "O'Farrell St"
+  ]
+ },
+ {
+  "raw": "HYDE ST \\ SUTTER ST",
+  "kind": "intersection",
+  "canonical": "Hyde St & Sutter St",
+  "streets": [
+   "Hyde St",
+   "Sutter St"
+  ]
+ },
+ {
+  "raw": "INGALLS ST \\ OAKDALE AVE",
+  "kind": "intersection",
+  "canonical": "Ingalls St & Oakdale Ave",
+  "streets": [
+   "Ingalls St",
+   "Oakdale Ave"
+  ]
+ },
+ {
+  "raw": "INGALLS ST \\ THOMAS AVE",
+  "kind": "intersection",
+  "canonical": "Ingalls St & Thomas Ave",
+  "streets": [
+   "Ingalls St",
+   "Thomas Ave"
+  ]
+ },
+ {
+  "raw": "ITALY AVE \\ NAPLES ST",
+  "kind": "intersection",
+  "canonical": "Italy Ave & Naples St",
+  "streets": [
+   "Italy Ave",
+   "Naples St"
+  ]
+ },
+ {
+  "raw": "JACKSON ST \\ WENTWORTH PL",
+  "kind": "intersection",
+  "canonical": "Jackson St & Wentworth Pl",
+  "streets": [
+   "Jackson St",
+   "Wentworth Pl"
+  ]
+ },
+ {
+  "raw": "JAVA ST \\ MASONIC AVE",
+  "kind": "intersection",
+  "canonical": "Java St & Masonic Ave",
+  "streets": [
+   "Java St",
+   "Masonic Ave"
+  ]
+ },
+ {
+  "raw": "JENNINGS ST/REVERE AVE",
+  "kind": "intersection",
+  "canonical": "Jennings St & Revere Ave",
+  "streets": [
+   "Jennings St",
+   "Revere Ave"
+  ]
+ },
+ {
+  "raw": "JONES ST \\ OFARRELL ST",
+  "kind": "intersection",
+  "canonical": "Jones St & O'Farrell St",
+  "streets": [
+   "Jones St",
+   "O'Farrell St"
+  ]
+ },
+ {
+  "raw": "JONES ST \\ TURK ST",
+  "kind": "intersection",
+  "canonical": "Jones St & Turk St",
+  "streets": [
+   "Jones St",
+   "Turk St"
+  ]
+ },
+ {
+  "raw": "KAMILLE CT/TREAT WAY",
+  "kind": "intersection",
+  "canonical": "Kamille Ct & Treat Way",
+  "streets": [
+   "Kamille Ct",
+   "Treat Way"
+  ]
+ },
+ {
+  "raw": "KEARNY ST \\ NORTH POINT ST \\ THE EMBARCADERO",
+  "kind": "intersection",
+  "canonical": "Kearny St & North Point St & The Embarcadero",
+  "streets": [
+   "Kearny St",
+   "North Point St",
+   "The Embarcadero"
+  ]
+ },
+ {
+  "raw": "LAGUNA HONDA BLVD/PLAZA ST",
+  "kind": "intersection",
+  "canonical": "Laguna Honda Blvd & Plaza St",
+  "streets": [
+   "Laguna Honda Blvd",
+   "Plaza St"
+  ]
+ },
+ {
+  "raw": "LAGUNA ST \\ PINE ST",
+  "kind": "intersection",
+  "canonical": "Laguna St & Pine St",
+  "streets": [
+   "Laguna St",
+   "Pine St"
+  ]
+ },
+ {
+  "raw": "LAKE MERCED BLVD \\ LAKE MERCED HILL",
+  "kind": "intersection",
+  "canonical": "Lake Merced Blvd & Lake Merced Hill St",
+  "streets": [
+   "Lake Merced Blvd",
+   "Lake Merced Hill St"
+  ]
+ },
+ {
+  "raw": "LARKIN ST/OFARRELL ST",
+  "kind": "intersection",
+  "canonical": "Larkin St & O'Farrell St",
+  "streets": [
+   "Larkin St",
+   "O'Farrell St"
+  ]
+ },
+ {
+  "raw": "LARKIN ST/WASHINGTON ST",
+  "kind": "intersection",
+  "canonical": "Larkin St & Washington St",
+  "streets": [
+   "Larkin St",
+   "Washington St"
+  ]
+ },
+ {
+  "raw": "LEAVENWORTH ST \\ LURMONT TER",
+  "kind": "intersection",
+  "canonical": "Leavenworth St & Lurmont Ter",
+  "streets": [
+   "Leavenworth St",
+   "Lurmont Ter"
+  ]
+ },
+ {
+  "raw": "LEAVENWORTH ST \\ TURK ST",
+  "kind": "intersection",
+  "canonical": "Leavenworth St & Turk St",
+  "streets": [
+   "Leavenworth St",
+   "Turk St"
+  ]
+ },
+ {
+  "raw": "LEAVENWORTH ST/PINE ST",
+  "kind": "intersection",
+  "canonical": "Leavenworth St & Pine St",
+  "streets": [
+   "Leavenworth St",
+   "Pine St"
+  ]
+ },
+ {
+  "raw": "LEAVENWORTH ST/TURK ST",
+  "kind": "intersection",
+  "canonical": "Leavenworth St & Turk St",
+  "streets": [
+   "Leavenworth St",
+   "Turk St"
+  ]
+ },
+ {
+  "raw": "LIBERTY ST \\ SANCHEZ ST",
+  "kind": "intersection",
+  "canonical": "Liberty St & Sanchez St",
+  "streets": [
+   "Liberty St",
+   "Sanchez St"
+  ]
+ },
+ {
+  "raw": "LOMBARD ST/STEINER ST",
+  "kind": "intersection",
+  "canonical": "Lombard St & Steiner St",
+  "streets": [
+   "Lombard St",
+   "Steiner St"
+  ]
+ },
+ {
+  "raw": "LOWELL ST/MORSE ST",
+  "kind": "intersection",
+  "canonical": "Lowell St & Morse St",
+  "streets": [
+   "Lowell St",
+   "Morse St"
+  ]
+ },
+ {
+  "raw": "MARKET ST \\ RESERVOIR ST",
+  "kind": "intersection",
+  "canonical": "Market St & Reservoir St",
+  "streets": [
+   "Market St",
+   "Reservoir St"
+  ]
+ },
+ {
+  "raw": "MARKET ST \\ SANCHEZ ST",
+  "kind": "intersection",
+  "canonical": "Market St & Sanchez St",
+  "streets": [
+   "Market St",
+   "Sanchez St"
+  ]
+ },
+ {
+  "raw": "MARKET ST/MASON ST/TURK ST",
+  "kind": "intersection",
+  "canonical": "Market St & Mason St & Turk St",
+  "streets": [
+   "Market St",
+   "Mason St",
+   "Turk St"
+  ]
+ },
+ {
+  "raw": "MARKET ST/MCALLISTER ST",
+  "kind": "intersection",
+  "canonical": "Market St & McAllister St",
+  "streets": [
+   "Market St",
+   "McAllister St"
+  ]
+ },
+ {
+  "raw": "MARY ST \\ MISSION ST",
+  "kind": "intersection",
+  "canonical": "Mary St & Mission St",
+  "streets": [
+   "Mary St",
+   "Mission St"
+  ]
+ },
+ {
+  "raw": "MASON ST/SUTTER ST",
+  "kind": "intersection",
+  "canonical": "Mason St & Sutter St",
+  "streets": [
+   "Mason St",
+   "Sutter St"
+  ]
+ },
+ {
+  "raw": "MCALLISTER ST/PIERCE ST",
+  "kind": "intersection",
+  "canonical": "McAllister St & Pierce St",
+  "streets": [
+   "McAllister St",
+   "Pierce St"
+  ]
+ },
+ {
+  "raw": "MCCOPPIN ST \\ STEVENSON ST",
+  "kind": "intersection",
+  "canonical": "McCoppin St & Stevenson St",
+  "streets": [
+   "McCoppin St",
+   "Stevenson St"
+  ]
+ },
+ {
+  "raw": "MINNA ST/RUSS ST",
+  "kind": "intersection",
+  "canonical": "Minna St & Russ St",
+  "streets": [
+   "Minna St",
+   "Russ St"
+  ]
+ },
+ {
+  "raw": "MISSION ST \\ MOUNT VERNON AVE",
+  "kind": "intersection",
+  "canonical": "Mission St & Mount Vernon Ave",
+  "streets": [
+   "Mission St",
+   "Mount Vernon Ave"
+  ]
+ },
+ {
+  "raw": "MISSION ST \\ SENECA AVE",
+  "kind": "intersection",
+  "canonical": "Mission St & Seneca Ave",
+  "streets": [
+   "Mission St",
+   "Seneca Ave"
+  ]
+ },
+ {
+  "raw": "MISSION ST/POPE ST",
+  "kind": "intersection",
+  "canonical": "Mission St & Pope St",
+  "streets": [
+   "Mission St",
+   "Pope St"
+  ]
+ },
+ {
+  "raw": "MONTANA ST \\ PLYMOUTH AVE",
+  "kind": "intersection",
+  "canonical": "Montana St & Plymouth Ave",
+  "streets": [
+   "Montana St",
+   "Plymouth Ave"
+  ]
+ },
+ {
+  "raw": "MULFORD ALY \\ TAYLOR ST",
+  "kind": "intersection",
+  "canonical": "Mulford Aly & Taylor St",
+  "streets": [
+   "Mulford Aly",
+   "Taylor St"
+  ]
+ },
+ {
+  "raw": "Not Available",
+  "kind": "unknown",
+  "canonical": "",
+  "streets": []
+ },
+ {
+  "raw": "OAK ST \\ STEINER ST",
+  "kind": "intersection",
+  "canonical": "Oak St & Steiner St",
+  "streets": [
+   "Oak St",
+   "Steiner St"
+  ]
+ },
+ {
+  "raw": "OAK ST \\ WEBSTER ST",
+  "kind": "intersection",
+  "canonical": "Oak St & Webster St",
+  "streets": [
+   "Oak St",
+   "Webster St"
+  ]
+ },
+ {
+  "raw": "OCTAVIA ST \\ SACRAMENTO ST",
+  "kind": "intersection",
+  "canonical": "Octavia St & Sacramento St",
+  "streets": [
+   "Octavia St",
+   "Sacramento St"
+  ]
+ },
+ {
+  "raw": "OFARRELL ST \\ SHANNON ST",
+  "kind": "intersection",
+  "canonical": "O'Farrell St & Shannon St",
+  "streets": [
+   "O'Farrell St",
+   "Shannon St"
+  ]
+ },
+ {
+  "raw": "OFARRELL ST/POWELL ST",
+  "kind": "intersection",
+  "canonical": "O'Farrell St & Powell St",
+  "streets": [
+   "O'Farrell St",
+   "Powell St"
+  ]
+ },
+ {
+  "raw": "PARIS ST \\ ROLPH ST",
+  "kind": "intersection",
+  "canonical": "Paris St & Rolph St",
+  "streets": [
+   "Paris St",
+   "Rolph St"
+  ]
+ },
+ {
+  "raw": "PIERCE ST \\ TOLEDO WAY",
+  "kind": "intersection",
+  "canonical": "Pierce St & Toledo Way",
+  "streets": [
+   "Pierce St",
+   "Toledo Way"
+  ]
+ },
+ {
+  "raw": "PLYMOUTH AVE/SAGAMORE ST",
+  "kind": "intersection",
+  "canonical": "Plymouth Ave & Sagamore St",
+  "streets": [
+   "Plymouth Ave",
+   "Sagamore St"
+  ]
+ },
+ {
+  "raw": "POLK ST \\ POST ST",
+  "kind": "intersection",
+  "canonical": "Polk St & Post St",
+  "streets": [
+   "Polk St",
+   "Post St"
+  ]
+ },
+ {
+  "raw": "POST ST \\ STOCKTON ST",
+  "kind": "intersection",
+  "canonical": "Post St & Stockton St",
+  "streets": [
+   "Post St",
+   "Stockton St"
+  ]
+ },
+ {
+  "raw": "POWELL ST \\ SUTTER ST",
+  "kind": "intersection",
+  "canonical": "Powell St & Sutter St",
+  "streets": [
+   "Powell St",
+   "Sutter St"
+  ]
+ },
+ {
+  "raw": "QUINT ST \\ TOPEKA AVE",
+  "kind": "intersection",
+  "canonical": "Quint St & Topeka Ave",
+  "streets": [
+   "Quint St",
+   "Topeka Ave"
+  ]
+ },
+ {
+  "raw": "RAYMOND AVE/SAWYER ST",
+  "kind": "intersection",
+  "canonical": "Raymond Ave & Sawyer St",
+  "streets": [
+   "Raymond Ave",
+   "Sawyer St"
+  ]
+ },
+ {
+  "raw": "RIZAL ST/TANDANG SORA",
+  "kind": "intersection",
+  "canonical": "Rizal St & Tandang Sora",
+  "streets": [
+   "Rizal St",
+   "Tandang Sora"
+  ]
+ },
+ {
+  "raw": "SANSOME ST/WASHINGTON ST",
+  "kind": "intersection",
+  "canonical": "Sansome St & Washington St",
+  "streets": [
+   "Sansome St",
+   "Washington St"
+  ]
+ },
+ {
+  "raw": "STOCKTON ST/WASHINGTON ST",
+  "kind": "intersection",
+  "canonical": "Stockton St & Washington St",
+  "streets": [
+   "Stockton St",
+   "Washington St"
+  ]
+ },
+ {
+  "raw": "TOLL PLAZA TUNNEL/UNNAMED 077",
+  "kind": "intersection",
+  "canonical": "Toll Plaza Tunnel & Unnamed 077",
+  "streets": [
+   "Toll Plaza Tunnel",
+   "Unnamed 077"
+  ]
+ },
+ {
+  "raw": "TUNNEL AVE \\ VISITACION AVE",
+  "kind": "intersection",
+  "canonical": "Tunnel Ave & Visitacion Ave",
+  "streets": [
+   "Tunnel Ave",
+   "Visitacion Ave"
+  ]
+ },
+ {
+  "raw": "UNNAMED 083/UNNAMED 088",
+  "kind": "intersection",
+  "canonical": "Unnamed 083 & Unnamed 088",
+  "streets": [
+   "Unnamed 083",
+   "Unnamed 088"
+  ]
+ }
+]

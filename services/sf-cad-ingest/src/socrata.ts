@@ -21,6 +21,7 @@ export interface SocrataQuery {
   dataset: string;
   select?: string;
   where?: string;
+  group?: string;
   order?: string;
   limit?: number;
   offset?: number;
@@ -64,6 +65,7 @@ export function buildUrl(host: string, query: SocrataQuery): string {
   const url = new URL(`${host}/resource/${query.dataset}.json`);
   if (query.select) url.searchParams.set("$select", query.select);
   if (query.where) url.searchParams.set("$where", query.where);
+  if (query.group) url.searchParams.set("$group", query.group);
   if (query.order) url.searchParams.set("$order", query.order);
   if (query.limit !== undefined) url.searchParams.set("$limit", String(query.limit));
   if (query.offset !== undefined) url.searchParams.set("$offset", String(query.offset));

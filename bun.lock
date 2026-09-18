@@ -45,6 +45,9 @@
     "packages/location-normalizer": {
       "name": "@scantron/location-normalizer",
       "version": "0.0.0",
+      "dependencies": {
+        "@scantron/sf-domain": "workspace:*",
+      },
     },
     "packages/observability": {
       "name": "@scantron/observability",

@@ -5,6 +5,8 @@
 
 export * from "./geo.ts";
 export * from "./time.ts";
+export * from "./streets.ts";
+export * from "./street-data.ts";
 
 /** Matches the bbox the mockups project against (`mockups/live.template.html`). */
 export const SF_BBOX = {

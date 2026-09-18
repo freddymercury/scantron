@@ -1,0 +1,99 @@
+# Ask interface design — and where a model is allowed to sit
+
+**Status:** Decided · **Date:** 2026-09-18 · **Implements:** [S-H4](../specs/S-H4-ask-interface.md)
+
+Someone types *"most interesting thing in the last 90 minutes in the Mission"* or *"all the
+car break-ins in the last 2 weeks in SoMa"* and gets an answer. This note records how that
+works, and — more usefully — where a language model is and is not permitted to be.
+
+## The shape
+
+```
+question text
+  → parse (deterministic grammar)        AskQuery { intent, area, windowMinutes, types, rawCodes }
+  → validate (allowlist schema)          the only surface a model could ever write to
+  → run (plain SQL)                      our code, always
+  → render (templates over fields)       every sentence the reader sees
+```
+
+**No free-text model output is ever shown to a reader.** That is the same constraint as
+PRD §21, and it is the point of the design rather than a limitation of it. A dispatch code
+is a report that something was called in; prose generated from it invites claims about harm,
+cause and safety that the data cannot support.
+
+## Applying the 12-factor agents principles
+
+Source: [humanlayer/12-factor-agents](https://github.com/humanlayer/12-factor-agents)
+(`content/factor-NN-*.md`; cite the zero-padded slugs — the unpadded ones are legacy
+redirects). Where the factors are quoted below, they are quoted; the rest is our reading.
+
+**Factor 1 — Natural Language to Tool Calls.** This is the feature's premise: a phrase
+becomes a structured object, and deterministic code picks up the payload. The factor's own
+caveat matters here — the real-world version resolves proper identifiers first. Our
+analogue is vocabulary: a question never free-texts an area or a category, it *selects*
+from the city's 41 Analysis Neighborhood names and our taxonomy of types, and anything that
+does not resolve is reported as unresolved rather than approximated.
+
+**Factor 4 — Tools are just structured outputs.** The load-bearing one. "The LLM decides
+what to do, but your code controls how it's done." `AskQuery` is the entire output surface:
+one validated object, no prose, no query the model gets to run itself. `ask/schema.ts` is
+that gate, and it uses the allowlist validator from `@scantron/incident-schema`, so a field
+a model invents — an `answerText`, say — is dropped rather than carried. A test asserts
+exactly that.
+
+**Factor 10 — Small, Focused Agents.** One step, one object, no loop. This is the argument
+against the ask box ever growing into a conversational assistant: "as context grows, LLMs
+are more likely to get lost or lose focus", and there is no context here to grow.
+
+**Factor 12 — Make your agent a stateless reducer.** `parseQuestion(text, vocabulary)` is a
+pure function, and a Tier 2 would be single-shot and equally pure. **Design invariant: the
+ask box holds no session state.** A follow-up question is a new question.
+
+**Factors 2 and 3 — Own your prompts / own your context window.** If Tier 2 ships, its
+prompt is a versioned file in this repo, not a framework's config, and its context is
+deliberately assembled — the area and category vocabularies, today's date so "last 90
+minutes" resolves, and a handful of question→JSON examples. Nothing accumulates, which is
+Factor 3's ideal case for free.
+
+**Factor 9 — Compact Errors into Context Window,** adapted. The factor's retry loop assumes
+a multi-turn agent. For single-shot parsing the equivalent is: validate the emitted JSON,
+and on failure re-ask **once** with the validation error appended, then fall back to Tier
+1's best guess or the unmatched state. One retry, not the factor's ~3, because a parse that
+fails twice is a grammar gap and should be visible as one.
+
+**Explicitly out of scope, so nobody asks:** Factors 5 and 6 (unified execution state,
+launch/pause/resume) have nothing to persist in a single-shot parser. Factor 7 (contact
+humans with tool calls) is inverted — the human initiates, and our no-prose rule is the
+stronger constraint. Factor 11 (trigger from anywhere) is a real future: the same
+`AskQuery` would serve an API or an alert rule unchanged.
+
+## Is this "agent work"?
+
+Tier 1 is not. It is a grammar, and it is deterministic on purpose: testable, instant, free,
+and it keeps working when a model endpoint does not. Tier 2 would be the smallest possible
+agent — one constrained emission of the same object Tier 1 emits — which is why both tiers
+can be run over the same corpus of questions and diffed. That diff is the coverage map for
+where the grammar needs extending, and it keeps Tier 2 from ever becoming load-bearing for
+questions Tier 1 already answers.
+
+## What the ranking claims
+
+"Most interesting" is a ranking we have to be able to defend, so every point it awards is
+something a reader can check: what the agency called it, how urgently it was dispatched,
+how many units went, and whether a second agency responded nearby. The answer says so in
+those words, and says what it is not: **a ranking of dispatch activity, not of harm.**
+
+## What the ask box refuses
+
+Questions about safety, injury, arrest, identity or causation are detected and answered
+honestly — the system reports what was dispatched, not what happened to anyone, and points
+to 911 for emergencies. An empty result says that nothing was *dispatched and published*,
+not that nothing happened, and names the two reasons the data would be quiet anyway: the
+~30 minute publication delay, and sensitive calls published without a location (docs/01 §8).
+
+## Coverage
+
+`apps/web/test/fixtures/ask-questions.json` holds 69 real-shaped questions asserted against
+their expected parse; CI fails on a regression. The spec asks for ≥100, and the two
+currently-unresolved cases are named in the test: landmark questions ("union square", "the
+embarcadero"), which the grammar resolves to neighborhoods rather than points.

@@ -1,0 +1,485 @@
+[
+ {
+  "q": "what's happening in the Mission right now",
+  "area": "Mission",
+  "category": null,
+  "minutes": 60,
+  "intent": "highlight"
+ },
+ {
+  "q": "whats happening in the mission",
+  "area": "Mission",
+  "category": null,
+  "minutes": 180,
+  "intent": "highlight"
+ },
+ {
+  "q": "tell me the most interesting thing in the last 90 min in the mission",
+  "area": "Mission",
+  "category": null,
+  "minutes": 90,
+  "intent": "highlight"
+ },
+ {
+  "q": "most interesting thing in the tenderloin in the last 2 hours",
+  "area": "Tenderloin",
+  "category": null,
+  "minutes": 120,
+  "intent": "highlight"
+ },
+ {
+  "q": "anything going on in soma",
+  "area": "South of Market",
+  "category": null,
+  "minutes": 180,
+  "intent": "highlight"
+ },
+ {
+  "q": "anything interesting in north beach tonight",
+  "area": "North Beach",
+  "category": null,
+  "minutes": 720,
+  "intent": "highlight"
+ },
+ {
+  "q": "what is happening in chinatown today",
+  "area": "Chinatown",
+  "category": null,
+  "minutes": 1440,
+  "intent": "highlight"
+ },
+ {
+  "q": "biggest thing in the bayview this week",
+  "area": "Bayview Hunters Point",
+  "category": null,
+  "minutes": 10080,
+  "intent": "highlight"
+ },
+ {
+  "q": "give me all the car break ins in the last 90 minutes in the mission",
+  "area": "Mission",
+  "category": "car break-ins",
+  "minutes": 90,
+  "intent": "list"
+ },
+ {
+  "q": "car break-ins in soma last week",
+  "area": "South of Market",
+  "category": "car break-ins",
+  "minutes": 10080,
+  "intent": "list"
+ },
+ {
+  "q": "smash and grab in the marina today",
+  "area": "Marina",
+  "category": "car break-ins",
+  "minutes": 1440,
+  "intent": "list"
+ },
+ {
+  "q": "auto boost in the richmond last 3 days",
+  "area": "Outer Richmond",
+  "category": "car break-ins",
+  "minutes": 4320,
+  "intent": "list"
+ },
+ {
+  "q": "stolen cars in the excelsior this month",
+  "area": "Excelsior",
+  "category": "vehicle thefts",
+  "minutes": 43200,
+  "intent": "list"
+ },
+ {
+  "q": "car theft in potrero hill last 24 hours",
+  "area": "Potrero Hill",
+  "category": "vehicle thefts",
+  "minutes": 1440,
+  "intent": "list"
+ },
+ {
+  "q": "shootings in the tenderloin this week",
+  "area": "Tenderloin",
+  "category": "shootings and weapon calls",
+  "minutes": 10080,
+  "intent": "list"
+ },
+ {
+  "q": "shots fired in the bayview last night",
+  "area": "Bayview Hunters Point",
+  "category": "shootings and weapon calls",
+  "minutes": 720,
+  "intent": "list"
+ },
+ {
+  "q": "gunfire near hunters point today",
+  "area": "Bayview Hunters Point",
+  "category": "shootings and weapon calls",
+  "minutes": 1440,
+  "intent": "list"
+ },
+ {
+  "q": "stabbings in soma this month",
+  "area": "South of Market",
+  "category": "stabbings",
+  "minutes": 43200,
+  "intent": "list"
+ },
+ {
+  "q": "robberies in chinatown last week",
+  "area": "Chinatown",
+  "category": "robberies",
+  "minutes": 10080,
+  "intent": "list"
+ },
+ {
+  "q": "burglaries in noe valley this month",
+  "area": "Noe Valley",
+  "category": "burglaries",
+  "minutes": 43200,
+  "intent": "list"
+ },
+ {
+  "q": "thefts in union square today",
+  "area": null,
+  "category": "thefts",
+  "minutes": 1440,
+  "intent": "list"
+ },
+ {
+  "q": "assaults in the tenderloin last 6 hours",
+  "area": "Tenderloin",
+  "category": "assaults",
+  "minutes": 360,
+  "intent": "list"
+ },
+ {
+  "q": "fights in the mission last night",
+  "area": "Mission",
+  "category": "assaults",
+  "minutes": 720,
+  "intent": "list"
+ },
+ {
+  "q": "fires in the sunset today",
+  "area": "Sunset/Parkside",
+  "category": "fires",
+  "minutes": 1440,
+  "intent": "list"
+ },
+ {
+  "q": "structure fire in hayes valley this week",
+  "area": "Hayes Valley",
+  "category": "fires",
+  "minutes": 10080,
+  "intent": "list"
+ },
+ {
+  "q": "medical calls in the castro in the last hour",
+  "area": "Castro/Upper Market",
+  "category": "medical calls",
+  "minutes": 60,
+  "intent": "list"
+ },
+ {
+  "q": "overdoses in the tenderloin today",
+  "area": "Tenderloin",
+  "category": "medical calls",
+  "minutes": 1440,
+  "intent": "list"
+ },
+ {
+  "q": "crashes on the embarcadero today",
+  "area": null,
+  "category": "collisions",
+  "minutes": 1440,
+  "intent": "list"
+ },
+ {
+  "q": "collisions in soma in the last 4 hours",
+  "area": "South of Market",
+  "category": "collisions",
+  "minutes": 240,
+  "intent": "list"
+ },
+ {
+  "q": "accidents in the presidio this week",
+  "area": "Presidio",
+  "category": "collisions",
+  "minutes": 10080,
+  "intent": "list"
+ },
+ {
+  "q": "hit and run in the mission last 12 hours",
+  "area": "Mission",
+  "category": "collisions",
+  "minutes": 720,
+  "intent": "list"
+ },
+ {
+  "q": "traffic stops in pacific heights today",
+  "area": "Pacific Heights",
+  "category": "traffic calls",
+  "minutes": 1440,
+  "intent": "list"
+ },
+ {
+  "q": "police activity in glen park right now",
+  "area": "Glen Park",
+  "category": "police activity",
+  "minutes": 60,
+  "intent": "list"
+ },
+ {
+  "q": "noise complaints in the haight tonight",
+  "area": "Haight Ashbury",
+  "category": "disturbances",
+  "minutes": 720,
+  "intent": "list"
+ },
+ {
+  "q": "disturbances in nob hill in the last 3 hours",
+  "area": "Nob Hill",
+  "category": "disturbances",
+  "minutes": 180,
+  "intent": "list"
+ },
+ {
+  "q": "missing person in the sunset this week",
+  "area": "Sunset/Parkside",
+  "category": "missing person reports",
+  "minutes": 10080,
+  "intent": "list"
+ },
+ {
+  "q": "gas leak in russian hill today",
+  "area": "Russian Hill",
+  "category": "hazards",
+  "minutes": 1440,
+  "intent": "list"
+ },
+ {
+  "q": "hazmat in mission bay this month",
+  "area": "Mission Bay",
+  "category": "hazards",
+  "minutes": 43200,
+  "intent": "list"
+ },
+ {
+  "q": "water rescue today",
+  "area": null,
+  "category": "rescues",
+  "minutes": 1440,
+  "intent": "list"
+ },
+ {
+  "q": "protests downtown this week",
+  "area": "Financial District",
+  "category": "protests",
+  "minutes": 10080,
+  "intent": "list"
+ },
+ {
+  "q": "welfare checks in the tenderloin last 8 hours",
+  "area": "Tenderloin",
+  "category": "welfare and mental-health calls",
+  "minutes": 480,
+  "intent": "list"
+ },
+ {
+  "q": "5150 calls in soma today",
+  "area": "South of Market",
+  "category": "welfare and mental-health calls",
+  "minutes": 1440,
+  "intent": "list"
+ },
+ {
+  "q": "encampment calls in the mission this week",
+  "area": "Mission",
+  "category": "homelessness-related calls",
+  "minutes": 10080,
+  "intent": "list"
+ },
+ {
+  "q": "how many fires in the bayview today",
+  "area": "Bayview Hunters Point",
+  "category": "fires",
+  "minutes": 1440,
+  "intent": "count"
+ },
+ {
+  "q": "how many robberies in chinatown this month",
+  "area": "Chinatown",
+  "category": "robberies",
+  "minutes": 43200,
+  "intent": "count"
+ },
+ {
+  "q": "count of medical calls in the tenderloin in the last 2 hours",
+  "area": "Tenderloin",
+  "category": "medical calls",
+  "minutes": 120,
+  "intent": "count"
+ },
+ {
+  "q": "number of car break ins in soma this week",
+  "area": "South of Market",
+  "category": "car break-ins",
+  "minutes": 10080,
+  "intent": "count"
+ },
+ {
+  "q": "how many calls in the mission today",
+  "area": "Mission",
+  "category": null,
+  "minutes": 1440,
+  "intent": "count"
+ },
+ {
+  "q": "fires",
+  "area": null,
+  "category": "fires",
+  "minutes": 180,
+  "intent": "list"
+ },
+ {
+  "q": "shootings",
+  "area": null,
+  "category": "shootings and weapon calls",
+  "minutes": 180,
+  "intent": "list"
+ },
+ {
+  "q": "the mission",
+  "area": "Mission",
+  "category": null,
+  "minutes": 180,
+  "intent": "list"
+ },
+ {
+  "q": "soma last 30 minutes",
+  "area": "South of Market",
+  "category": null,
+  "minutes": 30,
+  "intent": "list"
+ },
+ {
+  "q": "tenderloin in the last 45 mins",
+  "area": "Tenderloin",
+  "category": null,
+  "minutes": 45,
+  "intent": "list"
+ },
+ {
+  "q": "mission in the past 2 weeks",
+  "area": "Mission",
+  "category": null,
+  "minutes": 20160,
+  "intent": "list"
+ },
+ {
+  "q": "bayview last 6 months",
+  "area": "Bayview Hunters Point",
+  "category": null,
+  "minutes": 259200,
+  "intent": "list"
+ },
+ {
+  "q": "what happened in the mission in the last 15 minutes",
+  "area": "Mission",
+  "category": null,
+  "minutes": 15,
+  "intent": "list"
+ },
+ {
+  "q": "calls in inner sunset in the last three hours",
+  "area": "Inner Sunset",
+  "category": null,
+  "minutes": 180,
+  "intent": "list"
+ },
+ {
+  "q": "activity in outer richmond over the past day",
+  "area": "Outer Richmond",
+  "category": null,
+  "minutes": 1440,
+  "intent": "list"
+ },
+ {
+  "q": "crashes in west portal this year",
+  "area": "West of Twin Peaks",
+  "category": "collisions",
+  "minutes": 525600,
+  "intent": "list"
+ },
+ {
+  "q": "everything in the marina all time",
+  "area": "Marina",
+  "category": null,
+  "minutes": 0,
+  "intent": "list"
+ },
+ {
+  "q": "fires in ggp today",
+  "area": "Golden Gate Park",
+  "category": "fires",
+  "minutes": 1440,
+  "intent": "list"
+ },
+ {
+  "q": "calls in viz valley this week",
+  "area": "Visitacion Valley",
+  "category": null,
+  "minutes": 10080,
+  "intent": "list"
+ },
+ {
+  "q": "medical in omi today",
+  "area": "Oceanview/Merced/Ingleside",
+  "category": "medical calls",
+  "minutes": 1440,
+  "intent": "list"
+ },
+ {
+  "q": "police activity near usf tonight",
+  "area": "Lone Mountain/USF",
+  "category": "police activity",
+  "minutes": 720,
+  "intent": "list"
+ },
+ {
+  "q": "what's going on in japantown",
+  "area": "Japantown",
+  "category": null,
+  "minutes": 180,
+  "intent": "highlight"
+ },
+ {
+  "q": "anything in treasure island today",
+  "area": "Treasure Island",
+  "category": null,
+  "minutes": 1440,
+  "intent": "highlight"
+ },
+ {
+  "q": "robberies in the fidi in the last 4 hours",
+  "area": "Financial District",
+  "category": "robberies",
+  "minutes": 240,
+  "intent": "list"
+ },
+ {
+  "q": "burglaries in seacliff this month",
+  "area": "Seacliff",
+  "category": "burglaries",
+  "minutes": 43200,
+  "intent": "list"
+ },
+ {
+  "q": "assaults in western addition last night",
+  "area": "Western Addition",
+  "category": "assaults",
+  "minutes": 720,
+  "intent": "list"
+ }
+]

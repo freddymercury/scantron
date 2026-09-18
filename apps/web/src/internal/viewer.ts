@@ -10,6 +10,9 @@
 import type { Database } from "bun:sqlite";
 
 import { createNonce, escapeHtml, securityHeaders } from "../security.ts";
+import { askBox, renderAnswer, renderExamples } from "../ask/render.ts";
+import { parseQuestion } from "../ask/parse.ts";
+import { runAsk } from "../ask/answer.ts";
 import { renderDetail } from "./detail.ts";
 import { renderMap } from "./map.ts";
 import { INTERNAL_PREFIX } from "./paths.ts";
@@ -158,6 +161,13 @@ const STYLE = `
   }
   #hovercard[hidden] { display: none; }
   details pre { background: var(--panel); padding: .5rem; border-radius: .25rem; }
+  form.ask { margin: 1rem 0 .5rem; gap: .4rem; }
+  form.ask input { flex: 1; min-width: 20rem; padding: .5rem .6rem; }
+  .interp { margin: .25rem 0 1rem; font-size: .85rem; }
+  .answer { border: 1px solid var(--line); border-radius: .3rem; padding: .75rem 1rem; }
+  .answer p:first-child { margin-top: 0; }
+  .highlight { border-left: 3px solid var(--police); padding: .35rem .75rem; margin: .6rem 0; }
+  .examples { font-size: .85rem; }
 `;
 
 /**
@@ -459,6 +469,7 @@ export function renderViewer(db: Database, url: URL, nonce: string): string {
     nonce,
     "raw observations",
     `<h2 class="pagetitle">raw observations</h2>
+${askBox()}
 <div class="gate ${gate.passes ? "pass" : "fail"}">
   <b>Phase 0 gate: ${gate.passes ? "PASS" : "not yet"}</b>
   <div class="muted">PRD §44 — ≥72 h continuous ingestion, no duplicate explosion, no unexplained gaps.</div>
@@ -563,6 +574,53 @@ export async function handleInternal(
     return new Response(null, {
       status: 303,
       headers: { ...securityHeaders(), location: INTERNAL_PREFIX + (requeued ? "" : "?requeue=failed") },
+    });
+  }
+
+  if (url.pathname === `${INTERNAL_PREFIX}/ask`) {
+    const nonce = createNonce();
+    const question = url.searchParams.get("q")?.trim() ?? "";
+
+    if (!question) {
+      return new Response(
+        page(nonce, "ask", `${askBox()}<div class="answer"><p>Ask about activity in a neighborhood over a window of time.</p>${renderExamples()}</div>`),
+        { headers: { "content-type": "text/html; charset=utf-8", ...securityHeaders(nonce) } },
+      );
+    }
+
+    const areas = db
+      .query<{ neighborhood: string }, []>(
+        "SELECT DISTINCT neighborhood FROM observations WHERE neighborhood IS NOT NULL",
+      )
+      .all()
+      .map((row) => row.neighborhood);
+
+    const query = parseQuestion(question, { knownAreas: areas });
+    // One-click corrections come back as overrides on the same question, so the parse
+    // stays visible and the correction is explicit rather than a silent re-guess.
+    const areaOverride = url.searchParams.get("area");
+    if (areaOverride !== null) {
+      if (areaOverride === "") delete query.area;
+      else query.area = areaOverride;
+    }
+    const windowOverride = Number(url.searchParams.get("window") ?? Number.NaN);
+    if (Number.isFinite(windowOverride) && windowOverride > 0) {
+      query.windowMinutes = windowOverride;
+      query.windowLabel = windowOverride === 1440 ? "the last 24 hours" : `the last ${windowOverride} minutes`;
+    }
+    if (url.searchParams.get("category") === "") {
+      query.types = [];
+      query.rawCodes = [];
+      delete query.categoryLabel;
+    }
+
+    const answer = runAsk(db, query);
+    return new Response(page(nonce, "ask", renderAnswer(answer)), {
+      headers: {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "no-store",
+        ...securityHeaders(nonce),
+      },
     });
   }
 

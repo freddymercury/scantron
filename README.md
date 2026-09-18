@@ -44,6 +44,27 @@ Findings that changed the design, all measured against the live APIs on 2026-09-
 - **Incident reports join to dispatch records on `cad_number`** (~100% coverage for dispatched calls), which turns the city's own records into thousands of free correlation labels.
 - **The real-time feed retains only ~48 hours**, but a historical dataset going back to 2014 shares its schema — so gaps are recoverable and history is available from day one.
 
+## Development
+
+Requires [Bun](https://bun.sh) >= 1.4. Nothing else — there are no runtime dependencies.
+
+```bash
+bun install
+cp .env.example .env
+bun run dev        # web + ingest + correlator, hot-reloaded, in one terminal
+bun run check      # lint + typecheck + test, the same three CI runs
+```
+
+Layout is a Bun workspace monorepo: `packages/*` (shared code), `services/*` (long-running
+processes, which never import each other), `apps/web` (server-rendered HTML from
+`Bun.serve`). Cross-workspace imports use `@scantron/*` aliases.
+
+`bun run lint` is [`scripts/lint.ts`](scripts/lint.ts), not ESLint: it enforces the rules
+this repo actually has — zero third-party runtime dependencies, no service-to-service
+imports, no deep relative imports across workspaces, and every `process.env` variable
+documented in [`.env.example`](.env.example).
+
 ## Status
 
-Specification and design. No implementation yet — see the issues, which are filed in build order.
+Implementation started. Epic A scaffold is in; the remaining work is the issues, filed in
+build order — work them by the `[N]` prefix in the title, not by issue number.

@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "types": ["bun"],
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "exactOptionalPropertyTypes": true,
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
+    "skipLibCheck": true,
+
+    "noEmit": true,
+    "allowJs": false,
+
+    "baseUrl": ".",
+    "paths": {
+      "@scantron/incident-schema": ["packages/incident-schema/src/index.ts"],
+      "@scantron/location-normalizer": ["packages/location-normalizer/src/index.ts"],
+      "@scantron/sf-domain": ["packages/sf-domain/src/index.ts"],
+      "@scantron/event-taxonomy": ["packages/event-taxonomy/src/index.ts"],
+      "@scantron/database": ["packages/database/src/index.ts"],
+      "@scantron/observability": ["packages/observability/src/index.ts"]
+    }
+  }
+}

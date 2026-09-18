@@ -1,0 +1,18 @@
+{
+  "name": "scantron",
+  "private": true,
+  "type": "module",
+  "workspaces": ["apps/*", "services/*", "packages/*"],
+  "engines": { "bun": ">=1.4.0" },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "bun test",
+    "lint": "bun run scripts/lint.ts",
+    "dev": "bun run scripts/dev.ts",
+    "check": "bun run lint && bun run typecheck && bun run test"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.9.2"
+  }
+}

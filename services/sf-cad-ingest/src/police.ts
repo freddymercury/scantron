@@ -8,16 +8,17 @@
  *   * This feed carries no unit identifiers at all; units come from the fire/EMS feed.
  */
 
-import type { Observation, ObservationRow } from "@scantron/incident-schema";
-import { observationToRow } from "@scantron/incident-schema";
+import type { Observation } from "@scantron/incident-schema";
 import { parseSfTimestamp } from "@scantron/sf-domain";
+
+import { MalformedRecordError, type MappedRecord, type SourceAdapter } from "./adapter.ts";
 
 export const SFPD_SOURCE = "sf_police_cad" as const;
 export const SFPD_DATASET_ID = "gnap-fj3t";
 /** The column the cursor walks: when DataSF published the row, not when the call happened. */
 export const SFPD_CURSOR_FIELD = "data_loaded_at";
 
-export interface SfpdCallRecord {
+export interface SfpdCallRecord extends Record<string, unknown> {
   id?: string;
   cad_number?: string;
   received_datetime?: string;
@@ -46,25 +47,6 @@ export interface SfpdCallRecord {
   call_last_updated_at?: string;
   data_as_of?: string;
   data_loaded_at?: string;
-}
-
-export interface MappedRecord {
-  observation: Observation;
-  row: ObservationRow;
-  /** `data_loaded_at`, which is what the cursor advances on. */
-  publishedAt?: Date;
-  /** `received_datetime`; the basis of the source-lag metric. */
-  receivedAt: Date;
-}
-
-export class MalformedRecordError extends Error {
-  constructor(
-    message: string,
-    readonly recordId: string | undefined,
-  ) {
-    super(message);
-    this.name = "MalformedRecordError";
-  }
 }
 
 function isSensitive(value: SfpdCallRecord["sensitive_call"]): boolean | undefined {
@@ -156,12 +138,19 @@ export function mapSfpdRecord(record: SfpdCallRecord, ingestedAt: Date): MappedR
   }
   observation.metadata = metadata;
 
-  const mapped: MappedRecord = {
-    observation,
-    row: observationToRow(observation),
-    receivedAt,
-  };
+  const mapped: MappedRecord = { observation, receivedAt };
   const publishedAt = parseSfTimestamp(record.data_loaded_at);
   if (publishedAt) mapped.publishedAt = publishedAt;
   return mapped;
 }
+
+export const policeAdapter: SourceAdapter<SfpdCallRecord> = {
+  source: SFPD_SOURCE,
+  datasetId: SFPD_DATASET_ID,
+  cursorField: SFPD_CURSOR_FIELD,
+  idField: "id",
+  // docs/01: a ~30-minute batch feed, so half an hour of silence is normal and an hour
+  // is not.
+  silenceThresholdSeconds: 60 * 60,
+  map: mapSfpdRecord,
+};

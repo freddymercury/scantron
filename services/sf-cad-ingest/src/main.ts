@@ -1,9 +1,10 @@
 /**
  * sf-cad-ingest — polls the DataSF CAD feeds and writes raw observations.
  *
- * The poll interval defaults to 60 s, not the 15 s S-B1 first asked for: docs/01 measured
- * the source as a ~30-minute batch, so a 15 s cycle mostly re-fetches an unchanged
- * snapshot and spends rate limit for nothing.
+ * One process, three sources: police, fire and EMS each get their own adapter, cursor,
+ * interval and health threshold. The intervals differ because the feeds do — docs/01
+ * measured police at a ~30-minute batch and fire/EMS at ~19 hours behind — and a shared
+ * threshold would make one of them permanently, meaninglessly "stale".
  */
 
 import {
@@ -20,21 +21,69 @@ import {
   healthReport,
   serveObservability,
   type HealthReport,
+  type Logger,
 } from "@scantron/observability";
 
+import type { SourceAdapter } from "./adapter.ts";
+import { emsAdapter, fireAdapter } from "./fire.ts";
 import { runIngestCycle } from "./ingest.ts";
-import { createSocrataClient } from "./socrata.ts";
+import { policeAdapter } from "./police.ts";
+import { createSocrataClient, type SocrataClient } from "./socrata.ts";
 
 const SERVICE = "sf-cad-ingest";
-const DEFAULT_SILENCE_THRESHOLD_SECONDS = 30 * 60;
+
+export const ADAPTERS: SourceAdapter<never>[] = [
+  policeAdapter as unknown as SourceAdapter<never>,
+  fireAdapter as unknown as SourceAdapter<never>,
+  emsAdapter as unknown as SourceAdapter<never>,
+];
 
 export function describeService(): { service: string; implementedBy: string } {
   return { service: SERVICE, implementedBy: "S-B1" };
 }
 
-export function pollSeconds(): number {
+export function pollSeconds(source: string): number {
+  const specific = Number(
+    process.env[`INGEST_POLL_SECONDS_${source.toUpperCase()}`] ?? Number.NaN,
+  );
+  if (Number.isFinite(specific) && specific > 0) return specific;
+
   const configured = Number(process.env.INGEST_POLL_SECONDS ?? 60);
-  return Number.isFinite(configured) && configured > 0 ? configured : 60;
+  const fallback = Number.isFinite(configured) && configured > 0 ? configured : 60;
+  // Polling a feed that updates daily every minute is 1,440 wasted requests a day.
+  return source === "sf_police_cad" ? fallback : Math.max(fallback, 600);
+}
+
+/** Polls one source forever, on its own schedule. */
+async function pollLoop(options: {
+  adapter: SourceAdapter<never>;
+  db: ReturnType<typeof openDatabase>;
+  client: SocrataClient;
+  metrics: ReturnType<typeof createAppMetrics>;
+  log: Logger;
+  running: () => boolean;
+}): Promise<void> {
+  const { adapter, running } = options;
+  const interval = pollSeconds(adapter.source);
+  options.log.info("poller.started", { source: adapter.source, result: `every ${interval}s` });
+
+  while (running()) {
+    try {
+      await runIngestCycle({
+        db: options.db,
+        adapter,
+        client: options.client,
+        metrics: options.metrics,
+        log: options.log,
+        pollSeconds: interval,
+      });
+    } catch (error) {
+      // The cycle already recorded the failure and left the cursor where it was; the next
+      // pass re-reads the same window rather than losing it.
+      options.log.warn("cycle.failed", { source: adapter.source, error: errorMessage(error) });
+    }
+    await Bun.sleep(interval * 1000);
+  }
 }
 
 export async function main(): Promise<void> {
@@ -43,6 +92,8 @@ export async function main(): Promise<void> {
 
   const db = openDatabase({ path: databasePath() });
   migrate(db);
+
+  const thresholds = new Map(ADAPTERS.map((adapter) => [adapter.source, adapter.silenceThresholdSeconds]));
 
   const health = (): HealthReport => {
     const stats = queueStats(db);
@@ -55,10 +106,9 @@ export async function main(): Promise<void> {
       sources: sourceConfigurations(db).map((row) => ({
         source: row.source,
         lastSuccessAt: row.last_success_at ? new Date(row.last_success_at) : undefined,
-        silenceThresholdSeconds: Math.max(
-          DEFAULT_SILENCE_THRESHOLD_SECONDS,
-          row.poll_seconds * 10,
-        ),
+        // Per source: the fire feed is ~19 h behind by nature and must not be judged
+        // against the police feed's threshold.
+        silenceThresholdSeconds: thresholds.get(row.source) ?? Math.max(1800, row.poll_seconds * 10),
         enabled: row.enabled === 1,
         consecutiveFailures: row.consecutive_failures,
       })),
@@ -86,18 +136,13 @@ export async function main(): Promise<void> {
   process.on("SIGINT", stop("SIGINT"));
   process.on("SIGTERM", stop("SIGTERM"));
 
-  log.info("service.started", { result: `polling every ${pollSeconds()}s` });
+  log.info("service.started", { count: ADAPTERS.length });
 
-  while (running) {
-    try {
-      await runIngestCycle({ db, client, metrics, log });
-    } catch (error) {
-      // The cycle already recorded the failure and left the cursor where it was; the next
-      // pass re-reads the same window rather than losing it.
-      log.warn("cycle.failed", { source: "sf_police_cad", error: errorMessage(error) });
-    }
-    await Bun.sleep(pollSeconds() * 1000);
-  }
+  await Promise.all(
+    ADAPTERS.map((adapter) =>
+      pollLoop({ adapter, db, client, metrics, log, running: () => running }),
+    ),
+  );
 }
 
 if (import.meta.main) await main();

@@ -14,7 +14,7 @@ import { createTestDatabase } from "@scantron/database/testing";
 import { createAppMetrics, createLogger, type LogLine } from "@scantron/observability";
 
 import { OVERLAP_SECONDS, cursorWhere, runIngestCycle } from "../src/ingest.ts";
-import { mapSfpdRecord, type SfpdCallRecord } from "../src/police.ts";
+import { mapSfpdRecord, policeAdapter, type SfpdCallRecord } from "../src/police.ts";
 import type { SocrataClient } from "../src/socrata.ts";
 
 const FIXTURE: SfpdCallRecord[] = JSON.parse(
@@ -46,6 +46,7 @@ function harness(records: SfpdCallRecord[]) {
   return {
     db,
     lines,
+    adapter: policeAdapter,
     metrics: createAppMetrics(),
     client: fixedClient(records),
     log: createLogger({ sink: (line) => lines.push(line), level: "debug" }),
@@ -164,7 +165,7 @@ test("the cursor advances on success and carries an overlap window", async () =>
   expect(config?.last_record_at).toBe(result.cursor as string);
   expect(config?.consecutive_failures).toBe(0);
 
-  const where = cursorWhere(result.cursor, new Date());
+  const where = cursorWhere("data_loaded_at", result.cursor, new Date());
   const bound = /data_loaded_at > '([^']+)'/.exec(where)?.[1] as string;
   const overlapMs = new Date(result.cursor as string).getTime() - Date.parse(`${bound}Z`);
   // The bound is rendered in SF local time, so compare the shape rather than the instant.

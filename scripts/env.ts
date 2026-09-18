@@ -38,6 +38,24 @@ export const ENV_VARS: readonly EnvVar[] = [
     description: "Poll interval; the feed is a ~30 min batch, so 15s only wastes quota",
   },
   {
+    name: "INGEST_POLL_SECONDS_SF_POLICE_CAD",
+    required: false,
+    fallback: "60",
+    description: "Per-source poll interval override",
+  },
+  {
+    name: "INGEST_POLL_SECONDS_SF_FIRE_CAD",
+    required: false,
+    fallback: "900",
+    description: "Per-source poll interval override; this feed runs ~19 h behind",
+  },
+  {
+    name: "INGEST_POLL_SECONDS_SF_EMS_CAD",
+    required: false,
+    fallback: "900",
+    description: "Per-source poll interval override; shares the SFFD dataset",
+  },
+  {
     name: "INGEST_HEALTH_PORT",
     required: false,
     fallback: "3101",

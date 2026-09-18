@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-18.1",
+  "version": "2026-09-18.2",
   "source": "sf_police_cad",
   "note": "Codes observed live in gnap-fj3t on 2026-09-18 (93 distinct), plus label patterns as a safety net for codes the seed has never seen. Exact code always wins over a pattern.",
   "mappings": [
@@ -343,6 +343,13 @@
       "typeConfidence": 0.9
     },
     {
+      "rawCode": "529",
+      "rawLabel": "EXPLOSION",
+      "normalizedType": "hazard",
+      "defaultSeverity": "critical",
+      "typeConfidence": 0.9
+    },
+    {
       "rawCode": "531",
       "rawLabel": "EXPLOSIVE FOUND",
       "normalizedType": "hazard",
@@ -589,13 +596,8 @@
       "typeConfidence": 0.9
     },
     {
-      "rawLabelPattern": "\\bFIRE\\b",
-      "normalizedType": "fire",
-      "typeConfidence": 0.6
-    },
-    {
-      "rawLabelPattern": "ROBBERY|HOLDUP",
-      "normalizedType": "robbery",
+      "rawLabelPattern": "ACCIDENT|COLLISION",
+      "normalizedType": "collision",
       "typeConfidence": 0.6
     },
     {
@@ -604,13 +606,28 @@
       "typeConfidence": 0.6
     },
     {
+      "rawLabelPattern": "BURGLAR",
+      "normalizedType": "burglary",
+      "typeConfidence": 0.6
+    },
+    {
       "rawLabelPattern": "GUN|KNIFE|SHOTS|WEAPON",
       "normalizedType": "weapon",
       "typeConfidence": 0.6
     },
     {
-      "rawLabelPattern": "BURGLAR",
-      "normalizedType": "burglary",
+      "rawLabelPattern": "MEDIC|AIDED|SUICIDE|OVERDOSE",
+      "normalizedType": "medical",
+      "typeConfidence": 0.6
+    },
+    {
+      "rawLabelPattern": "MISSING",
+      "normalizedType": "missing_person",
+      "typeConfidence": 0.6
+    },
+    {
+      "rawLabelPattern": "ROBBERY|HOLDUP",
+      "normalizedType": "robbery",
       "typeConfidence": 0.6
     },
     {
@@ -619,23 +636,13 @@
       "typeConfidence": 0.6
     },
     {
-      "rawLabelPattern": "ACCIDENT|COLLISION",
-      "normalizedType": "collision",
-      "typeConfidence": 0.6
-    },
-    {
       "rawLabelPattern": "TRAF|TRAFFIC|VEHICLE",
       "normalizedType": "traffic",
       "typeConfidence": 0.5
     },
     {
-      "rawLabelPattern": "MISSING",
-      "normalizedType": "missing_person",
-      "typeConfidence": 0.6
-    },
-    {
-      "rawLabelPattern": "MEDIC|AIDED|SUICIDE|OVERDOSE",
-      "normalizedType": "medical",
+      "rawLabelPattern": "\\bFIRE\\b",
+      "normalizedType": "fire",
       "typeConfidence": 0.6
     }
   ]

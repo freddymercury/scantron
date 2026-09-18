@@ -37,6 +37,18 @@ export const ENV_VARS: readonly EnvVar[] = [
     fallback: "60",
     description: "Poll interval; the feed is a ~30 min batch, so 15s only wastes quota",
   },
+  {
+    name: "INGEST_HEALTH_PORT",
+    required: false,
+    fallback: "3101",
+    description: "Port for sf-cad-ingest /metrics and /health",
+  },
+  {
+    name: "CORRELATOR_HEALTH_PORT",
+    required: false,
+    fallback: "3102",
+    description: "Port for incident-correlator /metrics and /health",
+  },
   { name: "LOG_LEVEL", required: false, fallback: "info", description: "debug | info | warn | error" },
 ] as const;
 

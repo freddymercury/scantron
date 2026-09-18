@@ -24,10 +24,42 @@ export const IN_MEMORY = ":memory:";
  * remembering which is which.
  */
 export function applyPragmas(db: Database): void {
-  db.exec("PRAGMA journal_mode = WAL");
+  // busy_timeout first: everything after it is then willing to wait for a lock.
+  db.exec("PRAGMA busy_timeout = 5000");
+  enableWal(db);
   db.exec("PRAGMA synchronous = NORMAL");
   db.exec("PRAGMA foreign_keys = ON");
-  db.exec("PRAGMA busy_timeout = 5000");
+}
+
+function journalMode(db: Database): string {
+  const row = db.query("PRAGMA journal_mode").get() as Record<string, unknown>;
+  return String(Object.values(row)[0]).toLowerCase();
+}
+
+/**
+ * `PRAGMA journal_mode = WAL` takes a brief exclusive lock and, unlike ordinary writes,
+ * returns SQLITE_BUSY *immediately* rather than honouring `busy_timeout` — so two
+ * processes starting together (web and a worker) can collide on boot. WAL is a persistent
+ * property of the file, so the fix is to retry briefly and accept the mode another process
+ * has already set.
+ */
+function enableWal(db: Database, attempts = 20, sleepMs = 10): void {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    const mode = journalMode(db);
+    // An in-memory database reports `memory` and cannot use WAL; that is not a failure.
+    if (mode === "wal" || mode === "memory") return;
+    try {
+      db.exec("PRAGMA journal_mode = WAL");
+      if (journalMode(db) === "wal") return;
+    } catch (error) {
+      const code = (error as { code?: string }).code;
+      if (code !== "SQLITE_BUSY") throw error;
+    }
+    Bun.sleepSync(sleepMs);
+  }
+  if (journalMode(db) !== "wal") {
+    throw new Error("could not enable WAL mode; another process holds the database");
+  }
 }
 
 export function databasePath(): string {
@@ -111,23 +143,29 @@ export function loadMigrations(dir: string = MIGRATIONS_DIR): Migration[] {
  */
 export function migrate(db: Database, dir: string = MIGRATIONS_DIR): MigrationResult {
   ensureMigrationsTable(db);
-  const done = new Set(appliedMigrations(db));
+  const pending = loadMigrations(dir);
   const result: MigrationResult = { applied: [], alreadyApplied: [] };
 
-  for (const migration of loadMigrations(dir)) {
-    if (done.has(migration.name)) {
-      result.alreadyApplied.push(migration.name);
-      continue;
-    }
-    const run = db.transaction(() => {
+  for (const migration of pending) {
+    // BEGIN IMMEDIATE, and the applied-check happens *inside* it: two processes starting
+    // at once (web and a worker both calling migrate on boot) would otherwise each read
+    // "not applied", and the loser would fail on a duplicate CREATE.
+    const run = db.transaction((): "applied" | "skipped" => {
+      const already = db
+        .query<{ n: number }, [string]>("SELECT count(*) AS n FROM schema_migrations WHERE name = ?")
+        .get(migration.name);
+      if ((already?.n ?? 0) > 0) return "skipped";
+
       db.exec(migration.sql);
       db.query("INSERT INTO schema_migrations (name, applied_at) VALUES (?, ?)").run(
         migration.name,
         new Date().toISOString(),
       );
+      return "applied";
     });
-    run();
-    result.applied.push(migration.name);
+
+    if (run.immediate() === "applied") result.applied.push(migration.name);
+    else result.alreadyApplied.push(migration.name);
   }
   return result;
 }
@@ -187,3 +225,25 @@ export function neighborhoodRows(db: Database): NeighborhoodRow[] {
 
 export * from "./queue.ts";
 export * from "./worker.ts";
+
+// --- source configuration --------------------------------------------------
+
+export interface SourceConfigurationRow {
+  source: string;
+  dataset_id: string;
+  enabled: number;
+  poll_seconds: number;
+  publication_delay_seconds: number;
+  last_polled_at: string | null;
+  last_success_at: string | null;
+  last_record_at: string | null;
+  last_error: string | null;
+  consecutive_failures: number;
+  updated_at: string;
+}
+
+export function sourceConfigurations(db: Database): SourceConfigurationRow[] {
+  return db
+    .query<SourceConfigurationRow, []>("SELECT * FROM source_configuration ORDER BY source")
+    .all();
+}

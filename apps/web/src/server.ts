@@ -2,15 +2,33 @@
  * scantron web — server-rendered HTML from Bun.serve.
  *
  * ADR-002 amends PRD §34 and S-A1: no Next.js, React or MUI. The app shell arrives with
- * S-F1; this proves the server boots, serves a page, and does so under a CSP whose inline
- * scripts are nonce-allowed rather than blanket-allowed.
+ * S-F1; this proves the server boots, serves a page under a nonce-based CSP, and reports
+ * itself through the same /metrics and /health the workers expose (S-A6).
  */
 
+import type { Database } from "bun:sqlite";
+import {
+  databasePath,
+  migrate,
+  openDatabase,
+  queueStats,
+  sourceConfigurations,
+} from "@scantron/database";
+import {
+  createAppMetrics,
+  createLogger,
+  healthReport,
+  healthResponse,
+  metricsResponse,
+  type AppMetrics,
+  type HealthReport,
+} from "@scantron/observability";
 import { SF_BBOX, SF_TIMEZONE } from "@scantron/sf-domain";
 
 import { createNonce, escapeHtml, securityHeaders } from "./security.ts";
 
 const PORT = Number(process.env.WEB_PORT ?? 3000);
+const DEFAULT_SILENCE_THRESHOLD_SECONDS = 30 * 60;
 
 function page(nonce: string): string {
   const bbox = `${SF_BBOX.west},${SF_BBOX.south} → ${SF_BBOX.east},${SF_BBOX.north}`;
@@ -30,36 +48,84 @@ function page(nonce: string): string {
 `;
 }
 
-export function handle(request: Request): Response {
-  const path = new URL(request.url).pathname;
-
-  if (path === "/") {
-    const nonce = createNonce();
-    return new Response(page(nonce), {
-      headers: {
-        "content-type": "text/html; charset=utf-8",
-        ...securityHeaders(nonce),
-      },
-    });
-  }
-
-  if (path === "/healthz") {
-    return Response.json({ status: "ok", service: "web" }, { headers: securityHeaders() });
-  }
-
-  return new Response("not found", { status: 404, headers: securityHeaders() });
+export interface AppContext {
+  db?: Database;
+  metrics: AppMetrics;
 }
 
+export function buildHealth(context: AppContext, now: Date = new Date()): HealthReport {
+  const stats = context.db
+    ? queueStats(context.db, now)
+    : { pending: 0, running: 0, completed: 0, failed: 0, oldestPendingAgeSeconds: 0 };
+
+  context.metrics.queueDepth.set(stats.pending, { status: "pending" });
+  context.metrics.queueDepth.set(stats.running, { status: "running" });
+  context.metrics.queueDepth.set(stats.failed, { status: "failed" });
+
+  const sources = context.db ? sourceConfigurations(context.db) : [];
+  return healthReport({
+    now,
+    queue: stats,
+    sources: sources.map((row) => ({
+      source: row.source,
+      lastSuccessAt: row.last_success_at ? new Date(row.last_success_at) : undefined,
+      silenceThresholdSeconds: Math.max(DEFAULT_SILENCE_THRESHOLD_SECONDS, row.poll_seconds * 10),
+      enabled: row.enabled === 1,
+      consecutiveFailures: row.consecutive_failures,
+    })),
+  });
+}
+
+function withSecurityHeaders(response: Response): Response {
+  for (const [header, value] of Object.entries(securityHeaders())) {
+    response.headers.set(header, value);
+  }
+  return response;
+}
+
+export function createHandler(context: AppContext): (request: Request) => Response {
+  return function handle(request: Request): Response {
+    const path = new URL(request.url).pathname;
+    const startedAt = performance.now();
+
+    try {
+      if (path === "/") {
+        const nonce = createNonce();
+        return new Response(page(nonce), {
+          headers: { "content-type": "text/html; charset=utf-8", ...securityHeaders(nonce) },
+        });
+      }
+      if (path === "/healthz") {
+        return Response.json({ status: "ok", service: "web" }, { headers: securityHeaders() });
+      }
+      if (path === "/health") {
+        return withSecurityHeaders(healthResponse(buildHealth(context)));
+      }
+      if (path === "/metrics") {
+        return withSecurityHeaders(metricsResponse(context.metrics.registry));
+      }
+      return new Response("not found", { status: 404, headers: securityHeaders() });
+    } finally {
+      context.metrics.stepDurationSeconds.observe((performance.now() - startedAt) / 1000, {
+        processor: "web",
+      });
+    }
+  };
+}
+
+/** The default handler, for tests and for `main()`. No database unless one is given. */
+export const handle = createHandler({ metrics: createAppMetrics() });
+
 export function main(): void {
-  const server = Bun.serve({ port: PORT, fetch: handle });
-  console.log(
-    JSON.stringify({
-      ts: new Date().toISOString(),
-      service: "web",
-      event: "listening",
-      url: server.url.toString(),
-    }),
-  );
+  const log = createLogger({ context: { processor: "web" } });
+  const db = openDatabase({ path: databasePath() });
+  migrate(db);
+
+  const server = Bun.serve({
+    port: PORT,
+    fetch: createHandler({ db, metrics: createAppMetrics() }),
+  });
+  log.info("service.started", { result: server.url.toString() });
 }
 
 if (import.meta.main) main();

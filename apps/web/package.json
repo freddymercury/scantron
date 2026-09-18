@@ -10,6 +10,8 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@scantron/sf-domain": "workspace:*"
+    "@scantron/sf-domain": "workspace:*",
+    "@scantron/database": "workspace:*",
+    "@scantron/observability": "workspace:*"
   }
 }

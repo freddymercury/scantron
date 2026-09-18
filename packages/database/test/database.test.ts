@@ -80,3 +80,34 @@ test("a failing migration rolls back and is not recorded", () => {
 test("a missing migrations directory is not an error", () => {
   expect(loadMigrations(join(tempDir(), "absent"))).toEqual([]);
 });
+
+test("two processes migrating at once do not collide", async () => {
+  const path = join(tempDir(), "race.db");
+  const modulePath = new URL("../src/index.ts", import.meta.url).pathname;
+  const script = `
+    const { migrate, openDatabase } = await import(${JSON.stringify(modulePath)});
+    const db = openDatabase({ path: ${JSON.stringify(path)} });
+    const result = migrate(db);
+    console.log(JSON.stringify(result));
+  `;
+
+  const runners = Array.from({ length: 4 }, () =>
+    Bun.spawn(["bun", "-e", script], { stdout: "pipe", stderr: "pipe" }),
+  );
+  const outcomes = await Promise.all(
+    runners.map(async (child) => ({
+      code: await child.exited,
+      stdout: await new Response(child.stdout).text(),
+      stderr: await new Response(child.stderr).text(),
+    })),
+  );
+
+  for (const outcome of outcomes) {
+    expect(`${outcome.code}: ${outcome.stderr}`).toBe("0: ");
+  }
+  // Exactly one process applied each migration; the others saw it already applied.
+  const appliedCounts = outcomes.map(
+    (outcome) => (JSON.parse(outcome.stdout) as { applied: string[] }).applied.length,
+  );
+  expect(appliedCounts.filter((count) => count > 0)).toHaveLength(1);
+});

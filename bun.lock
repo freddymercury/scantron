@@ -17,6 +17,8 @@
       "name": "@scantron/web",
       "version": "0.0.0",
       "dependencies": {
+        "@scantron/database": "workspace:*",
+        "@scantron/observability": "workspace:*",
         "@scantron/sf-domain": "workspace:*",
       },
     },
@@ -43,6 +45,9 @@
     "packages/observability": {
       "name": "@scantron/observability",
       "version": "0.0.0",
+      "dependencies": {
+        "@scantron/database": "workspace:*",
+      },
     },
     "packages/sf-domain": {
       "name": "@scantron/sf-domain",
@@ -51,10 +56,18 @@
     "services/incident-correlator": {
       "name": "@scantron/incident-correlator",
       "version": "0.0.0",
+      "dependencies": {
+        "@scantron/database": "workspace:*",
+        "@scantron/observability": "workspace:*",
+      },
     },
     "services/sf-cad-ingest": {
       "name": "@scantron/sf-cad-ingest",
       "version": "0.0.0",
+      "dependencies": {
+        "@scantron/database": "workspace:*",
+        "@scantron/observability": "workspace:*",
+      },
     },
   },
   "packages": {

@@ -73,3 +73,34 @@ test("interpolated text is escaped", () => {
   );
   expect(contentSecurityPolicy("abc")).toContain("'nonce-abc'");
 });
+
+test("metrics are exposed in Prometheus text format", async () => {
+  const res = get("/metrics");
+  expect(res.status).toBe(200);
+  expect(res.headers.get("content-type")).toContain("text/plain");
+  expect(await res.text()).toContain("scantron_step_duration_seconds");
+});
+
+test("health reports queue depth and stays 200 with no sources configured", async () => {
+  const res = get("/health");
+  expect(res.status).toBe(200);
+  expect(await res.json()).toMatchObject({ status: "ok", sources: [], queue: { pending: 0 } });
+});
+
+test("health goes non-200 when a configured source has gone silent", async () => {
+  const { createTestDatabase } = await import("@scantron/database/testing");
+  const { createAppMetrics } = await import("@scantron/observability");
+  const { createHandler } = await import("../src/server.ts");
+
+  const db = createTestDatabase();
+  db.query(
+    `INSERT INTO source_configuration (source, dataset_id, poll_seconds, updated_at, last_success_at, consecutive_failures)
+     VALUES ('sf_police_cad', 'gnap-fj3t', 60, '2026-09-18T00:00:00.000Z', '2026-09-17T00:00:00.000Z', 3)`,
+  ).run();
+
+  const handler = createHandler({ db, metrics: createAppMetrics() });
+  const res = handler(new Request("http://localhost/health"));
+  expect(res.status).toBe(503);
+  expect(await res.json()).toMatchObject({ status: "degraded" });
+  db.close();
+});

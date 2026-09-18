@@ -4,5 +4,13 @@
   "private": true,
   "type": "module",
   "main": "src/main.ts",
-  "scripts": { "start": "bun run src/main.ts", "dev": "bun --hot src/main.ts", "test": "bun test" }
+  "scripts": {
+    "start": "bun run src/main.ts",
+    "dev": "bun --hot src/main.ts",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@scantron/database": "workspace:*",
+    "@scantron/observability": "workspace:*"
+  }
 }

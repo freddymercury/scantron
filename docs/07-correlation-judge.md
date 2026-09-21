@@ -34,7 +34,18 @@ ordered levels. Constrained hard:
 0 failures, 1 timeout, **$0.00285** — about a dollar a year. It moved 9 decisions: 3
 promoted to merges, 6 pushed apart. Reduction 2.9% → 3.1%.
 
-**Against the 155 labelled cases:** F1 0.955 → 0.957. It fixed 1 case and broke 3.
+**Against the 155 labelled cases**, run four times across both providers:
+
+| run | endpoint | F1 | change | false merges |
+|---|---|---|---|---|
+| 1 | OpenRouter | 0.957 | +0.001 | 2 |
+| 2 | TypeSafe direct | 0.944 | −0.011 | 3 |
+| 3 | TypeSafe direct | 0.951 | −0.005 | 3 |
+| 4 | TypeSafe direct | 0.945 | −0.011 | 4 |
+
+The first run was the outlier. Repeated, the judge is **consistently slightly worse**: it
+recovers about two missed merges and introduces three or four false ones, and a false
+merge is the failure a reader sees. It fixed and broke these:
 
 ```
 FIXED  hand_77  same       FIGHT NO WEAPON + Medical Incident, 7.6 min apart
@@ -45,8 +56,8 @@ BROKE  hand_95  different  SIT/LIE ENFORCEMENT + Medical Incident, 3.8 min apart
 
 ## The decision: off by default
 
-A +0.001 F1 change is noise, and the changes it made were concentrated on pairs where the
-answer is genuinely arguable — a vandalism call and a medical call at one corner five
+Not "neutral, so why bother" — **measurably slightly harmful on the labels we have**. The
+changes it makes are concentrated on pairs where the answer is genuinely arguable — a vandalism call and a medical call at one corner five
 minutes apart *might* be one event where someone was hurt. Our labels say different; the
 judge says same; neither of us can prove it from a record that carries no narrative.
 
@@ -54,6 +65,20 @@ So it ships behind `--judge` on `bun run replay:correlation` and `bun run
 eval:correlation`, and correlation runs without it. **Building it was still the right
 call** — the alternative was an opinion about whether it would help, and now there is a
 number.
+
+## Latency, for the record
+
+TypeSafe direct is faster than routing through OpenRouter, which matters for the search
+re-rank far more than for this:
+
+| endpoint | p50 | fastest |
+|---|---|---|
+| OpenRouter `/api/alpha/decisions` | 235–261 ms | 173 ms |
+| TypeSafe `/v1/systemone` | 203 ms | 122 ms |
+
+Same model (`jev-1.13.0`). One API difference worth knowing: OpenRouter reports `usage.cost`
+and TypeSafe reports only tokens, so cost accounting falls back to the published input rate
+rather than recording spend as zero.
 
 ## What it is actually good for
 

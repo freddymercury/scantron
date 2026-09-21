@@ -50,6 +50,9 @@ export interface JudgeResponse {
   usage?: { input_tokens: number; cost?: number };
 }
 
+/** Published rate, used when the provider does not report cost itself. */
+export const PRICE_PER_INPUT_TOKEN_USD = 0.042 / 1_000_000;
+
 export interface JudgeVerdict {
   /** 0–4 on the SAME_EVENT_LEVELS ladder, as a fractional expected value. */
   sameEvent: number;
@@ -244,7 +247,10 @@ export function createJevJudge(
           return undefined;
         }
         const parsed = (await response.json()) as JudgeResponse;
-        stats.costUsd += parsed.usage?.cost ?? 0;
+        // OpenRouter reports cost; TypeSafe direct reports only tokens, so fall back to
+        // the published input rate rather than recording spend as zero.
+        stats.costUsd +=
+          parsed.usage?.cost ?? (parsed.usage?.input_tokens ?? 0) * PRICE_PER_INPUT_TOKEN_USD;
         return parsed;
       } catch (error) {
         stats.totalMs += performance.now() - startedAt;

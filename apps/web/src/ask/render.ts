@@ -157,13 +157,16 @@ function incidentList(answer: AskAnswer, now: Date): string {
  * "prostitution" has no category in this taxonomy, so the structured half of the answer is
  * *all activity in the window* — 14,656 calls, none of which is what was asked. Leading
  * with that number is worse than leading with the two records that actually matched.
+ *
+ * This holds when the search found *nothing* too: "nothing matched, and here is why" is a
+ * real answer, and "1,318 reported calls in the Tenderloin" in its place is not.
  */
 function searchLeads(answer: AskAnswer): boolean {
   return (
     answer.query.unresolved.length > 0 &&
     answer.query.types.length === 0 &&
     answer.query.categoryLabel === undefined &&
-    (answer.search?.hits.length ?? 0) > 0
+    answer.search !== undefined
   );
 }
 

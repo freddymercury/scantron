@@ -174,7 +174,23 @@ Two selection rules, both from measurement rather than taste:
 
   The answer leads with those two records. Leading with "14,656 calls of every kind" and
   burying them below it is a worse answer than saying plainly that nothing in the taxonomy
-  covers the question.
+  covers the question — and that holds when the search finds *nothing*, too: "nothing
+  matched, and here is why" is an answer, "1,318 reported calls in the Tenderloin" is not.
+
+### Some subjects are searchable rather than typed
+
+`Prostitution` (1,125 reports across seven codes) and the trafficking categories are
+deliberately **not** mapped onto a product type. Every type broad enough to hold them —
+`disturbance`, `public_safety` — puts them in a breakdown beside vandalism and lost
+property, which is a worse answer than no type at all. They stay reachable through the
+agency's own vocabulary: `647B` on the dispatch side, the `13xxx` family in incident
+reports, wired into the query expansion with no type attached.
+
+**One prefix match had to be switched off.** `sex*` reaches `SEXUAL ASSAULT ADULT`, and the
+top four hits for "sex work in the mission" were all sexual assault calls — answering a
+question about sex work with a list of assaults is the worst failure this search can
+produce. `sex` is now matched exactly. Prefix matching is kept everywhere else, because it
+is what makes "gun" reach `PERSON W/GUN`.
 
 Result, live: "gunshots" → weapon calls. "someone smashed a car window" → theft and
 disturbance, top hit `AUTO BOOST / STRIP`. "person not breathing" → medical. None of those

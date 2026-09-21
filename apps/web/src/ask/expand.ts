@@ -51,6 +51,25 @@ const COLLOQUIAL: readonly { phrases: readonly string[]; types: readonly Inciden
   { phrases: ["tagged", "graffiti", "vandalized", "vandalised"], types: ["disturbance"], rawCodes: ["594", "595"], label: "vandalism" },
   { phrases: ["stole my bike", "bike stolen", "bike theft"], types: ["theft"], label: "theft" },
   { phrases: ["break into", "breaking into", "broke into"], types: ["burglary", "theft"], rawCodes: ["459", "602", "852"], label: "a break-in" },
+  // No `types` on purpose. This taxonomy has no category for these and every broad one is
+  // a worse answer than none (docs/06), so the expansion contributes the agency's codes and
+  // lets the words do the rest. The codes are SFPD's: `647B` on the dispatch side, the
+  // `13xxx` family in incident reports.
+  {
+    phrases: [
+      "prostitution", "prostitute", "prostitutes", "solicitation", "soliciting", "solicits",
+      "sex work", "sex worker", "sex workers", "pandering", "lewd conduct",
+    ],
+    types: [],
+    rawCodes: ["13075", "13060", "647B", "13111", "13020", "13010", "13070", "13110"],
+    label: "prostitution-related calls and reports",
+  },
+  {
+    phrases: ["trafficking", "human trafficking", "pimping", "involuntary servitude"],
+    types: [],
+    rawCodes: ["13045", "13030", "13080", "13050"],
+    label: "trafficking and pimping reports",
+  },
 ];
 
 /**

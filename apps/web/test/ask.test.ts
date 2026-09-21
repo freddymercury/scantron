@@ -338,3 +338,36 @@ test("a question with no category in the taxonomy leads with the search, not a t
   expect(html).toContain("No category in this taxonomy covers");
   db.close();
 });
+
+test("a subject with no category is reachable by the agency's own codes", async () => {
+  const { expandQuery } = await import("../src/ask/expand.ts");
+  const db = seedAsk();
+
+  for (const question of ["prostitution", "sex work", "soliciting", "pandering"]) {
+    const expansion = expandQuery(db, question);
+    // No type: every product type broad enough to hold these is a worse answer than none.
+    expect(expansion.types).toEqual([]);
+    // SFPD's own codes instead — `647B` on dispatch, the `13xxx` family in reports.
+    expect(expansion.rawCodes).toContain("647B");
+    expect(expansion.rawCodes).toContain("13060");
+    expect(expansion.matched).toContain("prostitution-related calls and reports");
+  }
+
+  const trafficking = expandQuery(db, "human trafficking");
+  expect(trafficking.types).toEqual([]);
+  expect(trafficking.rawCodes).toContain("13045");
+  db.close();
+});
+
+test("'sex' does not prefix-match 'sexual'", async () => {
+  const { toMatchQuery, EXACT_TERMS } = await import("../src/ask/search.ts");
+
+  // Answering a question about sex work with sexual assault calls is the worst failure
+  // this search can produce. Measured live: the top four hits were SEXUAL ASSAULT ADULT.
+  expect(toMatchQuery("sex work")).toBe('"sex" OR "work"*');
+  expect(EXACT_TERMS.has("sex")).toBe(true);
+
+  // Prefix matching still earns its place everywhere else.
+  expect(toMatchQuery("gun")).toBe('"gun"*');
+  expect(toMatchQuery("sexual assault")).toBe('"sexual"* OR "assault"*');
+});

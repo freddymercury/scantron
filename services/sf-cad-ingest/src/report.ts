@@ -143,7 +143,6 @@ const CATEGORY_TYPES: Readonly<Record<string, string>> = {
   "disorderly conduct": "disturbance",
   "suspicious occ": "disturbance",
   suspicious: "disturbance",
-  prostitution: "disturbance",
   "liquor laws": "disturbance",
   gambling: "disturbance",
   "civil sidewalks": "disturbance",
@@ -170,6 +169,12 @@ const CATEGORY_TYPES: Readonly<Record<string, string>> = {
 
   "lost property": "public_safety",
   "non-criminal": "public_safety",
+
+  // Deliberately unmapped: `Prostitution` (1,125 reports) and the trafficking categories.
+  // Every product type broad enough to hold them — `disturbance`, `public_safety` — puts
+  // them in a breakdown beside vandalism and lost property, which is a worse answer than
+  // no type at all. They stay findable by their own words and the agency's own codes
+  // through search (docs/06), which is where a question about them actually goes.
 };
 
 export function typeForCategory(category: string | undefined): string | undefined {

@@ -41,8 +41,19 @@ export function toMatchQuery(text: string): string {
     .split(/\s+/)
     .filter((term) => term.length > 2 && !STOPWORDS.has(term));
   if (terms.length === 0) return "";
-  return terms.map((term) => `"${term}"*`).join(" OR ");
+  return terms.map((term) => (EXACT_TERMS.has(term) ? `"${term}"` : `"${term}"*`)).join(" OR ");
 }
+
+/**
+ * Words whose prefix expansion means something else entirely.
+ *
+ * Prefix matching is what makes "gun" reach `PERSON W/GUN` and `GUNFIRE`, so it earns its
+ * place — but `sex*` reaches `SEXUAL ASSAULT ADULT`, and answering a question about sex
+ * work with a list of sexual assault calls is the worst failure this search can produce.
+ * Measured on live data 2026-09-21: the top four hits for "sex work in the mission" were
+ * all `SEXUAL ASSAULT ADULT`.
+ */
+export const EXACT_TERMS = new Set(["sex"]);
 
 const STOPWORDS = new Set(
   "the and for with any all was were what whats show give near around about happening going this that there here".split(

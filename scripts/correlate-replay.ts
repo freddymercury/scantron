@@ -10,8 +10,10 @@
 import { copyFileSync } from "node:fs";
 import {
   applyDecision,
+  applyDecisionJudged,
   correlationConfig,
   countDecisions,
+  createJevJudge,
   type CandidateObservation,
 } from "@scantron/correlation";
 import { databasePath, migrate, openDatabase } from "@scantron/database";
@@ -53,11 +55,17 @@ const rows = db
   .all(since);
 
 const config = correlationConfig(db).get();
+// `--judge` consults the decision model on the probable band only (~6% of pairs).
+const useJudge = process.argv.includes("--judge");
+const judge = createJevJudge();
+if (useJudge && !judge.available) console.log("(--judge given but no JEV_API_KEY; running without)");
+
 const startedAt = performance.now();
 let merged = 0;
 let probable = 0;
 let created = 0;
 const crossAgency: string[] = [];
+const judged: string[] = [];
 
 for (const row of rows) {
   const observation: CandidateObservation = {
@@ -73,11 +81,16 @@ for (const row of rows) {
     ...(row.location_normalized === null ? {} : { locationCanonical: row.location_normalized }),
   };
 
-  const result = applyDecision(db, {
-    observation,
-    config,
-    title: row.subtype ?? row.type ?? "Incident",
-  });
+  const result =
+    useJudge && judge.available
+      ? await applyDecisionJudged(db, {
+          observation,
+          config,
+          judge,
+          title: row.subtype ?? row.type ?? "Incident",
+        })
+      : applyDecision(db, { observation, config, title: row.subtype ?? row.type ?? "Incident" });
+  if (result.judgedBy) judged.push(`${row.subtype ?? row.type} — ${result.judgedBy}`);
 
   if (result.decision === "merged" && !result.alreadyAttached) {
     merged += 1;
@@ -116,6 +129,13 @@ console.log(`  created        ${created}`);
 console.log(`  multi-source   ${multi} incidents`);
 console.log(`  cross-agency   ${crossAgencyIncidents} incidents`);
 console.log(`  decisions      ${JSON.stringify(countDecisions(db))}`);
+
+if (useJudge && judge.available) {
+  console.log(
+    `\n  judge: ${judge.stats.requests} requests, ${judge.stats.failures} failed, ${judge.stats.timeouts} timed out, $${judge.stats.costUsd.toFixed(5)}, ${judged.length} decisions moved`,
+  );
+  for (const line of judged.slice(0, 8)) console.log(`    ${line.slice(0, 120)}`);
+}
 
 if (crossAgency.length > 0) {
   console.log(`\n  cross-agency merges (first 10):`);

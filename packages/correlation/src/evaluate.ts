@@ -12,7 +12,8 @@ import type { Database } from "bun:sqlite";
 import { upsertObservation } from "@scantron/database";
 import { observationToRow, type Observation } from "@scantron/incident-schema";
 
-import { applyDecision } from "./apply.ts";
+import { applyDecision, applyDecisionJudged } from "./apply.ts";
+import type { JudgeClient } from "./judge.ts";
 import type { CandidateObservation } from "./candidates.ts";
 import { DEFAULT_CORRELATION_CONFIG, type CorrelationConfig } from "./config.ts";
 import { DEFAULT_THRESHOLDS, type Thresholds } from "./decide.ts";
@@ -89,6 +90,8 @@ export interface EvaluateOptions {
   weights?: Weights;
   thresholds?: Thresholds;
   config?: CorrelationConfig;
+  /** Consulted on the probable band only, exactly as in production. */
+  judge?: JudgeClient;
 }
 
 function toObservation(fixture: FixtureObservation): Observation {
@@ -153,8 +156,15 @@ export function runCase(
     incidentOf.set(fixture.id, result.incidentId);
   }
 
-  // Pair-level scoring: every pair of observations in the case is either together or not,
-  // and the label says which it should be.
+  return scoreGrouping(testCase, ordered, incidentOf);
+}
+
+/** Pair-level scoring: each pair is either together or not, and the label says which. */
+function scoreGrouping(
+  testCase: FixtureCase,
+  ordered: FixtureObservation[],
+  incidentOf: Map<string, string>,
+): CaseOutcome {
   let truePositives = 0;
   let falsePositives = 0;
   let falseNegatives = 0;
@@ -194,8 +204,13 @@ export function evaluate(
   fixtures: FixtureSet,
   options: EvaluateOptions = {},
 ): EvaluationResult {
-  const outcomes = fixtures.cases.map((testCase) => runCase(db, testCase, options));
+  return summarize(
+    fixtures.cases.map((testCase) => runCase(db, testCase, options)),
+    options,
+  );
+}
 
+function summarize(outcomes: CaseOutcome[], options: EvaluateOptions): EvaluationResult {
   const truePositives = outcomes.reduce((sum, outcome) => sum + outcome.truePositives, 0);
   const falsePositives = outcomes.reduce((sum, outcome) => sum + outcome.falsePositives, 0);
   const falseNegatives = outcomes.reduce((sum, outcome) => sum + outcome.falseNegatives, 0);
@@ -222,4 +237,47 @@ export function evaluate(
       correlation: options.config ?? DEFAULT_CORRELATION_CONFIG,
     },
   };
+}
+
+/** The same replay, with the judge consulted on the probable band. */
+export async function runCaseJudged(
+  db: Database,
+  testCase: FixtureCase,
+  judge: JudgeClient,
+  options: EvaluateOptions = {},
+): Promise<CaseOutcome> {
+  db.query("DELETE FROM incident_observations").run();
+  db.query("DELETE FROM probable_matches").run();
+  db.query("DELETE FROM incidents").run();
+  db.query("DELETE FROM observations").run();
+
+  const ordered = [...testCase.observations].sort((a, b) => a.occurredAt.localeCompare(b.occurredAt));
+  for (const fixture of ordered) upsertObservation(db, observationToRow(toObservation(fixture)));
+
+  const incidentOf = new Map<string, string>();
+  for (const fixture of ordered) {
+    const result = await applyDecisionJudged(db, {
+      observation: toCandidate(fixture),
+      judge,
+      ...(options.config ? { config: options.config } : {}),
+      ...(options.weights ? { weights: options.weights } : {}),
+      ...(options.thresholds ? { thresholds: options.thresholds } : {}),
+      title: fixture.subtype ?? fixture.type ?? "Incident",
+    });
+    incidentOf.set(fixture.id, result.incidentId);
+  }
+  return scoreGrouping(testCase, ordered, incidentOf);
+}
+
+export async function evaluateJudged(
+  db: Database,
+  fixtures: FixtureSet,
+  judge: JudgeClient,
+  options: EvaluateOptions = {},
+): Promise<EvaluationResult> {
+  const outcomes: CaseOutcome[] = [];
+  for (const testCase of fixtures.cases) {
+    outcomes.push(await runCaseJudged(db, testCase, judge, options));
+  }
+  return summarize(outcomes, options);
 }

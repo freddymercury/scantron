@@ -9,7 +9,16 @@
  * noisier than it should be.
  */
 
-import { evaluate, DEFAULT_THRESHOLDS, DEFAULT_WEIGHTS, type EvaluationResult, type FixtureSet, type Weights } from "@scantron/correlation";
+import {
+  createJevJudge,
+  evaluate,
+  evaluateJudged,
+  DEFAULT_THRESHOLDS,
+  DEFAULT_WEIGHTS,
+  type EvaluationResult,
+  type FixtureSet,
+  type Weights,
+} from "@scantron/correlation";
 import { migrate, openDatabase, IN_MEMORY } from "@scantron/database";
 
 const FIXTURES = new URL("../packages/correlation/fixtures/correlation-cases.json", import.meta.url).pathname;
@@ -50,6 +59,23 @@ if (failures.length > 0) {
     );
   }
   if (failures.length > 15) console.log(`    …and ${failures.length - 15} more`);
+}
+
+// `--judge` measures the second opinion: same fixtures, judge consulted on the probable
+// band only, so the comparison is exactly the production difference.
+if (process.argv.includes("--judge")) {
+  const judge = createJevJudge();
+  if (!judge.available) {
+    console.log("\n--judge given but no JEV_API_KEY is set; skipping.");
+  } else {
+    const judged = await evaluateJudged(db, fixtures, judge);
+    report(judged, "with the judge on the probable band");
+    console.log(
+      `  cost         $${judge.stats.costUsd.toFixed(5)} for ${judge.stats.requests} requests (${judge.stats.timeouts} timed out)`,
+    );
+    const delta = judged.metrics.f1 - baseResult.metrics.f1;
+    console.log(`  F1 change    ${delta >= 0 ? "+" : ""}${delta.toFixed(3)}`);
+  }
 }
 
 if (process.argv.includes("--sweep")) {

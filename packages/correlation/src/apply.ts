@@ -11,6 +11,7 @@
 import type { Database } from "bun:sqlite";
 
 import type { CandidateObservation } from "./candidates.ts";
+import { applyVerdict, judgePair, type JudgeClient } from "./judge.ts";
 import type { CorrelationConfig } from "./config.ts";
 import { DEFAULT_CORRELATION_CONFIG } from "./config.ts";
 import { decide, DEFAULT_THRESHOLDS, type Decision, type DecisionResult, type Thresholds } from "./decide.ts";
@@ -26,11 +27,17 @@ export interface ApplyInput {
   now?: Date;
 }
 
+export interface JudgedApplyInput extends ApplyInput {
+  judge: JudgeClient;
+}
+
 export interface ApplyResult extends DecisionResult {
   incidentId: string;
   /** True when this observation was already attached to that incident. */
   alreadyAttached: boolean;
   probableLogged: boolean;
+  /** Set when the second-opinion judge moved the decision, with its reason. */
+  judgedBy?: string;
 }
 
 function incidentIdFor(observationId: string): string {
@@ -242,4 +249,43 @@ export function countDecisions(db: Database): CorrelationCounts {
     if (row.decision in counts) counts[row.decision as Decision] = row.n;
   }
   return counts;
+}
+
+/**
+ * Apply a decision, consulting the judge **only** when the scorer landed in the probable
+ * band. Everything else is decided exactly as it would be without a judge, which is what
+ * makes this safe to switch off: with no key, no network, or a slow answer, correlation
+ * behaves identically.
+ */
+export async function applyDecisionJudged(
+  db: Database,
+  input: JudgedApplyInput,
+): Promise<ApplyResult> {
+  const preview = decide(db, {
+    observation: input.observation,
+    ...(input.config ? { config: input.config } : {}),
+    ...(input.weights ? { weights: input.weights } : {}),
+    ...(input.thresholds ? { thresholds: input.thresholds } : {}),
+  });
+
+  if (preview.decision !== "probable" || !preview.best || !input.judge.available) {
+    return applyDecision(db, input);
+  }
+
+  const verdict = await judgePair(input.judge, input.observation, preview.best.candidate);
+  const moved = applyVerdict(preview.decision, verdict);
+  if (moved.decision === preview.decision) return applyDecision(db, input);
+
+  // The judge moved it, so the thresholds are nudged for this one pair only — the score
+  // itself is untouched, and the reason is recorded with the attachment.
+  const score = preview.best.score.score;
+  const thresholds =
+    moved.decision === "merged"
+      ? { merge: score, probable: input.thresholds?.probable ?? DEFAULT_THRESHOLDS.probable }
+      : { merge: input.thresholds?.merge ?? DEFAULT_THRESHOLDS.merge, probable: score + 1e-6 };
+
+  const result = await Promise.resolve(applyDecision(db, { ...input, thresholds }));
+  const judged: ApplyResult = { ...result };
+  if (moved.reason) judged.judgedBy = moved.reason;
+  return judged;
 }

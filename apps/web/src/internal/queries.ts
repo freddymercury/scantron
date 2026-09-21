@@ -441,3 +441,89 @@ export function incidentForObservation(
       .get(observationId) ?? undefined
   );
 }
+
+export interface IncidentRow {
+  id: string;
+  title: string;
+  primary_type: string;
+  status: string;
+  severity: string | null;
+  agency_types: string;
+  lat: number | null;
+  lng: number | null;
+  neighborhood: string | null;
+  location_display_name: string | null;
+  first_observed_at: string;
+  last_observed_at: string | null;
+  last_updated_at: string;
+  resolved_at: string | null;
+  units: string;
+  source_count: number;
+  independent_source_count: number;
+  verification_classification: string;
+  merged_into_id: string | null;
+}
+
+const INCIDENT_FIELDS = [
+  "id", "title", "primary_type", "status", "severity", "agency_types", "lat", "lng",
+  "neighborhood", "location_display_name", "first_observed_at", "last_observed_at",
+  "last_updated_at", "resolved_at", "units", "source_count", "independent_source_count",
+  "verification_classification", "merged_into_id",
+] as const;
+
+const incidentColumns = (alias = ""): string =>
+  INCIDENT_FIELDS.map((field) => `${alias}${field}`).join(", ");
+
+export function incidentById(db: Database, id: string): IncidentRow | undefined {
+  return (
+    db
+      .query<IncidentRow, [string]>(`SELECT ${incidentColumns()} FROM incidents WHERE id = ?`)
+      .get(id) ?? undefined
+  );
+}
+
+/** The observations an incident is made of, oldest first — the order they were reported. */
+export function observationsForIncident(db: Database, incidentId: string): ObservationListRow[] {
+  return db
+    .query<ObservationListRow, [string]>(
+      `SELECT o.id, o.source, o.source_record_id, o.occurred_at, o.ingested_at, o.type,
+              o.type_confidence, o.raw_type, o.subtype, o.priority, o.priority_rank,
+              o.location_raw, o.location_normalized, o.neighborhood, o.lat, o.lng,
+              o.location_method, o.units, o.sensitive, o.backfilled
+         FROM incident_observations io
+         JOIN observations o ON o.id = io.observation_id
+        WHERE io.incident_id = ?
+        ORDER BY o.occurred_at`,
+    )
+    .all(incidentId);
+}
+
+export interface AnswerIncidentRow extends IncidentRow {
+  /** How many of *this answer's* observations landed in this incident. */
+  matched: number;
+  /** The most recent matching observation, which is what the list is sorted by. */
+  matched_at: string;
+}
+
+/**
+ * The incidents behind a set of observations, most recently active first.
+ *
+ * The answer is still counted in calls — that is what the feed publishes — but the thing a
+ * reader drills into is the incident, so the list is grouped up to it (S-D5).
+ */
+export function incidentsForObservations(db: Database, ids: readonly string[]): AnswerIncidentRow[] {
+  if (ids.length === 0) return [];
+  const placeholders = ids.map(() => "?").join(", ");
+  return db
+    .query<AnswerIncidentRow, string[]>(
+      `SELECT ${incidentColumns("i.")},
+              count(*) AS matched, max(o.occurred_at) AS matched_at
+         FROM incident_observations io
+         JOIN incidents i ON i.id = io.incident_id
+         JOIN observations o ON o.id = io.observation_id
+        WHERE io.observation_id IN (${placeholders})
+        GROUP BY i.id
+        ORDER BY matched_at DESC`,
+    )
+    .all(...ids);
+}

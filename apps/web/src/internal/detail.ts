@@ -13,6 +13,7 @@ import { readTimeline } from "@scantron/correlation";
 
 import { escapeHtml } from "../security.ts";
 import { renderMap } from "./map.ts";
+import { timeTag } from "./time.ts";
 import { INTERNAL_PREFIX } from "./paths.ts";
 import {
   incidentForObservation,
@@ -45,7 +46,7 @@ export function relativeTime(iso: string, now: Date = new Date()): string {
   return future ? `in ${value}` : `${value} ago`;
 }
 
-function fact(label: string, value: string | undefined | null): string {
+export function fact(label: string, value: string | undefined | null): string {
   if (value === undefined || value === null || value === "") return "";
   return `<div><span class="muted">${escapeHtml(label)}</span><b>${escapeHtml(value)}</b></div>`;
 }
@@ -108,7 +109,7 @@ export function renderDetail(db: Database, id: string, now: Date = new Date()): 
   }</p>
 
 <h1>${escapeHtml(summaryLine(row, now))}</h1>
-<p class="muted">${escapeHtml(row.occurred_at)} · reported by ${escapeHtml(row.source)}${
+<p class="muted">${timeTag(row.occurred_at)} · reported by ${escapeHtml(row.source)}${
     row.backfilled === 1 ? " · backfilled from the historical dataset" : ""
   }</p>
 
@@ -155,7 +156,7 @@ ${
          ${timeline
            .map(
              (entry) => `<li${entry.observationId === row.id ? ' class="here"' : ""}>
-               <span class="muted">${escapeHtml(relativeTime(entry.occurredAt, now))}</span>
+               <span class="muted">${timeTag(entry.occurredAt, { text: relativeTime(entry.occurredAt, now) })}</span>
                <b>${escapeHtml(entry.text)}</b>
                <span class="muted">${escapeHtml(entry.kind)} · <a href="${INTERNAL_PREFIX}/observation/${encodeURIComponent(entry.observationId)}">source</a></span>
              </li>`,
@@ -175,7 +176,7 @@ ${
         ${nearby
           .map(
             (other) => `<tr>
-              <td>${escapeHtml(relativeTime(other.occurred_at, new Date(row.occurred_at)))}</td>
+              <td>${timeTag(other.occurred_at, { text: relativeTime(other.occurred_at, new Date(row.occurred_at)) })}</td>
               <td>${escapeHtml(other.source)}</td>
               <td>${escapeHtml(other.type ?? "unknown")}</td>
               <td>${escapeHtml(other.location_normalized ?? other.location_raw ?? "—")}</td>
@@ -197,7 +198,7 @@ ${
 ${payloads
   .map(
     (payload) => `<details${payloads.indexOf(payload) === 0 ? " open" : ""}>
-      <summary>fetched ${escapeHtml(relativeTime(payload.fetched_at, now))} · ${escapeHtml(payload.fetched_at)}</summary>
+      <summary>fetched ${escapeHtml(relativeTime(payload.fetched_at, now))} · ${timeTag(payload.fetched_at)}</summary>
       <pre>${escapeHtml(JSON.stringify(JSON.parse(payload.payload) as object, null, 2))}</pre>
     </details>`,
   )

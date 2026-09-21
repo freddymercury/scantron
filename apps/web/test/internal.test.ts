@@ -567,3 +567,62 @@ test("a correlated observation shows its incident and the timeline built from it
   expect(html).toContain('<li class="here">');
   db.close();
 });
+
+test("an incident has its own page: timeline, calls, and the records behind both", async () => {
+  const { applyDecision } = await import("@scantron/correlation");
+  const db = seeded();
+  const fire = observation({
+    id: "obs_fire",
+    sourceRecordId: "fire-2",
+    source: "sf_fire_cad",
+    type: "medical",
+    subtype: "Medical Incident",
+    units: ["E07"],
+    occurredAt: new Date(Date.now() - 25 * 60_000),
+    location: { normalized: "24th St & Mission St", latitude: 37.75, longitude: -122.41, neighborhood: "Mission" },
+  });
+  upsertObservation(db, observationToRow(fire));
+
+  const candidate = (row: Observation) => ({
+    id: row.id,
+    source: row.source,
+    occurredAt: row.occurredAt,
+    lat: row.location?.latitude,
+    lng: row.location?.longitude,
+    neighborhood: row.location?.neighborhood,
+    type: row.type,
+    locationCanonical: row.location?.normalized,
+    ...(row.units ? { units: row.units } : {}),
+  });
+
+  const created = applyDecision(db, { observation: candidate(observation()) });
+  applyDecision(db, { observation: candidate(fire) });
+
+  const response = await handleInternal(
+    request(`/internal/incident/${created.incidentId}`, { headers: { "x-scantron-internal-key": KEY } }),
+    { db, metrics: createAppMetrics() },
+  );
+  const html = (await response?.text()) ?? "";
+
+  expect(response?.status).toBe(200);
+  expect(html).toContain("Assault · 24th St &amp; Mission St");
+  expect(html).toContain("Fire joined the response.");
+  // Both calls are listed, and each drills back to its own record.
+  expect(html).toContain("/internal/observation/obs_fire");
+  expect(html).toContain("/internal/observation/obs_1");
+  // Times are emitted for the browser to localize, with the original kept.
+  expect(html).toContain("<time");
+  expect(html).toContain('data-rel="1"');
+  db.close();
+});
+
+test("an unknown incident id is a 404", async () => {
+  const db = seeded();
+  const response = await handleInternal(
+    request("/internal/incident/nope", { headers: { "x-scantron-internal-key": KEY } }),
+    { db, metrics: createAppMetrics() },
+  );
+  expect(response?.status).toBe(404);
+  expect(await response?.text()).toContain("No incident with that id");
+  db.close();
+});

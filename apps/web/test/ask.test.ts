@@ -247,3 +247,61 @@ test("an unanswerable question is refused in the answer, not just in the parse",
   expect(html).toContain("call 911");
   db.close();
 });
+
+test("a count answer lists the incidents behind the number, each drillable", async () => {
+  const { applyDecision } = await import("@scantron/correlation");
+  const db = seedAsk();
+
+  for (const row of db
+    .query<
+      { id: string; source: string; occurred_at: string; type: string | null; lat: number | null; lng: number | null; neighborhood: string | null; location_normalized: string | null; units: string | null },
+      []
+    >(
+      `SELECT id, source, occurred_at, type, lat, lng, neighborhood, location_normalized, units
+         FROM observations ORDER BY occurred_at`,
+    )
+    .all()) {
+    applyDecision(db, {
+      observation: {
+        id: row.id,
+        source: row.source,
+        occurredAt: new Date(row.occurred_at),
+        ...(row.lat === null ? {} : { lat: row.lat }),
+        ...(row.lng === null ? {} : { lng: row.lng }),
+        ...(row.neighborhood === null ? {} : { neighborhood: row.neighborhood }),
+        ...(row.type === null ? {} : { type: row.type }),
+        ...(row.location_normalized === null ? {} : { locationCanonical: row.location_normalized }),
+        ...(row.units === null ? {} : { units: JSON.parse(row.units) as string[] }),
+      },
+    });
+  }
+
+  const query = parseQuestion("how many calls in the mission in the last 2 hours", {
+    knownAreas: ["Mission"],
+  });
+  const answer = runAsk(db, query);
+  expect(answer.incidents.length).toBeGreaterThan(0);
+  expect(answer.incidentTotal).toBe(answer.incidents.length);
+
+  const html = renderAnswer(answer);
+  expect(html).toContain("<h3>incidents");
+  expect(html).toContain(`/internal/incident/${answer.incidents[0]!.id}`);
+  // The type mix narrows the same question rather than being dead text.
+  expect(html).toContain("category=weapon");
+  db.close();
+});
+
+test("timestamps carry the original instant for the browser to localize", async () => {
+  const { timeTag } = await import("../src/internal/time.ts");
+
+  const absolute = timeTag("2026-09-21T17:27:49.702Z");
+  expect(absolute).toContain('datetime="2026-09-21T17:27:49.702Z"');
+  expect(absolute).toContain('title="2026-09-21T17:27:49.702Z"');
+  expect(absolute).toContain('data-rel="0"');
+  // Without scripting the ISO string is still the visible text — less friendly, not wrong.
+  expect(absolute).toContain(">2026-09-21T17:27:49.702Z</time>");
+
+  const relative = timeTag("2026-09-21T17:27:49.702Z", { text: "12 min ago" });
+  expect(relative).toContain('data-rel="1"');
+  expect(relative).toContain(">12 min ago</time>");
+});

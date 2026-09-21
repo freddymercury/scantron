@@ -10,6 +10,7 @@
 import type { Database } from "bun:sqlite";
 
 import type { AppMetrics } from "@scantron/observability";
+import { INCIDENT_TYPES } from "@scantron/incident-schema";
 
 import { createNonce, escapeHtml, securityHeaders } from "../security.ts";
 import { askBox, renderAnswer, renderExamples } from "../ask/render.ts";
@@ -17,8 +18,10 @@ import { parseQuestion } from "../ask/parse.ts";
 import { expandForRetrieval, rerankAnswer, runAsk, runSearchFallback } from "../ask/answer.ts";
 import { createJevClient } from "../ask/jev.ts";
 import { renderDetail } from "./detail.ts";
+import { renderIncident } from "./incident.ts";
 import { renderMap } from "./map.ts";
 import { INTERNAL_PREFIX } from "./paths.ts";
+import { LOCAL_TIME_SCRIPT, timeTag } from "./time.ts";
 import {
   failedJobs,
   listObservations,
@@ -151,6 +154,7 @@ const STYLE = `
   .counters { display: flex; gap: 1.25rem; flex-wrap: wrap; margin: .5rem 0 1rem; }
   .counters div { min-width: 7rem; }
   .counters b { display: block; font-size: 1.15rem; }
+  time { cursor: help; text-decoration: underline dotted var(--line); text-underline-offset: .2em; }
   .timeline { list-style: none; margin: .5rem 0 1rem; padding: 0 0 0 1rem; border-left: 2px solid var(--line); }
   .timeline li { padding: .35rem 0 .35rem .75rem; display: grid; gap: .1rem; position: relative; }
   .timeline li::before { content: "●"; position: absolute; left: -1.35rem; color: var(--line); }
@@ -399,7 +403,7 @@ function observationRow(db: Database, row: ObservationListRow): string {
   const formatted = payloads[0] ? JSON.stringify(JSON.parse(raw) as object, null, 2) : raw;
 
   return `<tr>
-    <td>${escapeHtml(row.occurred_at)}</td>
+    <td>${timeTag(row.occurred_at)}</td>
     <td>${escapeHtml(row.source)}</td>
     <td>${escapeHtml(row.type ?? "—")}${row.type === "unknown" || row.type === null ? ` <span class="muted">(${escapeHtml(row.raw_type ?? "no code")})</span>` : ""}</td>
     <td>${escapeHtml(row.location_normalized ?? row.location_raw ?? "—")}</td>
@@ -454,6 +458,7 @@ export function page(nonce: string, title: string, body: string): string {
 <style nonce="${nonce}">${STYLE}</style>
 <script nonce="${nonce}">${THEME_SCRIPT}</script>
 <script nonce="${nonce}">${HOVER_SCRIPT}</script>
+<script nonce="${nonce}">${LOCAL_TIME_SCRIPT}</script>
 <div class="topbar">
   <h1 class="brand"><a href="${INTERNAL_PREFIX}">scantron</a> <span class="muted">internal · not public</span></h1>
   <button type="button" data-theme-toggle>dark mode</button>
@@ -500,8 +505,8 @@ ${counterBlock(counters)}
   ${coverage
     .map(
       (row) => `<tr><td>${escapeHtml(row.source)}</td><td>${row.observations}</td>
-        <td>${escapeHtml(row.first_at ?? "—")}</td><td>${escapeHtml(row.last_at ?? "—")}</td>
-        <td>${escapeHtml(row.last_success_at ?? "never")}</td><td>${row.consecutive_failures}</td></tr>`,
+        <td>${row.first_at ? timeTag(row.first_at) : "—"}</td><td>${row.last_at ? timeTag(row.last_at) : "—"}</td>
+        <td>${row.last_success_at ? timeTag(row.last_success_at) : "never"}</td><td>${row.consecutive_failures}</td></tr>`,
     )
     .join("")}
 </table>
@@ -546,7 +551,7 @@ ${gaps.length === 0 ? "<p class=\"muted\">every observed code maps to a type</p>
         <td>${escapeHtml(job.type)}</td>
         <td>${job.attempts}/${job.max_attempts}</td>
         <td>${escapeHtml(job.last_error ?? "—")}</td>
-        <td>${escapeHtml(job.updated_at)}</td>
+        <td>${timeTag(job.updated_at)}</td>
         <td><form method="post" action="${INTERNAL_PREFIX}/jobs/requeue">
           <input type="hidden" name="id" value="${escapeHtml(job.id)}">
           <button type="submit">requeue</button>
@@ -625,10 +630,21 @@ export async function handleInternal(
       query.windowMinutes = windowOverride;
       query.windowLabel = windowOverride === 1440 ? "the last 24 hours" : `the last ${windowOverride} minutes`;
     }
-    if (url.searchParams.get("category") === "") {
+    const categoryOverride = url.searchParams.get("category");
+    if (categoryOverride === "") {
       query.types = [];
       query.rawCodes = [];
       delete query.categoryLabel;
+    } else if (
+      categoryOverride &&
+      (INCIDENT_TYPES as readonly string[]).includes(categoryOverride)
+    ) {
+      const type = categoryOverride as (typeof INCIDENT_TYPES)[number];
+      // Clicking a type in the breakdown narrows the same question to that type. The
+      // allowlist is the taxonomy itself, so nothing else can reach the query.
+      query.types = [type];
+      query.rawCodes = [];
+      query.categoryLabel = `${type} calls`;
     }
 
     const client = createJevClient();
@@ -673,6 +689,25 @@ export async function handleInternal(
       }
     }
     return new Response(page(nonce, "ask", renderAnswer(answer)), {
+      headers: {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "no-store",
+        ...securityHeaders(nonce),
+      },
+    });
+  }
+
+  if (url.pathname.startsWith(`${INTERNAL_PREFIX}/incident/`)) {
+    const id = decodeURIComponent(url.pathname.slice(`${INTERNAL_PREFIX}/incident/`.length));
+    const nonce = createNonce();
+    const body = renderIncident(db, id);
+    if (!body) {
+      return new Response(page(nonce, "not found", "<p>No incident with that id.</p>"), {
+        status: 404,
+        headers: { "content-type": "text/html; charset=utf-8", ...securityHeaders(nonce) },
+      });
+    }
+    return new Response(page(nonce, "incident", body), {
       headers: {
         "content-type": "text/html; charset=utf-8",
         "cache-control": "no-store",

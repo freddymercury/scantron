@@ -8,6 +8,8 @@
 
 import { escapeHtml } from "../security.ts";
 import { relativeTime } from "../internal/detail.ts";
+import { incidentSummary, typeLabel } from "../internal/incident.ts";
+import { timeTag } from "../internal/time.ts";
 import { INTERNAL_PREFIX } from "../internal/paths.ts";
 import type { AskAnswer } from "./answer.ts";
 import { describeQuery, type AskQuery } from "./parse.ts";
@@ -54,7 +56,7 @@ function row(observation: AskAnswer["rows"][number], now: Date, relevance?: Map<
   const what = observation.subtype ?? observation.type ?? "unknown";
   const where = observation.location_normalized ?? observation.location_raw ?? "location withheld";
   return `<tr>
-    <td>${escapeHtml(relativeTime(observation.occurred_at, now))}</td>
+    <td>${timeTag(observation.occurred_at, { text: relativeTime(observation.occurred_at, now) })}</td>
     <td>${escapeHtml(what)}</td>
     <td>${escapeHtml(where)}</td>
     <td>${escapeHtml(observation.neighborhood ?? "—")}</td>
@@ -99,7 +101,7 @@ function searchSection(answer: AskAnswer, now: Date): string {
         .slice(0, 20)
         .map(
           (hit) => `<tr>
-            <td>${escapeHtml(relativeTime(hit.row.occurred_at, now))}</td>
+            <td>${timeTag(hit.row.occurred_at, { text: relativeTime(hit.row.occurred_at, now) })}</td>
             <td>${escapeHtml(hit.row.subtype ?? hit.row.type ?? "unknown")}</td>
             <td>${escapeHtml(hit.row.location_normalized ?? hit.row.location_raw ?? "—")}</td>
             <td>${escapeHtml(hit.row.neighborhood ?? "—")}</td>
@@ -110,6 +112,43 @@ function searchSection(answer: AskAnswer, now: Date): string {
         .join("")}
     </table>
   </div>`;
+}
+
+/**
+ * The list of incidents behind the count, which is what a reader wants next: the number is
+ * an opening, not an answer. Each row drills into the incident's own page and its timeline.
+ */
+function incidentList(answer: AskAnswer, now: Date): string {
+  if (answer.incidents.length === 0) {
+    return `<p class="muted">None of those calls have been correlated into incidents yet, so there is nothing to drill into. Correlation runs behind ingestion.</p>`;
+  }
+
+  const shown = answer.incidents.length;
+  return `<h3>incidents <span class="muted">${
+    answer.incidentTotal > shown ? `${shown} of ${answer.incidentTotal}` : `${answer.incidentTotal}`
+  }</span></h3>
+  <table>
+    <tr><th>when</th><th>what</th><th>where</th><th>status</th><th>calls</th><th>agencies</th><th></th></tr>
+    ${answer.incidents
+      .map((incident) => {
+        const agencies = JSON.parse(incident.agency_types) as string[];
+        return `<tr>
+          <td>${timeTag(incident.first_observed_at, { text: relativeTime(incident.first_observed_at, now) })}</td>
+          <td>${escapeHtml(typeLabel(incident.primary_type))}</td>
+          <td>${escapeHtml(incident.location_display_name ?? incident.neighborhood ?? "location withheld")}</td>
+          <td>${escapeHtml(incident.status)}</td>
+          <td>${incident.source_count}</td>
+          <td>${escapeHtml(agencies.join(" "))}</td>
+          <td><a href="${INTERNAL_PREFIX}/incident/${encodeURIComponent(incident.id)}">open</a></td>
+        </tr>`;
+      })
+      .join("")}
+  </table>
+  ${
+    answer.incidentTotal > shown
+      ? `<p class="muted">Showing the ${shown} most recently active of ${answer.incidentTotal}. Narrow the window or the type to see the rest.</p>`
+      : ""
+  }`;
 }
 
 export function renderAnswer(answer: AskAnswer, now: Date = new Date()): string {
@@ -149,6 +188,7 @@ export function renderAnswer(answer: AskAnswer, now: Date = new Date()): string 
       <div class="answer">
         <p><b>${answer.total} ${escapeHtml(subject)}</b> in ${escapeHtml(scope)} in ${escapeHtml(query.windowLabel)}.${trend}</p>
         ${breakdown(answer)}
+        ${incidentList(answer, now)}
       </div>
       ${searchSection(answer, now)}`;
   }
@@ -163,7 +203,7 @@ export function renderAnswer(answer: AskAnswer, now: Date = new Date()): string 
             (item) => `<div class="highlight">
               <b>${escapeHtml(item.row.subtype ?? item.row.type ?? "unknown")}</b>
               · ${escapeHtml(item.row.location_normalized ?? item.row.location_raw ?? "location withheld")}
-              · ${escapeHtml(relativeTime(item.row.occurred_at, now))}
+              · ${timeTag(item.row.occurred_at, { text: relativeTime(item.row.occurred_at, now) })}
               ${item.reasons.length > 0 ? `<div class="muted">${escapeHtml(item.reasons.join(" · "))}</div>` : ""}
               <a href="${INTERNAL_PREFIX}/observation/${encodeURIComponent(item.row.id)}">open</a>
             </div>`,
@@ -171,6 +211,7 @@ export function renderAnswer(answer: AskAnswer, now: Date = new Date()): string 
           .join("")}
         <p class="muted">Ranked by what the agency called it, how urgently it was dispatched, how many units went, and whether a second agency responded nearby. It is a ranking of dispatch activity, not of harm.</p>
         ${breakdown(answer)}
+        ${incidentList(answer, now)}
       </div>
       ${searchSection(answer, now)}`;
   }
@@ -184,6 +225,9 @@ export function renderAnswer(answer: AskAnswer, now: Date = new Date()): string 
           : ""
       }</p>
       ${answer.ordering ? `<p class="muted">${escapeHtml(answer.ordering)}.</p>` : ""}
+      ${breakdown(answer)}
+      ${incidentList(answer, now)}
+      <h3>calls <span class="muted">${answer.rows.length} of ${answer.total}</span></h3>
       <table>
         <tr><th>when</th><th>reported as</th><th>where</th><th>neighborhood</th><th>source</th>${answer.relevance ? "<th>match</th>" : ""}<th></th></tr>
         ${answer.rows.map((observation) => row(observation, now, answer.relevance)).join("")}
@@ -193,9 +237,15 @@ export function renderAnswer(answer: AskAnswer, now: Date = new Date()): string 
     ${searchSection(answer, now)}`;
 }
 
+/** The type mix, with each type a link that narrows the same question to it. */
 function breakdown(answer: AskAnswer): string {
   if (answer.breakdown.length === 0) return "";
-  return `<p class="muted">${answer.breakdown
-    .map((entry) => `${entry.n} ${escapeHtml(entry.type)}`)
+  return `<p class="muted breakdown">${answer.breakdown
+    .map((entry) => {
+      const params = new URLSearchParams({ q: answer.query.question, category: entry.type });
+      if (answer.query.area) params.set("area", answer.query.area);
+      params.set("window", String(answer.query.windowMinutes));
+      return `<a href="${INTERNAL_PREFIX}/ask?${params.toString()}">${entry.n} ${escapeHtml(entry.type)}</a>`;
+    })
     .join(" · ")}</p>`;
 }

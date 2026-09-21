@@ -10,7 +10,11 @@ import type { Database } from "bun:sqlite";
 
 import { INCIDENT_TYPES } from "@scantron/incident-schema";
 
-import type { ObservationListRow } from "../internal/queries.ts";
+import {
+  incidentsForObservations,
+  type AnswerIncidentRow,
+  type ObservationListRow,
+} from "../internal/queries.ts";
 import { expandQuery } from "./expand.ts";
 import { createJevClient, type JevClient } from "./jev.ts";
 import type { AskQuery } from "./parse.ts";
@@ -58,6 +62,14 @@ export interface AskAnswer {
   total: number;
   rows: ObservationListRow[];
   ranked: RankedObservation[];
+  /**
+   * The incidents those calls belong to — the thing a reader drills into. Counted in calls
+   * because that is what the feed publishes, grouped to incidents because that is the
+   * object (S-D5).
+   */
+  incidents: AnswerIncidentRow[];
+  /** Distinct incidents across the whole window, not just the rows shown. */
+  incidentTotal: number;
   /** Counts by type for the window, for the "what's happening" shape of question. */
   breakdown: { type: string; n: number }[];
   /** Records in the window whose location the source withheld. */
@@ -335,10 +347,23 @@ export function runAsk(
         )?.n ?? 0;
   }
 
+  // Grouped from the rows in hand, so the list always agrees with the table above it.
+  const incidents = incidentsForObservations(db, rows.map((row) => row.id));
+
+  const incidentTotal =
+    db
+      .query<{ n: number }, (string | number)[]>(
+        `SELECT count(DISTINCT incident_id) AS n FROM incident_observations
+          WHERE observation_id IN (SELECT id FROM observations ${sql})`,
+      )
+      .get(...parameters)?.n ?? 0;
+
   return {
     query,
     total,
     rows,
+    incidents,
+    incidentTotal,
     ranked: query.intent === "highlight" ? rank(db, rows) : [],
     breakdown,
     withheldLocations,

@@ -91,10 +91,31 @@ export const OBSERVATION_SOURCES = [
   "sf_police_cad",
   "sf_fire_cad",
   "sf_ems_cad",
+  "sf_police_report",
   "radio",
   "other",
 ] as const;
 export type ObservationSource = (typeof OBSERVATION_SOURCES)[number];
+
+/**
+ * The live dispatch feeds — "a call went out".
+ *
+ * `sf_police_report` is deliberately **not** one: a report is SFPD writing up a call it
+ * already dispatched, days later (median 2.0, docs/01 §1). Counting it beside the call
+ * would double-count the same event, so every surface that answers "how many calls" filters
+ * to these (S-I2).
+ */
+export const DISPATCH_SOURCES = ["sf_police_cad", "sf_fire_cad", "sf_ems_cad"] as const;
+
+/** Which agency a source belongs to — two sources can be the same agency (S-I2). */
+export const SOURCE_AGENCIES: Readonly<Record<string, string>> = {
+  sf_police_cad: "police",
+  sf_police_report: "police",
+  sf_fire_cad: "fire",
+  sf_ems_cad: "ems",
+  radio: "radio",
+  other: "other",
+};
 
 export const AGENCY_TYPES = ["police", "fire", "ems", "other"] as const;
 export type AgencyType = (typeof AGENCY_TYPES)[number];
@@ -122,6 +143,7 @@ export const TIMELINE_EVENT_KINDS = [
   "escalation",
   "status_changed",
   "closed",
+  "report_filed",
   "correction",
 ] as const;
 export type TimelineEventKind = (typeof TIMELINE_EVENT_KINDS)[number];

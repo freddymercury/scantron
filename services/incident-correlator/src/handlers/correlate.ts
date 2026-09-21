@@ -7,7 +7,12 @@
 
 import type { Database } from "bun:sqlite";
 import { type Job } from "@scantron/database";
-import { applyDecision, correlationConfig, type CandidateObservation } from "@scantron/correlation";
+import {
+  applyDecision,
+  correlationConfig,
+  joinReport,
+  type CandidateObservation,
+} from "@scantron/correlation";
 import type { AppMetrics, Logger } from "@scantron/observability";
 
 export interface CorrelatePayload {
@@ -59,6 +64,33 @@ export function createCorrelateHandler(deps: CorrelateHandlerDeps) {
       return;
     }
 
+    const metadata = row.metadata
+      ? (JSON.parse(row.metadata) as Record<string, unknown>)
+      : undefined;
+
+    // A written-up report is joined on the call's `cad_number`, never scored (S-I2). It is
+    // the agency's own paperwork for a call we already have, so a guess is not an
+    // acceptable substitute for the key.
+    if (row.source === "sf_police_report") {
+      const joined = joinReport(db, {
+        id: row.id,
+        source: row.source,
+        occurredAt: new Date(row.occurred_at),
+        ...(metadata ? { metadata } : {}),
+      });
+      metrics.stepDurationSeconds.observe((performance.now() - startedAt) / 1000, {
+        processor: "correlate_incident",
+      });
+      metrics.reportJoins.increment({ outcome: joined.outcome });
+      log.debug("report.joined", {
+        observation_id: row.id,
+        result: joined.outcome,
+        ...(joined.incidentId ? { incident_id: joined.incidentId } : {}),
+        ...(joined.lagDays === undefined ? {} : { count: joined.lagDays }),
+      });
+      return;
+    }
+
     const observation: CandidateObservation = {
       id: row.id,
       source: row.source,
@@ -77,7 +109,7 @@ export function createCorrelateHandler(deps: CorrelateHandlerDeps) {
       observation,
       config: config.get(),
       title: row.subtype ?? row.type ?? "Incident",
-      ...(row.metadata ? { metadata: JSON.parse(row.metadata) as Record<string, unknown> } : {}),
+      ...(metadata ? { metadata } : {}),
     });
 
     const durationSeconds = (performance.now() - startedAt) / 1000;

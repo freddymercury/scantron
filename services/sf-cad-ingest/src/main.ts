@@ -1,7 +1,8 @@
 /**
  * sf-cad-ingest — polls the DataSF CAD feeds and writes raw observations.
  *
- * One process, three sources: police, fire and EMS each get their own adapter, cursor,
+ * One process, four sources: police, fire, EMS and SFPD's written-up incident reports each
+ * get their own adapter, cursor,
  * interval and health threshold. The intervals differ because the feeds do — docs/01
  * measured police at a ~30-minute batch and fire/EMS at ~19 hours behind — and a shared
  * threshold would make one of them permanently, meaninglessly "stale".
@@ -34,6 +35,7 @@ import { emsAdapter, fireAdapter } from "./fire.ts";
 import { fillOpenGaps } from "./backfill.ts";
 import { runIngestCycle } from "./ingest.ts";
 import { policeAdapter } from "./police.ts";
+import { reportAdapter } from "./report.ts";
 import { createSocrataClient, type SocrataClient } from "./socrata.ts";
 
 const SERVICE = "sf-cad-ingest";
@@ -42,6 +44,7 @@ export const ADAPTERS: SourceAdapter<never>[] = [
   policeAdapter as unknown as SourceAdapter<never>,
   fireAdapter as unknown as SourceAdapter<never>,
   emsAdapter as unknown as SourceAdapter<never>,
+  reportAdapter as unknown as SourceAdapter<never>,
 ];
 
 export function describeService(): { service: string; implementedBy: string } {
@@ -56,7 +59,9 @@ export function pollSeconds(source: string): number {
 
   const configured = Number(process.env.INGEST_POLL_SECONDS ?? 60);
   const fallback = Number.isFinite(configured) && configured > 0 ? configured : 60;
-  // Polling a feed that updates daily every minute is 1,440 wasted requests a day.
+  // Polling a feed that updates daily every minute is 1,440 wasted requests a day. The
+  // incident-report feed lags days (docs/01 §1), so hourly is already generous.
+  if (source === "sf_police_report") return Math.max(fallback, 3600);
   return source === "sf_police_cad" ? fallback : Math.max(fallback, 600);
 }
 

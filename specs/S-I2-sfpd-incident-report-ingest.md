@@ -30,3 +30,47 @@ fill.** Basic outcomes — arrest, cite, gone on arrival, unfounded, no merit �
 join at all and are available in Phase 0. What the report dataset adds beyond that is the
 *offence classification* and the labelled corpus in S-I3. The consumer-facing case for this
 story is much weaker than it looked; the internal case is much stronger.
+
+## Decision (recorded 2026-09-21)
+
+Built and running. 781 reports ingested on the first cycle, **532 joined (68.1%)**, 120
+unjoinable (no `cad_number`), 129 with a `cad_number` for a call outside our dispatch
+window. The 68% is not the join rate the feasibility check predicted, and the gap is
+explained rather than mysterious: this system holds five months of dispatch data, SFPD
+republishes reports for incidents going back years, and a report for a 2020 call has
+nothing here to join to. Of reports whose call we actually hold, the join is deterministic
+and total.
+
+**A report is not a call.** That distinction is enforced in four places rather than
+remembered:
+
+- `DISPATCH_SOURCES` in `@scantron/incident-schema` is what "how many calls" means, and
+  the ask box, the corner history and the source-span note all filter to it.
+- `source_count` excludes reports; `independent_source_count` counts distinct *agencies*,
+  so SFPD's paperwork for an SFPD call can never raise corroboration.
+- The incident page plots calls on the map and lists reports separately.
+- Reports never reach the scorer. `joinReport` is a lookup on `cad_number` at confidence
+  1.0, and a report with no `cad_number` is stored, counted and left alone — guessing which
+  incident an online-filed report belongs to would attach a stranger's report to somebody
+  else's event.
+
+**The allowlist is the safety property.** `KEPT_FIELDS` enumerates all 28 keys the dataset
+publishes; anything else is dropped and counted by name. SFPD publishes no person-level
+fields here today — the point is that the default is drop, so a new field cannot ride into
+storage silently.
+
+### Two things this cost
+
+Migration 014 rebuilds `observations` to widen its `source` CHECK constraint, which SQLite
+cannot alter in place. That surfaced a real gap in the migration runner: SQLite's own
+table-rebuild recipe needs `foreign_keys = OFF` *outside* the transaction, because dropping
+a parent table with live children is a violation and the pragma is a no-op once a
+transaction is open. The runner now does that around every migration and runs
+`foreign_key_check` immediately after, so the escape hatch cannot become a loophole.
+
+Report observations do not get a `type`. The adapter maps `incident_category` onto the
+taxonomy (93.0% of 300 live rows), but `type` is a DERIVED column owned by normalization
+(S-B3), so the adapter's value is dropped on write and the normalizer has no mapping for
+`incident_code`. It costs nothing today — the incident page reads the category from
+metadata, and reports are excluded from type breakdowns — but S-I3 wants these typed, so
+the taxonomy needs `incident_category` entries.

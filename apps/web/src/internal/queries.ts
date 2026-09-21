@@ -584,7 +584,11 @@ export function cornerHistory(
   const previousFrom = new Date(now.getTime() - 2 * days * 86_400_000).toISOString();
 
   const box: (string | number)[] = [lat - degrees, lat + degrees, lng - degrees, lng + degrees];
-  const scope = `lat BETWEEN ? AND ? AND lng BETWEEN ? AND ?
+  // Calls only: an SFPD report is the same agency's paperwork for a call already counted
+  // here, so including it would inflate a corner's history by however much of it got
+  // written up (S-I2).
+  const scope = `source IN ('sf_police_cad', 'sf_fire_cad', 'sf_ems_cad')
+       AND lat BETWEEN ? AND ? AND lng BETWEEN ? AND ?
        AND id NOT IN (SELECT observation_id FROM incident_observations WHERE incident_id = ?)`;
 
   const byType = db
@@ -615,8 +619,15 @@ export function cornerHistory(
 
 /** The oldest observation we hold, so a history count can say what it is counted from. */
 export function earliestObservation(db: Database): string | undefined {
+  // Dispatch only, to match what `cornerHistory` counts. SFPD republishes reports for
+  // incidents going back years, so the oldest observation overall says nothing about how
+  // far back this system's own record of the street goes.
   return (
-    db.query<{ at: string | null }, []>("SELECT min(occurred_at) AS at FROM observations").get()
-      ?.at ?? undefined
+    db
+      .query<{ at: string | null }, []>(
+        `SELECT min(occurred_at) AS at FROM observations
+          WHERE source IN ('sf_police_cad', 'sf_fire_cad', 'sf_ems_cad')`,
+      )
+      .get()?.at ?? undefined
   );
 }

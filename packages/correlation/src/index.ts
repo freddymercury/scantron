@@ -14,5 +14,6 @@ export * from "./decide.ts";
 export * from "./apply.ts";
 export * from "./lifecycle.ts";
 export * from "./timeline.ts";
+export * from "./reports.ts";
 export * from "./judge.ts";
 export * from "./evaluate.ts";

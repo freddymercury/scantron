@@ -148,9 +148,17 @@ function updateIncident(
       ? observation.occurredAt.toISOString()
       : row.first_observed_at;
 
+  // Distinct *agencies*, not distinct sources: SFPD's written-up report is the same agency
+  // as SFPD's dispatch call, so a report must never raise corroboration (S-I2).
   const sources = db
     .query<{ n: number }, [string]>(
-      `SELECT count(DISTINCT o.source) AS n FROM incident_observations io
+      `SELECT count(DISTINCT CASE o.source
+                WHEN 'sf_police_cad' THEN 'police'
+                WHEN 'sf_police_report' THEN 'police'
+                WHEN 'sf_fire_cad' THEN 'fire'
+                WHEN 'sf_ems_cad' THEN 'ems'
+                ELSE o.source END) AS n
+         FROM incident_observations io
          JOIN observations o ON o.id = io.observation_id
         WHERE io.incident_id = ?`,
     )
@@ -166,7 +174,9 @@ function updateIncident(
     `UPDATE incidents
         SET units = ?, agency_types = ?, primary_type = ?, severity = ?,
             first_observed_at = ?, last_observed_at = ?, last_updated_at = ?,
-            source_count = (SELECT count(*) FROM incident_observations WHERE incident_id = ?),
+            source_count = (SELECT count(*) FROM incident_observations io
+                              JOIN observations o ON o.id = io.observation_id
+                             WHERE io.incident_id = ? AND o.source <> 'sf_police_report'),
             independent_source_count = ?,
             verification_classification = CASE WHEN ? >= 2 THEN 'multi-source' ELSE verification_classification END
       WHERE id = ?`,

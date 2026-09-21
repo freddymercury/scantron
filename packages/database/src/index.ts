@@ -175,8 +175,28 @@ export function migrate(db: Database, dir: string = MIGRATIONS_DIR): MigrationRe
       return "applied";
     });
 
-    if (run.immediate() === "applied") result.applied.push(migration.name);
-    else result.alreadyApplied.push(migration.name);
+    // SQLite's own table-rebuild recipe requires `foreign_keys = OFF` *outside* the
+    // transaction: dropping a parent table that still has children is a violation, and the
+    // pragma is a no-op once a transaction is open. Turning it off for the duration of one
+    // migration is the documented way to rebuild a table — and `foreign_key_check`
+    // immediately after is what stops that from being a loophole.
+    db.exec("PRAGMA foreign_keys = OFF");
+    let outcome: "applied" | "skipped";
+    try {
+      outcome = run.immediate();
+    } finally {
+      db.exec("PRAGMA foreign_keys = ON");
+    }
+
+    if (outcome === "applied") {
+      const violations = db.query("PRAGMA foreign_key_check").all();
+      if (violations.length > 0) {
+        throw new Error(
+          `${migration.name} left ${violations.length} foreign-key violation(s): ${JSON.stringify(violations.slice(0, 3))}`,
+        );
+      }
+      result.applied.push(migration.name);
+    } else result.alreadyApplied.push(migration.name);
   }
   return result;
 }

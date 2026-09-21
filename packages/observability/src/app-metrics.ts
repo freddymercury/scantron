@@ -20,6 +20,8 @@ export interface AppMetrics {
   duplicateSourceRecords: Counter;
   incidentsCreated: Counter;
   incidentMerges: Counter;
+  /** SFPD report → call joins by outcome, which is the S-I2 join-rate metric. */
+  reportJoins: Counter;
   probableMatches: Counter;
   unmappedCodes: Counter;
   jobsProcessed: Counter;
@@ -66,6 +68,10 @@ export function createAppMetrics(): AppMetrics {
     incidentMerges: registry.counter(
       "scantron_incident_merges_total",
       "Observation-into-incident merges — the signal-reduction hypothesis, measured",
+    ),
+    reportJoins: registry.counter(
+      "scantron_report_joins_total",
+      "SFPD incident reports joined to the call they name, by outcome (S-I2)",
     ),
     probableMatches: registry.counter(
       "scantron_probable_matches_total",

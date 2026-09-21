@@ -8,7 +8,7 @@
  */
 
 import type { Database } from "bun:sqlite";
-import { readTimeline } from "@scantron/correlation";
+import { readTimeline, reportFields } from "@scantron/correlation";
 import { INCIDENT_TYPE_LABELS, type IncidentType } from "@scantron/incident-schema";
 
 import { escapeHtml } from "../security.ts";
@@ -66,6 +66,36 @@ export function statusNote(incident: IncidentRow): string {
  * on every record. It is the one place this data describes an event unfolding rather than
  * a row being filed.
  */
+
+/**
+ * What SFPD wrote up afterwards (S-I2).
+ *
+ * This is the only outcome any of these feeds states in the city's own words. It is a
+ * statement about the case file and nothing more: "Cite or Arrest Adult" means a report was
+ * written that way, not that anyone was convicted of anything, and the page says so.
+ */
+function reportSection(
+  reports: { row: { id: string; occurred_at: string }; fields: ReturnType<typeof reportFields> }[],
+): string {
+  if (reports.length === 0) return "";
+  return `<h2>how it was written up <span class="muted">${reports.length} report${reports.length === 1 ? "" : "s"}</span></h2>
+  <table>
+    <tr><th>offence</th><th>category</th><th>case status</th><th>report</th><th></th></tr>
+    ${reports
+      .map(
+        ({ row, fields }) => `<tr>
+          <td>${escapeHtml(fields.description ?? "—")}</td>
+          <td>${escapeHtml(fields.category ?? "—")}</td>
+          <td>${escapeHtml(fields.resolution ?? "—")}</td>
+          <td>${escapeHtml(fields.reportType ?? "—")}</td>
+          <td><a href="${INTERNAL_PREFIX}/observation/${encodeURIComponent(row.id)}">open</a></td>
+        </tr>`,
+      )
+      .join("")}
+  </table>
+  <p class="muted">Joined to this call on its <code>cad_number</code> — a lookup, not a guess (S-I2). One call yields 1.71 offence rows on average, so several lines here are normal. "Case status" is what the report says about the case file; it is not a statement about any person.</p>`;
+}
+
 function responseSection(responses: (UnitResponse & { source: string })[]): string {
   if (responses.length === 0) return "";
   return `<h2>response <span class="muted">${responses.length} unit${responses.length === 1 ? "" : "s"}</span></h2>
@@ -134,9 +164,16 @@ export function renderIncident(db: Database, id: string, now: Date = new Date())
     ...new Map(
       observations
         .flatMap((row) => recordFacts(metadata.get(row.id)))
-        .map((entry) => [`${entry.label}|${entry.value}`, entry]),
+        .map((entry) => [`${entry.label}|${entry.value}`.toLowerCase(), entry]),
     ).values(),
   ];
+  // SFPD's written-up reports for this call. They are attached, but they are not calls —
+  // they are the same agency's paperwork days later (S-I2).
+  const reports = observations
+    .filter((row) => row.source === "sf_police_report")
+    .map((row) => ({ row, fields: reportFields(metadata.get(row.id)) }));
+  const calls = observations.filter((row) => row.source !== "sf_police_report");
+
   const history =
     incident.lat !== null && incident.lng !== null
       ? cornerHistory(db, incident.lat, incident.lng, id, now)
@@ -144,7 +181,9 @@ export function renderIncident(db: Database, id: string, now: Date = new Date())
   const timeline = readTimeline(db, id);
   const agencies = JSON.parse(incident.agency_types) as string[];
   const units = JSON.parse(incident.units) as string[];
-  const located = observations.filter((row) => row.lat !== null && row.lng !== null);
+  // The map plots the calls. A report is paperwork filed at the same corner days later,
+  // so plotting it adds a dot that means nothing new.
+  const located = calls.filter((row) => row.lat !== null && row.lng !== null);
 
   const focus =
     incident.lat !== null && incident.lng !== null
@@ -259,10 +298,12 @@ ${
 
 ${historySection(history, incident, earliestObservation(db), now)}
 
-<h2>calls <span class="muted">${observations.length} record${observations.length === 1 ? "" : "s"}</span></h2>
+${reportSection(reports)}
+
+<h2>calls <span class="muted">${calls.length} record${calls.length === 1 ? "" : "s"}</span></h2>
 <table>
   <tr><th>when</th><th>source</th><th>reported as</th><th>where</th><th>units</th><th></th></tr>
-  ${observations
+  ${calls
     .map(
       (row) => `<tr>
         <td>${timeTag(row.occurred_at, { text: relativeTime(row.occurred_at, now) })}</td>

@@ -8,7 +8,7 @@
 
 import type { Database } from "bun:sqlite";
 
-import { INCIDENT_TYPES } from "@scantron/incident-schema";
+import { DISPATCH_SOURCES, INCIDENT_TYPES } from "@scantron/incident-schema";
 
 import {
   incidentsForObservations,
@@ -172,8 +172,10 @@ export async function runSearchFallback(
 }
 
 function conditions(query: AskQuery, now: Date): { sql: string; parameters: (string | number)[] } {
-  const clauses: string[] = [];
-  const parameters: (string | number)[] = [];
+  // "How many calls" means calls. SFPD's written-up report of a call it already dispatched
+  // is the same event on paper days later, so counting it here would double-count (S-I2).
+  const clauses: string[] = [`source IN (${DISPATCH_SOURCES.map(() => "?").join(", ")})`];
+  const parameters: (string | number)[] = [...DISPATCH_SOURCES];
 
   if (query.windowMinutes > 0) {
     clauses.push("occurred_at >= ?");
@@ -196,7 +198,7 @@ function conditions(query: AskQuery, now: Date): { sql: string; parameters: (str
   }
   if (typeClauses.length > 0) clauses.push(`(${typeClauses.join(" OR ")})`);
 
-  return { sql: clauses.length > 0 ? `WHERE ${clauses.join(" AND ")}` : "", parameters };
+  return { sql: `WHERE ${clauses.join(" AND ")}`, parameters };
 }
 
 const TYPE_WEIGHT: Readonly<Record<string, number>> = {

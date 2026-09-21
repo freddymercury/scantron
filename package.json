@@ -28,7 +28,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "bun test",
     "lint": "bun run scripts/lint.ts",
-    "check": "bun run lint && bun run typecheck && bun run test"
+    "check": "bun run lint && bun run typecheck && bun run test",
+    "rejoin:reports": "bun run scripts/rejoin-reports.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",

@@ -118,3 +118,28 @@ test("a unit's kind is a word and survives the timestamp parser", () => {
   const responses = unitResponses(FIRE_METADATA);
   expect(responses.map((response) => response.unitType)).toEqual(["ENGINE", "CHIEF", "TRUCK"]);
 });
+
+test("a response time is read from whichever field its agency publishes", async () => {
+  const { toSceneMs } = await import("../src/internal/dispatch.ts");
+
+  // Fire and EMS put it on the unit: E06 dispatched 02:09:36, on scene 02:14:49.
+  expect(toSceneMs(FIRE_METADATA)).toBe(313_000);
+
+  // SFPD puts it on the call.
+  expect(
+    toSceneMs({
+      dispatch_datetime: "2026-09-21T02:09:36.000",
+      onscene_datetime: "2026-09-21T02:16:36.000",
+    }),
+  ).toBe(420_000);
+
+  expect(toSceneMs({ dispatch_datetime: "2026-09-21T02:09:36.000" })).toBeUndefined();
+  expect(toSceneMs(undefined)).toBeUndefined();
+});
+
+test("a median needs enough calls to be worth stating", async () => {
+  const { medianResponseMs } = await import("../src/internal/dispatch.ts");
+  expect(medianResponseMs([1, 2, 3])).toBeUndefined();
+  expect(medianResponseMs([5, 1, 3, 2, 4, 6, 7, 8, 9, 10])).toBe(5.5);
+  expect(medianResponseMs([3, 1, 2], 3)).toBe(2);
+});

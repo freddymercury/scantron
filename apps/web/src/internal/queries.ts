@@ -631,3 +631,72 @@ export function earliestObservation(db: Database): string | undefined {
       .get()?.at ?? undefined
   );
 }
+
+export interface NearMissRow {
+  observation_id: string;
+  score: number;
+  breakdown: string;
+  applied_features: string;
+  created_at: string;
+  source: string;
+  occurred_at: string;
+  subtype: string | null;
+  type: string | null;
+  location_normalized: string | null;
+  location_raw: string | null;
+}
+
+/**
+ * The calls correlation considered for this incident and did not merge (S-D3).
+ *
+ * The probable band — 0.65 to 0.85 — is the honest middle: close enough to be worth
+ * logging, not close enough to act on. Showing it is how a reader can tell the difference
+ * between "nothing else happened here" and "something did, and we were not sure".
+ */
+export function nearMisses(db: Database, incidentId: string): NearMissRow[] {
+  return db
+    .query<NearMissRow, [string, string]>(
+      `SELECT pm.observation_id, pm.score, pm.breakdown, pm.applied_features, pm.created_at,
+              o.source, o.occurred_at, o.subtype, o.type, o.location_normalized, o.location_raw
+         FROM probable_matches pm
+         JOIN observations o ON o.id = pm.observation_id
+        WHERE pm.incident_id = ? OR pm.created_incident_id = ?
+        ORDER BY pm.score DESC`,
+    )
+    .all(incidentId, incidentId);
+}
+
+/**
+ * Metadata for comparable calls, so a response time can be put in context.
+ *
+ * "Comparable" is same type, same neighborhood, recent — the three things a reader would
+ * control for themselves. It is bounded by a LIMIT because this parses JSON per row.
+ */
+export function comparableCallMetadata(
+  db: Database,
+  type: string,
+  neighborhood: string | null,
+  now: Date = new Date(),
+  days = 30,
+  limit = 400,
+): string[] {
+  const from = new Date(now.getTime() - days * 86_400_000).toISOString();
+  const rows = neighborhood
+    ? db
+        .query<{ metadata: string }, [string, string, string, number]>(
+          `SELECT metadata FROM observations
+            WHERE source IN ('sf_police_cad', 'sf_fire_cad', 'sf_ems_cad')
+              AND type = ? AND neighborhood = ? AND occurred_at >= ? AND metadata IS NOT NULL
+            ORDER BY occurred_at DESC LIMIT ?`,
+        )
+        .all(type, neighborhood, from, limit)
+    : db
+        .query<{ metadata: string }, [string, string, number]>(
+          `SELECT metadata FROM observations
+            WHERE source IN ('sf_police_cad', 'sf_fire_cad', 'sf_ems_cad')
+              AND type = ? AND occurred_at >= ? AND metadata IS NOT NULL
+            ORDER BY occurred_at DESC LIMIT ?`,
+        )
+        .all(type, from, limit);
+  return rows.map((row) => row.metadata);
+}

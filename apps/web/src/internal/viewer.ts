@@ -158,6 +158,7 @@ const STYLE = `
   .facts li { padding: .3rem .5rem; border-left: 3px solid var(--line); background: var(--panel); }
   .facts li.notable { border-left-color: var(--police); }
   .facts .muted { display: inline-block; min-width: 9rem; }
+  .facts s { opacity: .6; }
   time { cursor: help; text-decoration: underline dotted var(--line); text-underline-offset: .2em; }
   .timeline { list-style: none; margin: .5rem 0 1rem; padding: 0 0 0 1rem; border-left: 2px solid var(--line); }
   .timeline li { padding: .35rem 0 .35rem .75rem; display: grid; gap: .1rem; position: relative; }

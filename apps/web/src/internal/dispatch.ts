@@ -208,3 +208,43 @@ export function recordFacts(metadata: Record<string, unknown> | undefined): Reco
 
   return facts;
 }
+
+export interface ResponseContext {
+  /** Median dispatch → on-scene across comparable calls, in milliseconds. */
+  medianMs: number;
+  /** How many calls that median is drawn from. */
+  sample: number;
+  /** What "comparable" meant, in the words shown to the reader. */
+  scope: string;
+}
+
+/**
+ * The median of the sample, or undefined when the sample is too small to be worth a
+ * sentence. Ten is the floor: a "median" of three numbers invites a comparison the data
+ * cannot support.
+ */
+export function medianResponseMs(samples: readonly number[], minimum = 10): number | undefined {
+  if (samples.length < minimum) return undefined;
+  const sorted = [...samples].sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0 ? (sorted[middle - 1]! + sorted[middle]!) / 2 : sorted[middle]!;
+}
+
+/**
+ * Dispatch → on-scene for one record, whichever way its agency publishes it.
+ *
+ * SFPD puts it on the call (`onscene_datetime`, 84% fill). SFFD and SFEMS put it on each
+ * unit, so the call's number is the first unit to arrive — which is the one a reader means.
+ */
+export function toSceneMs(metadata: Record<string, unknown> | undefined): number | undefined {
+  if (!metadata) return undefined;
+
+  const first = firstOnScene(unitResponses(metadata));
+  if (first?.toSceneMs !== undefined) return first.toSceneMs;
+
+  const dispatch = iso(metadata["dispatch_datetime"]);
+  const onScene = iso(metadata["onscene_datetime"]);
+  if (!dispatch || !onScene) return undefined;
+  const ms = Date.parse(onScene) - Date.parse(dispatch);
+  return Number.isFinite(ms) && ms >= 0 ? ms : undefined;
+}

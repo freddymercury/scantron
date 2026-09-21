@@ -13,14 +13,24 @@ import { INCIDENT_TYPE_LABELS, type IncidentType } from "@scantron/incident-sche
 
 import { escapeHtml } from "../security.ts";
 import { fact, relativeTime } from "./detail.ts";
-import { elapsed, firstOnScene, recordFacts, unitResponses, type UnitResponse } from "./dispatch.ts";
+import {
+  elapsed,
+  firstOnScene,
+  medianResponseMs,
+  recordFacts,
+  toSceneMs,
+  unitResponses,
+  type UnitResponse,
+} from "./dispatch.ts";
 import { renderMap } from "./map.ts";
 import { INTERNAL_PREFIX } from "./paths.ts";
 import { timeTag } from "./time.ts";
 import {
+  comparableCallMetadata,
   cornerHistory,
   earliestObservation,
   incidentById,
+  nearMisses,
   neighborhoodShapes,
   observationsWithMetadata,
   type IncidentRow,
@@ -74,6 +84,57 @@ export function statusNote(incident: IncidentRow): string {
  * statement about the case file and nothing more: "Cite or Arrest Adult" means a report was
  * written that way, not that anyone was convicted of anything, and the page says so.
  */
+
+/**
+ * One response time against its peers. Stated as a comparison and nothing more — a fast
+ * response is not a good outcome and a slow one is not a failure, and the sentence is
+ * written so it cannot be read either way.
+ */
+function responseComparison(
+  ownMs: number | undefined,
+  medianMs: number | undefined,
+  sample: number,
+  incident: IncidentRow,
+  citywide: boolean,
+): string {
+  if (ownMs === undefined || medianMs === undefined) return "";
+  const own = elapsed("1970-01-01T00:00:00Z", new Date(ownMs).toISOString());
+  const median = elapsed("1970-01-01T00:00:00Z", new Date(medianMs).toISOString());
+  const delta = ownMs - medianMs;
+  const word = Math.abs(delta) < 30_000 ? "about the same as" : delta < 0 ? "faster than" : "slower than";
+  const where = citywide || !incident.neighborhood ? " citywide" : ` in ${incident.neighborhood}`;
+  return `<p class="muted">First unit on scene in <b>${escapeHtml(own ?? "—")}</b> — ${escapeHtml(word)} the median of ${escapeHtml(median ?? "—")} for ${escapeHtml(incident.primary_type)} calls${escapeHtml(where)} over the last 30 days (${sample} calls). A comparison of dispatch timings, not of how well anyone did.</p>`;
+}
+
+/**
+ * What correlation looked at and left alone (S-D3).
+ *
+ * The probable band is logged rather than merged, and showing it is the difference between
+ * a page that says "nothing else happened here" and one that says "something did, and we
+ * were not sure enough to say it was the same event".
+ */
+function nearMissSection(missed: ReturnType<typeof nearMisses>, now: Date): string {
+  if (missed.length === 0) return "";
+  return `<h2>considered and not merged <span class="muted">${missed.length}</span></h2>
+  <table>
+    <tr><th>when</th><th>source</th><th>reported as</th><th>where</th><th>score</th><th>on</th><th></th></tr>
+    ${missed
+      .map(
+        (row) => `<tr>
+          <td>${timeTag(row.occurred_at, { text: relativeTime(row.occurred_at, now) })}</td>
+          <td>${escapeHtml(row.source.replace("sf_", "").replace("_cad", ""))}</td>
+          <td>${escapeHtml(row.subtype ?? row.type ?? "unknown")}</td>
+          <td>${escapeHtml(row.location_normalized ?? row.location_raw ?? "—")}</td>
+          <td>${row.score.toFixed(2)}</td>
+          <td class="muted">${escapeHtml((JSON.parse(row.applied_features) as string[]).join(", "))}</td>
+          <td><a href="${INTERNAL_PREFIX}/observation/${encodeURIComponent(row.observation_id)}">open</a></td>
+        </tr>`,
+      )
+      .join("")}
+  </table>
+  <p class="muted">Scored in the probable band (0.65–0.85): close enough to log, not close enough to merge. The features column says which parts of the comparison actually applied — a pair with no shared units and no type affinity is scored on less than it looks.</p>`;
+}
+
 function reportSection(
   reports: { row: { id: string; occurred_at: string }; fields: ReturnType<typeof reportFields> }[],
 ): string {
@@ -173,6 +234,29 @@ export function renderIncident(db: Database, id: string, now: Date = new Date())
     .filter((row) => row.source === "sf_police_report")
     .map((row) => ({ row, fields: reportFields(metadata.get(row.id)) }));
   const calls = observations.filter((row) => row.source !== "sf_police_report");
+
+  const missed = nearMisses(db, id);
+
+  // The incident's own response time, against comparable calls. Only computed when there
+  // is one to compare, which rules out most police incidents (no on-scene time on 16%).
+  const ownResponseMs = calls
+    .map((row) => toSceneMs(metadata.get(row.id)))
+    .find((value) => value !== undefined);
+  const sceneTimes = (neighborhood: string | null): number[] =>
+    comparableCallMetadata(db, incident.primary_type, neighborhood, now)
+      .map((raw) => toSceneMs(JSON.parse(raw) as Record<string, unknown>))
+      .filter((value): value is number => value !== undefined);
+
+  // A neighborhood is often too small a sample — "assault in Treasure Island" was one
+  // call — so the comparison widens to the city rather than going quiet, and the sentence
+  // says which it used.
+  let comparableMs = ownResponseMs === undefined ? [] : sceneTimes(incident.neighborhood);
+  let comparedCitywide = false;
+  if (ownResponseMs !== undefined && medianResponseMs(comparableMs) === undefined) {
+    comparableMs = sceneTimes(null);
+    comparedCitywide = true;
+  }
+  const medianMs = medianResponseMs(comparableMs);
 
   const history =
     incident.lat !== null && incident.lng !== null
@@ -279,6 +363,7 @@ ${
 }
 
 ${responseSection(responses)}
+${responseComparison(ownResponseMs, medianMs, comparableMs.length, incident, comparedCitywide)}
 
 ${
   facts.length === 0
@@ -297,6 +382,8 @@ ${
 }
 
 ${historySection(history, incident, earliestObservation(db), now)}
+
+${nearMissSection(missed, now)}
 
 ${reportSection(reports)}
 

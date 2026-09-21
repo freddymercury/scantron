@@ -13,6 +13,7 @@ import { readTimeline } from "@scantron/correlation";
 
 import { escapeHtml } from "../security.ts";
 import { renderMap } from "./map.ts";
+import { revisions } from "./revisions.ts";
 import { timeTag } from "./time.ts";
 import { INTERNAL_PREFIX } from "./paths.ts";
 import {
@@ -62,6 +63,7 @@ export function renderDetail(db: Database, id: string, now: Date = new Date()): 
   if (!row) return undefined;
 
   const payloads = rawPayloads(db, row.source, row.source_record_id ?? "");
+  const revised = revisions(payloads);
   const nearby = nearbyObservations(db, row);
   const incident = incidentForObservation(db, row.id);
   const timeline = incident ? readTimeline(db, incident.id) : [];
@@ -189,10 +191,38 @@ ${
       <p class="muted">These are the rows correlation will decide about (Epic D): same place, same hour, possibly the same event.</p>`
 }
 
+${
+  revised.length === 0
+    ? ""
+    : `<h2>what the agency changed <span class="muted">${revised.length} revision${revised.length === 1 ? "" : "s"}</span></h2>
+       ${revised
+         .map(
+           (revision) => `<p class="muted">${timeTag(revision.at)}${revision.series ? ` · ${escapeHtml(revision.series)}` : ""}</p>
+             <ul class="facts">
+               ${revision.changes
+                 .map(
+                   (change) => `<li${change.kind === "changed" ? ' class="notable"' : ""}>
+                     <span class="muted">${escapeHtml(change.field)}</span>
+                     ${
+                       change.kind === "changed"
+                         ? `<s>${escapeHtml(change.before ?? "")}</s> → ${escapeHtml(change.after ?? "")}`
+                         : change.kind === "added"
+                           ? `set to ${escapeHtml(change.after ?? "")}`
+                           : `cleared (was ${escapeHtml(change.before ?? "")})`
+                     }
+                   </li>`,
+                 )
+                 .join("")}
+             </ul>`,
+         )
+         .join("")}
+       <p class="muted">Republication timestamps are excluded: <code>data_as_of</code> and <code>data_loaded_at</code> change on every fetch and say nothing about the call. Fire and EMS publish one row per unit under the same call number, so revisions are grouped by the feed's own row key — otherwise one unit would look like an edit of another. This is the raw material of S-D7: a correction adds a timeline entry rather than editing one.</p>`
+}
+
 <h2>source payloads <span class="muted">${payloads.length} version${payloads.length === 1 ? "" : "s"}</span></h2>
 ${
-  payloads.length > 1
-    ? `<p class="muted">The source revised this record — every version is kept, which is what makes a correction traceable (S-D7).</p>`
+  payloads.length > 1 && revised.length === 0
+    ? `<p class="muted">The source republished this record without changing anything that matters — every version is kept regardless, which is what makes a correction traceable (S-D7).</p>`
     : ""
 }
 ${payloads

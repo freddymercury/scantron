@@ -527,3 +527,96 @@ export function incidentsForObservations(db: Database, ids: readonly string[]): 
     )
     .all(...ids);
 }
+
+export interface IncidentObservationRow extends ObservationListRow {
+  /** The agency's own record, as fetched — the fields normalization does not keep. */
+  metadata: string | null;
+}
+
+/** The incident's calls with their metadata, oldest first — the order they were reported. */
+export function observationsWithMetadata(db: Database, incidentId: string): IncidentObservationRow[] {
+  return db
+    .query<IncidentObservationRow, [string]>(
+      `SELECT o.id, o.source, o.source_record_id, o.occurred_at, o.ingested_at, o.type,
+              o.type_confidence, o.raw_type, o.subtype, o.priority, o.priority_rank,
+              o.location_raw, o.location_normalized, o.neighborhood, o.lat, o.lng,
+              o.location_method, o.units, o.sensitive, o.backfilled, o.metadata
+         FROM incident_observations io
+         JOIN observations o ON o.id = io.observation_id
+        WHERE io.incident_id = ?
+        ORDER BY o.occurred_at`,
+    )
+    .all(incidentId);
+}
+
+export interface CornerHistoryEntry {
+  type: string;
+  n: number;
+}
+
+export interface CornerHistory {
+  total: number;
+  days: number;
+  byType: CornerHistoryEntry[];
+  /** The same count for the window before this one, for a sense of whether it is unusual. */
+  earlier: number;
+}
+
+/**
+ * What else has happened at this corner.
+ *
+ * Most incidents are a single call — 14,309 observations made 13,748 incidents — so
+ * structure alone leaves a page thin. History is the context that is actually available:
+ * the archive shares the live feed's schema and goes back years, so a corner has a record
+ * even when the event does not.
+ */
+export function cornerHistory(
+  db: Database,
+  lat: number,
+  lng: number,
+  excludeIncidentId: string,
+  now: Date = new Date(),
+  days = 90,
+): CornerHistory {
+  // ~165 m, which is a street corner rather than a block group.
+  const degrees = 0.0015;
+  const from = new Date(now.getTime() - days * 86_400_000).toISOString();
+  const previousFrom = new Date(now.getTime() - 2 * days * 86_400_000).toISOString();
+
+  const box: (string | number)[] = [lat - degrees, lat + degrees, lng - degrees, lng + degrees];
+  const scope = `lat BETWEEN ? AND ? AND lng BETWEEN ? AND ?
+       AND id NOT IN (SELECT observation_id FROM incident_observations WHERE incident_id = ?)`;
+
+  const byType = db
+    .query<CornerHistoryEntry, (string | number)[]>(
+      `SELECT COALESCE(type, 'unknown') AS type, count(*) AS n FROM observations
+        WHERE ${scope} AND occurred_at >= ?
+        GROUP BY type ORDER BY n DESC LIMIT 6`,
+    )
+    .all(...box, excludeIncidentId, from);
+
+  const total =
+    db
+      .query<{ n: number }, (string | number)[]>(
+        `SELECT count(*) AS n FROM observations WHERE ${scope} AND occurred_at >= ?`,
+      )
+      .get(...box, excludeIncidentId, from)?.n ?? 0;
+
+  const earlier =
+    db
+      .query<{ n: number }, (string | number)[]>(
+        `SELECT count(*) AS n FROM observations
+          WHERE ${scope} AND occurred_at >= ? AND occurred_at < ?`,
+      )
+      .get(...box, excludeIncidentId, previousFrom, from)?.n ?? 0;
+
+  return { total, days, byType, earlier };
+}
+
+/** The oldest observation we hold, so a history count can say what it is counted from. */
+export function earliestObservation(db: Database): string | undefined {
+  return (
+    db.query<{ at: string | null }, []>("SELECT min(occurred_at) AS at FROM observations").get()
+      ?.at ?? undefined
+  );
+}

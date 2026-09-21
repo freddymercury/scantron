@@ -154,6 +154,10 @@ const STYLE = `
   .counters { display: flex; gap: 1.25rem; flex-wrap: wrap; margin: .5rem 0 1rem; }
   .counters div { min-width: 7rem; }
   .counters b { display: block; font-size: 1.15rem; }
+  .facts { list-style: none; margin: .5rem 0 1rem; padding: 0; display: grid; gap: .3rem; }
+  .facts li { padding: .3rem .5rem; border-left: 3px solid var(--line); background: var(--panel); }
+  .facts li.notable { border-left-color: var(--police); }
+  .facts .muted { display: inline-block; min-width: 9rem; }
   time { cursor: help; text-decoration: underline dotted var(--line); text-underline-offset: .2em; }
   .timeline { list-style: none; margin: .5rem 0 1rem; padding: 0 0 0 1rem; border-left: 2px solid var(--line); }
   .timeline li { padding: .35rem 0 .35rem .75rem; display: grid; gap: .1rem; position: relative; }

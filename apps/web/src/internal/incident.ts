@@ -13,13 +13,16 @@ import { INCIDENT_TYPE_LABELS, type IncidentType } from "@scantron/incident-sche
 
 import { escapeHtml } from "../security.ts";
 import { fact, relativeTime } from "./detail.ts";
+import { elapsed, firstOnScene, recordFacts, unitResponses, type UnitResponse } from "./dispatch.ts";
 import { renderMap } from "./map.ts";
 import { INTERNAL_PREFIX } from "./paths.ts";
 import { timeTag } from "./time.ts";
 import {
+  cornerHistory,
+  earliestObservation,
   incidentById,
   neighborhoodShapes,
-  observationsForIncident,
+  observationsWithMetadata,
   type IncidentRow,
 } from "./queries.ts";
 
@@ -55,11 +58,89 @@ export function statusNote(incident: IncidentRow): string {
   }
 }
 
+
+/**
+ * Who went, and how long it took them.
+ *
+ * SFFD and SFEMS publish a timestamp per unit — dispatch, en route, on scene, available —
+ * on every record. It is the one place this data describes an event unfolding rather than
+ * a row being filed.
+ */
+function responseSection(responses: (UnitResponse & { source: string })[]): string {
+  if (responses.length === 0) return "";
+  return `<h2>response <span class="muted">${responses.length} unit${responses.length === 1 ? "" : "s"}</span></h2>
+  <table>
+    <tr><th>unit</th><th>kind</th><th>dispatched</th><th>en route after</th><th>on scene</th><th>took</th><th>cleared</th></tr>
+    ${responses
+      .map(
+        (response) => `<tr>
+          <td>${escapeHtml(response.unit)}</td>
+          <td>${escapeHtml((response.unitType ?? "—").toLowerCase())}</td>
+          <td>${response.dispatch ? timeTag(response.dispatch) : "—"}</td>
+          <td>${response.response ? elapsed(response.dispatch, response.response) ?? "—" : "—"}</td>
+          <td>${response.onScene ? timeTag(response.onScene) : "—"}</td>
+          <td>${escapeHtml(elapsed(response.dispatch, response.onScene) ?? "—")}</td>
+          <td>${response.available ? escapeHtml(elapsed(response.onScene ?? response.dispatch, response.available) ?? "—") : "—"}</td>
+        </tr>`,
+      )
+      .join("")}
+  </table>
+  <p class="muted">"took" is dispatch to on-scene, as the agency recorded it. A dash means that unit never reported that step, which is common and is not evidence it did not happen.</p>`;
+}
+
+/**
+ * The corner's own record. Most incidents are one call, so the event itself is thin — but
+ * the place has a history, and that is context the data genuinely supports.
+ */
+function historySection(
+  history: ReturnType<typeof cornerHistory> | undefined,
+  incident: IncidentRow,
+  since: string | undefined,
+  now: Date,
+): string {
+  if (!history || history.total === 0) return "";
+  const where = incident.location_display_name ?? "this corner";
+  const trend =
+    history.earlier > 0
+      ? ` The ${history.days} days before that had ${history.earlier}.`
+      : "";
+  return `<h2>this corner</h2>
+  <p><b>${history.total} other call${history.total === 1 ? "" : "s"}</b> within about 165 m of ${escapeHtml(where)} in the last ${history.days} days.${escapeHtml(trend)}</p>
+  <p class="muted breakdown">${history.byType
+    .map((entry) => `${entry.n} ${escapeHtml(entry.type)}`)
+    .join(" · ")}</p>
+  <p class="muted">Counted from what has been ingested${
+    since ? `, which begins ${escapeHtml(relativeTime(since, now))}` : ""
+  } — not from the city's full archive. It says how busy a place is for dispatch, nothing about whether it is safe.</p>`;
+}
+
 export function renderIncident(db: Database, id: string, now: Date = new Date()): string | undefined {
   const incident = incidentById(db, id);
   if (!incident) return undefined;
 
-  const observations = observationsForIncident(db, id);
+  const observations = observationsWithMetadata(db, id);
+  const metadata = new Map(
+    observations.map((row) => [
+      row.id,
+      row.metadata ? (JSON.parse(row.metadata) as Record<string, unknown>) : undefined,
+    ]),
+  );
+  const responses = observations.flatMap((row) =>
+    unitResponses(metadata.get(row.id)).map((response) => ({ ...response, source: row.source })),
+  );
+  // Two agencies on one incident repeat the district, the outcome and so on. The same
+  // label and value twice says nothing twice, so identical facts collapse.
+  const facts = [
+    ...new Map(
+      observations
+        .flatMap((row) => recordFacts(metadata.get(row.id)))
+        .map((entry) => [`${entry.label}|${entry.value}`, entry]),
+    ).values(),
+  ];
+  const history =
+    incident.lat !== null && incident.lng !== null
+      ? cornerHistory(db, incident.lat, incident.lng, id, now)
+      : undefined;
   const timeline = readTimeline(db, id);
   const agencies = JSON.parse(incident.agency_types) as string[];
   const units = JSON.parse(incident.units) as string[];
@@ -121,6 +202,15 @@ ${
   ${fact("calls", String(incident.source_count))}
   ${fact("units", units.length > 0 ? units.join(" ") : null)}
   ${fact("corroboration", incident.verification_classification)}
+  ${fact(
+    "first on scene",
+    (() => {
+      const first = firstOnScene(responses);
+      if (!first) return null;
+      const took = elapsed(first.dispatch, first.onScene);
+      return took ? `${first.unit} in ${took}` : first.unit;
+    })(),
+  )}
   ${fact("last reported", incident.last_observed_at ? relativeTime(incident.last_observed_at, now) : null)}
 </div>
 
@@ -148,6 +238,26 @@ ${
       </ol>
       <p class="muted">Ordered by when the agency said each thing happened, not by when we saw it. Every line is templated from structured fields — no source free-text, no model output (S-D5).</p>`
 }
+
+${responseSection(responses)}
+
+${
+  facts.length === 0
+    ? ""
+    : `<h2>what the record says</h2>
+       <ul class="facts">
+         ${facts
+           .map(
+             (entry) => `<li${entry.notable ? ' class="notable"' : ""}>
+               <span class="muted">${escapeHtml(entry.label)}</span> ${escapeHtml(entry.value)}
+             </li>`,
+           )
+           .join("")}
+       </ul>
+       <p class="muted">These are fields the agency published that normalization does not keep. There is no narrative anywhere in this feed — no call notes, no remarks — so this is everything the record says.</p>`
+}
+
+${historySection(history, incident, earliestObservation(db), now)}
 
 <h2>calls <span class="muted">${observations.length} record${observations.length === 1 ? "" : "s"}</span></h2>
 <table>

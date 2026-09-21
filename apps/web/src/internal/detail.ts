@@ -13,6 +13,7 @@ import { readTimeline } from "@scantron/correlation";
 
 import { escapeHtml } from "../security.ts";
 import { renderMap } from "./map.ts";
+import { reportDetail } from "./report-detail.ts";
 import { revisions } from "./revisions.ts";
 import { timeTag } from "./time.ts";
 import { INTERNAL_PREFIX } from "./paths.ts";
@@ -64,6 +65,7 @@ export function renderDetail(db: Database, id: string, now: Date = new Date()): 
 
   const payloads = rawPayloads(db, row.source, row.source_record_id ?? "");
   const revised = revisions(payloads);
+  const report = reportDetail(row.source, payloads[0]?.payload);
   const nearby = nearbyObservations(db, row);
   const incident = incidentForObservation(db, row.id);
   const timeline = incident ? readTimeline(db, incident.id) : [];
@@ -114,6 +116,8 @@ export function renderDetail(db: Database, id: string, now: Date = new Date()): 
 <p class="muted">${timeTag(row.occurred_at)} · reported by ${escapeHtml(row.source)}${
     row.backfilled === 1 ? " · backfilled from the historical dataset" : ""
   }</p>
+
+${report}
 
 <div class="counters">
   ${fact("type", row.type ?? "unknown")}

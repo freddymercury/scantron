@@ -216,3 +216,33 @@ Two things this run established that are worth keeping:
 The honest framing, unchanged from docs/05: if the merge rate stays near this after tuning,
 the product needs more sources (S-I2's incident reports, S-I4's news adapter) or a different
 claim — and it is much better to know that at issue 19 than at issue 50.
+
+## 10. What the report dataset is actually good for — measured 2026-09-21
+
+Per record, an incident report is thin: a code, a description, a category, a resolution, a
+place and two times. There is no narrative anywhere in it. A single report tells you close
+to nothing that the dispatch call did not.
+
+In aggregate it tells you something the dispatch feed cannot, because `resolution` is the
+only outcome any SF public-safety source publishes. Across the full history:
+
+| category | reports | cited or arrested | unfounded |
+|---|---:|---:|---:|
+| Prostitution | 1,125 | **85.9%** | 0.1% |
+| Assault | 69,798 | 27.6% | 0.2% |
+| Robbery | 23,562 | 18.7% | 0.2% |
+| Burglary | 58,579 | 12.0% | 0.1% |
+| Motor Vehicle Theft | 57,234 | 5.1% | 0.2% |
+| Larceny Theft | 306,636 | **4.5%** | 0.1% |
+
+That is a **19× spread**, and it is not a statement about how serious these offences are.
+It separates two different things that both get called "a report": an enforcement action,
+where police initiated contact and the report records what they did (prostitution, 86%
+cited or arrested), and a victim's filing, where someone reported a theft and nothing
+further was recorded (larceny, 4.5%). Reading either number as a clearance rate would be
+wrong.
+
+**The design consequence:** this source earns its place through distributions, not through
+detail on an incident page. `Unfounded` running at 0.1–0.2% everywhere is worth knowing for
+the same reason — it is too rare to carry information, so a reader should not be offered it
+as if it did.

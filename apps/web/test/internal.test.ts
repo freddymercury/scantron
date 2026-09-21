@@ -51,8 +51,10 @@ function observation(overrides: Partial<Observation> = {}): Observation {
     id: "obs_1",
     source: "sf_police_cad",
     sourceRecordId: "262600914",
-    occurredAt: new Date("2026-09-18T01:00:00.000Z"),
-    ingestedAt: new Date("2026-09-18T01:30:00.000Z"),
+    // Relative to now: the page's default window is the last 24 hours, and a fixed date
+    // silently falls out of it the day after it was written.
+    occurredAt: new Date(Date.now() - 30 * 60_000),
+    ingestedAt: new Date(Date.now() - 20 * 60_000),
     rawType: "219",
     subtype: "STABBING",
     type: "assault",
@@ -439,7 +441,7 @@ test("clicking a point opens its record, with what was near it", async () => {
         type: "medical",
         subtype: "Medical Incident",
         units: ["E07"],
-        occurredAt: new Date("2026-09-18T01:05:00.000Z"),
+        occurredAt: new Date(Date.now() - 25 * 60_000),
         location: { normalized: "24th St & Mission St", latitude: 37.7502, longitude: -122.4101, neighborhood: "Mission" },
       }),
     ),

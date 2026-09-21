@@ -354,17 +354,22 @@ test("a catch-all type never widens a query alongside a specific one", async () 
   expect(plan.types).toEqual(["medical"]);
   expect([...CATCH_ALL_TYPES]).toContain("public_safety");
 
-  // With nothing specific judged, a catch-all is better than nothing.
+  // With nothing specific judged, a catch-all is *worse* than nothing — corrected against
+  // live data on 2026-09-21. "prostitution" judged only `public_safety` and the answer
+  // became 2,069 public-safety calls in 90 days, none of which were what was asked about,
+  // while the records that were ("Solicits For Act Of Prostitution") sat unreturned.
+  // Returning no plan hands the question to keyword search, which finds them by their words.
   const onlyCatchAll = (async () =>
     new Response(
       JSON.stringify({ model: "jev-latest", answers: { type_public_safety: { type: "noul", noul: 0.8 } } }),
     )) as unknown as typeof fetch;
   const fallback = await planRetrieval(
     createJevClient({ apiKey: "test", fetchImpl: onlyCatchAll }),
-    "something odd going on",
+    "prostitution",
     ["public_safety"],
   );
-  expect(fallback.types).toEqual(["public_safety"]);
+  expect(fallback.types).toEqual([]);
+  expect(fallback.reason).toContain("no category in this taxonomy");
 });
 
 test("ranked codes put the kind that was asked about first", async () => {

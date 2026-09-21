@@ -158,10 +158,23 @@ Two selection rules, both from measurement rather than taste:
   0.83, disturbance 0.66, medical 0.61. A flat 0.6 gate retrieves four categories for a
   question about one, so a type is kept only if it is within 0.15 of the strongest, capped
   at three.
-- **Catch-alls never widen a query.** `public_safety`, `police_activity` and `unknown`
-  score high on almost anything. Retrieved beside `medical`, `public_safety` buried
-  "person not breathing" under suspicious-person calls. They are used only when nothing
-  more specific was judged at all.
+- **Catch-alls never widen a query, and never stand in for one.** `public_safety`,
+  `police_activity` and `unknown` score high on almost anything. Retrieved beside `medical`,
+  `public_safety` buried "person not breathing" under suspicious-person calls.
+
+  The original rule kept them "when nothing more specific was judged at all", and that half
+  was **wrong** — corrected against live data on 2026-09-21. Asked about *prostitution*, a
+  subject this taxonomy has no category for, Jev judged only `public_safety` and the answer
+  became **2,069 public-safety calls in 90 days**, none of them what was asked, while the
+  two records that were — `PROSTITUTE/SOLICITE` and `Solicits For Act Of Prostitution` —
+  were never returned. A catch-all as the *only* judgement means the taxonomy has no answer,
+  which is a fact to state rather than a gap to paper over. The plan now comes back empty
+  and the question goes to keyword search, which finds both records by their words and
+  labels the first "exactly what they asked about".
+
+  The answer leads with those two records. Leading with "14,656 calls of every kind" and
+  burying them below it is a worse answer than saying plainly that nothing in the taxonomy
+  covers the question.
 
 Result, live: "gunshots" → weapon calls. "someone smashed a car window" → theft and
 disturbance, top hit `AUTO BOOST / STRIP`. "person not breathing" → medical. None of those

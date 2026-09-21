@@ -161,11 +161,21 @@ export async function planRetrieval(
     .filter((entry) => entry.noul >= GATE.noul)
     .sort((a, b) => b.noul - a.noul);
 
+  // When *nothing* specific was judged, the honest answer is that our taxonomy has no
+  // category for this question — not `public_safety`, which is 2,069 calls in 90 days and
+  // buries the handful actually asked about. Returning no plan hands the question to
+  // keyword search, which can still find "Solicits For Act Of Prostitution" by its words.
   const specific = scored.filter((entry) => !CATCH_ALL_TYPES.has(entry.type));
-  const usable = specific.length > 0 ? specific : scored;
+  if (specific.length === 0) {
+    return {
+      types: [],
+      reason: "no category in this taxonomy matches the question",
+      latencyMs: client.stats.lastMs,
+    };
+  }
 
-  const top = usable[0]?.noul ?? 0;
-  const chosen = usable
+  const top = specific[0]?.noul ?? 0;
+  const chosen = specific
     .filter((entry) => entry.noul >= top - RETRIEVAL_SPREAD)
     .slice(0, MAX_RETRIEVAL_TYPES)
     .map((entry) => entry.type);

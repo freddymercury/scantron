@@ -305,3 +305,36 @@ test("timestamps carry the original instant for the browser to localize", async 
   expect(relative).toContain('data-rel="1"');
   expect(relative).toContain(">12 min ago</time>");
 });
+
+test("a question with no category in the taxonomy leads with the search, not a total", () => {
+  const db = seedAsk();
+  const query = parseQuestion("prostitution in the last 2 hours", { knownAreas: ["Mission"] });
+  const answer = runAsk(db, query);
+
+  // Nothing in the taxonomy covers it, so the structured half is "all activity".
+  expect(query.types).toEqual([]);
+  expect(query.unresolved).toContain("prostitution");
+
+  answer.search = {
+    reranked: true,
+    hits: [
+      {
+        row: { ...answer.rows[0]!, subtype: "Solicits For Act Of Prostitution" },
+        lexicalScore: 1,
+        via: "keyword" as const,
+        finalScore: 1,
+        relevanceLabel: "Exactly what they asked about",
+      },
+    ],
+    latencyMs: 100,
+  };
+
+  const html = renderAnswer(answer);
+  const searchAt = html.indexOf("which the grammar did not recognise");
+  const totalAt = html.indexOf("of every kind");
+  expect(searchAt).toBeGreaterThan(0);
+  // The two records that matched come before the number that did not answer anything.
+  expect(searchAt).toBeLessThan(totalAt);
+  expect(html).toContain("No category in this taxonomy covers");
+  db.close();
+});

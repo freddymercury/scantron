@@ -151,8 +151,35 @@ function incidentList(answer: AskAnswer, now: Date): string {
   }`;
 }
 
+/**
+ * True when the grammar placed nothing and search did.
+ *
+ * "prostitution" has no category in this taxonomy, so the structured half of the answer is
+ * *all activity in the window* — 14,656 calls, none of which is what was asked. Leading
+ * with that number is worse than leading with the two records that actually matched.
+ */
+function searchLeads(answer: AskAnswer): boolean {
+  return (
+    answer.query.unresolved.length > 0 &&
+    answer.query.types.length === 0 &&
+    answer.query.categoryLabel === undefined &&
+    (answer.search?.hits.length ?? 0) > 0
+  );
+}
+
 export function renderAnswer(answer: AskAnswer, now: Date = new Date()): string {
   const { query } = answer;
+
+  if (searchLeads(answer)) {
+    const scope = query.area ?? "San Francisco";
+    return `${askBox(query.question)}
+      ${interpretation(query)}
+      ${searchSection(answer, now)}
+      <div class="answer">
+        <p class="muted">No category in this taxonomy covers <b>${escapeHtml(query.unresolved.join(" "))}</b>, so this is a search of what each agency called its own calls rather than a count. For context, ${answer.total} call${answer.total === 1 ? "" : "s"} of every kind were reported in ${escapeHtml(scope)} in ${escapeHtml(query.windowLabel)}.</p>
+        ${breakdown(answer)}
+      </div>`;
+  }
 
   if (query.unanswerable) {
     return `${askBox(query.question)}

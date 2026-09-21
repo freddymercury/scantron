@@ -12,6 +12,7 @@
   "dependencies": {
     "@scantron/sf-domain": "workspace:*",
     "@scantron/database": "workspace:*",
+    "@scantron/correlation": "workspace:*",
     "@scantron/observability": "workspace:*"
   }
 }

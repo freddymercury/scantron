@@ -89,6 +89,17 @@ export function nextStatus(
 ): StatusDecision {
   const proposed = statusFromSignals(signals);
 
+  // A record that carries no lifecycle timestamps is silence, and silence is not evidence
+  // that what we already knew stopped being true. Only the staleness sweep may move a
+  // known status to `unknown`, and it does so on elapsed time, not on a missing field.
+  if (proposed.status === "unknown" && current !== "unknown") {
+    return {
+      status: current,
+      reason: `kept ${current}: this record carried no lifecycle timestamps`,
+      regressionBlocked: true,
+    };
+  }
+
   if (
     !options.allowRegression &&
     statusRank(proposed.status) !== -1 &&

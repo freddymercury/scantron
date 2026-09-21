@@ -24,6 +24,8 @@ export interface CandidateObservation {
   type?: string | undefined;
   /** The agency's own code, for the code-level affinity overrides in scoring. */
   rawType?: string | undefined;
+  /** Normalized severity, which drives the incident's escalation entries (S-D5). */
+  severity?: string | undefined;
   units?: string[] | undefined;
   locationCanonical?: string | undefined;
 }

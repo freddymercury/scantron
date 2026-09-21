@@ -217,8 +217,9 @@ test("attaching an observation moves the status and writes why", async () => {
   expect(incident?.status).toBe("active");
   expect(incident?.resolved_at).toBeNull();
 
+  // The initial report is written alongside it (S-D5); this assertion is about the status.
   const entry = db.query<{ kind: string; text: string; observation_id: string }, []>(
-    "SELECT kind, text, observation_id FROM timeline_events",
+    "SELECT kind, text, observation_id FROM timeline_events WHERE kind = 'status_changed'",
   ).get();
   expect(entry?.kind).toBe("status_changed");
   expect(entry?.text).toContain("on scene");

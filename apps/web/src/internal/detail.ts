@@ -9,10 +9,13 @@
 
 import type { Database } from "bun:sqlite";
 
+import { readTimeline } from "@scantron/correlation";
+
 import { escapeHtml } from "../security.ts";
 import { renderMap } from "./map.ts";
 import { INTERNAL_PREFIX } from "./paths.ts";
 import {
+  incidentForObservation,
   nearbyObservations,
   neighborhoodShapes,
   observationById,
@@ -59,6 +62,8 @@ export function renderDetail(db: Database, id: string, now: Date = new Date()): 
 
   const payloads = rawPayloads(db, row.source, row.source_record_id ?? "");
   const nearby = nearbyObservations(db, row);
+  const incident = incidentForObservation(db, row.id);
+  const timeline = incident ? readTimeline(db, incident.id) : [];
   const units = row.units ? (JSON.parse(row.units) as string[]) : [];
 
   // A tight box around the point, so the detail map is a street-level view rather than
@@ -127,6 +132,38 @@ ${
     ? `${renderMap(points, neighborhoodShapes(db), { focus, focusName: row.neighborhood ?? undefined })}
        <p class="legend"><span class="police">police</span><span class="fire">fire</span><span class="ems">EMS</span></p>`
     : `<p class="muted">No location was published for this call, so there is nothing to plot. That is SFPD's suppression, not a gap in our geocoding.</p>`
+}
+
+${
+  incident
+    ? `<h2>incident <span class="muted">${escapeHtml(incident.id)}</span></h2>
+       <div class="counters">
+         ${fact("status", incident.status)}
+         ${fact("type", incident.primary_type)}
+         ${fact("severity", incident.severity)}
+         ${fact("agencies", (JSON.parse(incident.agency_types) as string[]).join(" "))}
+         ${fact("observations", String(incident.source_count))}
+         ${fact(
+           "attached as",
+           incident.decision
+             ? `${incident.decision}${incident.score === null ? "" : ` (${incident.score.toFixed(2)})`}`
+             : null,
+         )}
+       </div>
+       <h3>timeline <span class="muted">${timeline.length} entr${timeline.length === 1 ? "y" : "ies"}</span></h3>
+       <ol class="timeline">
+         ${timeline
+           .map(
+             (entry) => `<li${entry.observationId === row.id ? ' class="here"' : ""}>
+               <span class="muted">${escapeHtml(relativeTime(entry.occurredAt, now))}</span>
+               <b>${escapeHtml(entry.text)}</b>
+               <span class="muted">${escapeHtml(entry.kind)} · <a href="${INTERNAL_PREFIX}/observation/${encodeURIComponent(entry.observationId)}">source</a></span>
+             </li>`,
+           )
+           .join("")}
+       </ol>
+       <p class="muted">Entries are ordered by when the agency said each thing happened, not by when we saw it, and every line is templated from structured fields (S-D5).</p>`
+    : `<p class="muted">This observation has not been correlated yet, so it has no incident or timeline.</p>`
 }
 
 <h2>within 450 m and an hour <span class="muted">${nearby.length} other observation${nearby.length === 1 ? "" : "s"}</span></h2>

@@ -151,6 +151,12 @@ const STYLE = `
   .counters { display: flex; gap: 1.25rem; flex-wrap: wrap; margin: .5rem 0 1rem; }
   .counters div { min-width: 7rem; }
   .counters b { display: block; font-size: 1.15rem; }
+  .timeline { list-style: none; margin: .5rem 0 1rem; padding: 0 0 0 1rem; border-left: 2px solid var(--line); }
+  .timeline li { padding: .35rem 0 .35rem .75rem; display: grid; gap: .1rem; position: relative; }
+  .timeline li::before { content: "●"; position: absolute; left: -1.35rem; color: var(--line); }
+  .timeline li.here::before { color: var(--police); }
+  .timeline li.here b { text-decoration: underline; }
+  .timeline span { font-size: .8rem; }
   .map { width: 100%; max-width: 760px; height: auto; background: var(--panel);
          border: 1px solid var(--line); border-radius: .25rem; }
   .map .hood { fill: var(--hood-fill); stroke: var(--hood); stroke-width: .7; }

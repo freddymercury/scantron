@@ -7,7 +7,7 @@
  * copy of the database so the numbers can be produced repeatedly without consequence.
  */
 
-import { copyFileSync } from "node:fs";
+import { copyFileSync, unlinkSync } from "node:fs";
 import {
   applyDecision,
   applyDecisionJudged,
@@ -29,6 +29,7 @@ migrate(db);
 
 // A replay starts from no incidents: the point is what correlation produces, not what it
 // produced last time.
+db.query("DELETE FROM timeline_events").run();
 db.query("DELETE FROM incident_observations").run();
 db.query("DELETE FROM probable_matches").run();
 db.query("DELETE FROM incidents").run();
@@ -47,12 +48,13 @@ const rows = db
       units: string | null;
       location_normalized: string | null;
       subtype: string | null;
+      severity: string | null;
       metadata: string | null;
     },
     [string]
   >(
     `SELECT id, source, occurred_at, lat, lng, neighborhood, type, units, location_normalized,
-            subtype, metadata
+            subtype, severity, metadata
        FROM observations WHERE occurred_at >= ? ORDER BY occurred_at`,
   )
   .all(since);
@@ -80,6 +82,7 @@ for (const row of rows) {
     ...(row.neighborhood === null ? {} : { neighborhood: row.neighborhood }),
     ...(row.type === null ? {} : { type: row.type }),
     ...(row.subtype === null ? {} : { rawType: row.subtype }),
+    ...(row.severity === null ? {} : { severity: row.severity }),
     ...(row.units === null ? {} : { units: JSON.parse(row.units) as string[] }),
     ...(row.location_normalized === null ? {} : { locationCanonical: row.location_normalized }),
   };
@@ -148,6 +151,12 @@ const sweep = sweepStaleIncidents(db);
 console.log(`  stale sweep    ${sweep.movedToUnknown} of ${sweep.examined} open incidents went quiet`);
 const timeline = db.query<{ n: number }, []>("SELECT count(*) AS n FROM timeline_events").get();
 console.log(`  timeline       ${timeline?.n ?? 0} entries`);
+const kinds = db
+  .query<{ kind: string; n: number }, []>(
+    "SELECT kind, count(*) AS n FROM timeline_events GROUP BY kind ORDER BY n DESC",
+  )
+  .all();
+console.log(`  entry kinds    ${kinds.map((row) => `${row.n} ${row.kind}`).join(", ")}`);
 
 if (useJudge && judge.available) {
   console.log(
@@ -162,3 +171,15 @@ if (crossAgency.length > 0) {
 }
 
 db.close();
+
+// The replay copy is a scratch database, not an artefact: it is the same size as the real
+// one and leaving it behind doubles the disk footprint for no reason.
+if (!process.argv.includes("--keep")) {
+  for (const suffix of ["", "-wal", "-shm"]) {
+    try {
+      unlinkSync(`${replayPath}${suffix}`);
+    } catch {
+      // Already gone, which is the desired state.
+    }
+  }
+}

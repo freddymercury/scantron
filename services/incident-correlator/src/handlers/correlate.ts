@@ -25,6 +25,7 @@ interface ObservationRow {
   neighborhood: string | null;
   type: string | null;
   subtype: string | null;
+  severity: string | null;
   units: string | null;
   location_normalized: string | null;
   metadata: string | null;
@@ -44,7 +45,7 @@ export function createCorrelateHandler(deps: CorrelateHandlerDeps) {
     const startedAt = performance.now();
     const row = db
       .query<ObservationRow, [string]>(
-        `SELECT id, source, occurred_at, lat, lng, neighborhood, type, subtype, units,
+        `SELECT id, source, occurred_at, lat, lng, neighborhood, type, subtype, severity, units,
                 location_normalized, metadata
            FROM observations WHERE id = ?`,
       )
@@ -67,6 +68,7 @@ export function createCorrelateHandler(deps: CorrelateHandlerDeps) {
       ...(row.neighborhood === null ? {} : { neighborhood: row.neighborhood }),
       ...(row.type === null ? {} : { type: row.type }),
       ...(row.subtype === null ? {} : { rawType: row.subtype }),
+      ...(row.severity === null ? {} : { severity: row.severity }),
       ...(row.units === null ? {} : { units: JSON.parse(row.units) as string[] }),
       ...(row.location_normalized === null ? {} : { locationCanonical: row.location_normalized }),
     };

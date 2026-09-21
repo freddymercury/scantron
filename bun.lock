@@ -21,6 +21,7 @@
       "name": "@scantron/web",
       "version": "0.0.0",
       "dependencies": {
+        "@scantron/correlation": "workspace:*",
         "@scantron/database": "workspace:*",
         "@scantron/observability": "workspace:*",
         "@scantron/sf-domain": "workspace:*",

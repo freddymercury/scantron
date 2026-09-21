@@ -23,6 +23,14 @@ import type { CorrelationConfig } from "./config.ts";
 import { DEFAULT_CORRELATION_CONFIG } from "./config.ts";
 import { decide, DEFAULT_THRESHOLDS, type Decision, type DecisionResult, type Thresholds } from "./decide.ts";
 import { DEFAULT_WEIGHTS, type Weights } from "./scoring.ts";
+import {
+  agencyOf,
+  recordTimeline,
+  renderStatus,
+  severityRank,
+  snapshotIncident,
+  timelineDrafts,
+} from "./timeline.ts";
 
 export interface ApplyInput {
   observation: CandidateObservation;
@@ -61,26 +69,20 @@ function createIncident(
 ): string {
   const observation = input.observation;
   const id = incidentIdFor(observation.id);
-  const agency =
-    observation.source === "sf_police_cad"
-      ? "police"
-      : observation.source === "sf_fire_cad"
-        ? "fire"
-        : observation.source === "sf_ems_cad"
-          ? "ems"
-          : "other";
+  const agency = agencyOf(observation.source);
 
   db.query(
-    `INSERT INTO incidents (id, primary_type, title, agency_types, status, lat, lng, neighborhood,
+    `INSERT INTO incidents (id, primary_type, title, agency_types, status, severity, lat, lng, neighborhood,
        location_display_name, first_observed_at, last_observed_at, last_updated_at, units,
        confidence, source_count, independent_source_count, verification_classification)
-     VALUES (?, ?, ?, ?, 'reported', ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, 'reported')
+     VALUES (?, ?, ?, ?, 'reported', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, 'reported')
      ON CONFLICT (id) DO NOTHING`,
   ).run(
     id,
     observation.type ?? "unknown",
     input.title ?? observation.locationCanonical ?? observation.type ?? "Incident",
     JSON.stringify([agency]),
+    observation.severity ?? null,
     observation.lat ?? null,
     observation.lng ?? null,
     observation.neighborhood ?? null,
@@ -103,9 +105,19 @@ function updateIncident(
 ): void {
   const row = db
     .query<
-      { units: string; agency_types: string; first_observed_at: string; last_observed_at: string | null },
+      {
+        units: string;
+        agency_types: string;
+        primary_type: string;
+        severity: string | null;
+        first_observed_at: string;
+        last_observed_at: string | null;
+      },
       [string]
-    >("SELECT units, agency_types, first_observed_at, last_observed_at FROM incidents WHERE id = ?")
+    >(
+      `SELECT units, agency_types, primary_type, severity, first_observed_at, last_observed_at
+         FROM incidents WHERE id = ?`,
+    )
     .get(incidentId);
   if (!row) return;
 
@@ -113,15 +125,22 @@ function updateIncident(
   for (const unit of observation.units ?? []) units.add(unit);
 
   const agencies = new Set(JSON.parse(row.agency_types) as string[]);
-  agencies.add(
-    observation.source === "sf_police_cad"
-      ? "police"
-      : observation.source === "sf_fire_cad"
-        ? "fire"
-        : observation.source === "sf_ems_cad"
-          ? "ems"
-          : "other",
-  );
+  agencies.add(agencyOf(observation.source));
+
+  // Type only ever moves *off* `unknown` (S-D5). A second agency that classified the call
+  // differently is not evidence the first one was wrong, so a known type is never
+  // overwritten here — reclassification is a correction, and corrections are S-D7.
+  const primaryType =
+    row.primary_type === "unknown" && observation.type && observation.type !== "unknown"
+      ? observation.type
+      : row.primary_type;
+
+  // Severity is the high-water mark across the incident's observations: an event does not
+  // become less serious because a later record was calmer about it.
+  const severity =
+    severityRank(observation.severity) > severityRank(row.severity)
+      ? (observation.severity ?? null)
+      : row.severity;
 
   // The earliest report is the incident's start, whichever observation arrived first.
   const firstObserved =
@@ -145,7 +164,8 @@ function updateIncident(
 
   db.query(
     `UPDATE incidents
-        SET units = ?, agency_types = ?, first_observed_at = ?, last_observed_at = ?, last_updated_at = ?,
+        SET units = ?, agency_types = ?, primary_type = ?, severity = ?,
+            first_observed_at = ?, last_observed_at = ?, last_updated_at = ?,
             source_count = (SELECT count(*) FROM incident_observations WHERE incident_id = ?),
             independent_source_count = ?,
             verification_classification = CASE WHEN ? >= 2 THEN 'multi-source' ELSE verification_classification END
@@ -153,6 +173,8 @@ function updateIncident(
   ).run(
     JSON.stringify([...units].sort()),
     JSON.stringify([...agencies].sort()),
+    primaryType,
+    severity,
     firstObserved,
     lastObserved,
     now.toISOString(),
@@ -213,7 +235,21 @@ export function applyDecision(db: Database, input: ApplyInput): ApplyResult {
       JSON.stringify(decision.best?.score.appliedFeatures ?? []),
     );
 
+    // The timeline is the difference this observation made, so the snapshot has to be
+    // taken before the fold (S-D5). A created incident has no `before` — its first entry
+    // is the initial report.
+    const before = decision.decision === "merged" ? snapshotIncident(db, attachTo) : undefined;
     updateIncident(db, attachTo, observation, now);
+    const after = snapshotIncident(db, attachTo);
+    if (after) {
+      recordTimeline(
+        db,
+        attachTo,
+        observation.id,
+        timelineDrafts({ before, after, observation }),
+        now,
+      );
+    }
     applyLifecycle(db, attachTo, observation, input.metadata, now);
 
     let probableLogged = false;
@@ -325,19 +361,7 @@ export function applyLifecycle(
       WHERE id = ?`,
   ).run(decision.status, decision.resolvedAt ?? null, now.toISOString(), incidentId);
 
-  db.query(
-    `INSERT INTO timeline_events (id, incident_id, occurred_at, recorded_at, kind, text, observation_id)
-     VALUES (?, ?, ?, ?, ?, ?, ?)
-     ON CONFLICT (incident_id, observation_id, kind) DO NOTHING`,
-  ).run(
-    `tl_${incidentId}_${observation.id}_status`,
-    incidentId,
-    (decision.resolvedAt ?? observation.occurredAt.toISOString()),
-    now.toISOString(),
-    decision.status === "resolved" ? "closed" : "status_changed",
-    `Status ${decision.status}: ${decision.reason}`,
-    observation.id,
-  );
+  recordTimeline(db, incidentId, observation.id, [renderStatus(decision, observation)], now);
   return decision;
 }
 

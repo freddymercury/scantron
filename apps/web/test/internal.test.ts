@@ -522,3 +522,48 @@ test("a guessable internal credential is flagged, not silently accepted", async 
   // Unset is a different thing entirely: the route does not exist at all.
   expect(isWeakKey(undefined)).toBe(false);
 });
+
+test("a correlated observation shows its incident and the timeline built from it", async () => {
+  const { applyDecision } = await import("@scantron/correlation");
+  const db = seeded();
+  const fire = observation({
+    id: "obs_fire",
+    sourceRecordId: "fire-1",
+    source: "sf_fire_cad",
+    type: "medical",
+    subtype: "Medical Incident",
+    units: ["E07"],
+    occurredAt: new Date(Date.now() - 25 * 60_000),
+    location: { normalized: "24th St & Mission St", latitude: 37.75, longitude: -122.41, neighborhood: "Mission" },
+  });
+  upsertObservation(db, observationToRow(fire));
+
+  const candidate = (row: Observation) => ({
+    id: row.id,
+    source: row.source,
+    occurredAt: row.occurredAt,
+    lat: row.location?.latitude,
+    lng: row.location?.longitude,
+    neighborhood: row.location?.neighborhood,
+    type: row.type,
+    locationCanonical: row.location?.normalized,
+    ...(row.units ? { units: row.units } : {}),
+  });
+
+  applyDecision(db, { observation: candidate(observation()) });
+  const second = applyDecision(db, { observation: candidate(fire) });
+  expect(second.decision).toBe("merged");
+
+  const response = await handleInternal(
+    request("/internal/observation/obs_fire", { headers: { "x-scantron-internal-key": KEY } }),
+    { db, metrics: createAppMetrics() },
+  );
+  const html = (await response?.text()) ?? "";
+
+  expect(html).toContain("<h2>incident");
+  expect(html).toContain("Assault reported at 24th St &amp; Mission St");
+  expect(html).toContain("Fire joined the response.");
+  // The entry from the observation being viewed is marked as such.
+  expect(html).toContain('<li class="here">');
+  db.close();
+});

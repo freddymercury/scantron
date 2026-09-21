@@ -406,3 +406,38 @@ export function nearbyObservations(
       options.limit ?? 20,
     );
 }
+
+export interface IncidentForObservation {
+  id: string;
+  title: string;
+  primary_type: string;
+  status: string;
+  agency_types: string;
+  first_observed_at: string;
+  last_observed_at: string | null;
+  source_count: number;
+  severity: string | null;
+  decision: string | null;
+  score: number | null;
+}
+
+/**
+ * The incident this observation was folded into, with the decision that put it there
+ * (S-D3) — so the timeline on the page can be read next to the reason it exists.
+ */
+export function incidentForObservation(
+  db: Database,
+  observationId: string,
+): IncidentForObservation | undefined {
+  return (
+    db
+      .query<IncidentForObservation, [string]>(
+        `SELECT i.id, i.title, i.primary_type, i.status, i.agency_types, i.first_observed_at,
+                i.last_observed_at, i.source_count, i.severity, io.decision, io.score
+           FROM incident_observations io
+           JOIN incidents i ON i.id = io.incident_id
+          WHERE io.observation_id = ?`,
+      )
+      .get(observationId) ?? undefined
+  );
+}

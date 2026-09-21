@@ -20,6 +20,7 @@
     "build:street-data": "bun run scripts/build-street-data.ts",
     "backfill": "bun run scripts/backfill.ts",
     "renormalize": "bun run scripts/renormalize.ts",
+    "prune:payloads": "bun run scripts/prune-payloads.ts",
     "replay:correlation": "bun run scripts/correlate-replay.ts",
     "fixtures:correlation": "bun run scripts/build-correlation-fixtures.ts",
     "eval:correlation": "bun run scripts/eval-correlation.ts",

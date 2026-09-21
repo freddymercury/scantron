@@ -7,12 +7,21 @@
  */
 
 import type { Database } from "bun:sqlite";
-import { claim, complete, fail, type Job, type JobType, type RetryPolicy } from "./queue.ts";
+import {
+  claim,
+  complete,
+  DEFAULT_COMPLETED_RETENTION_HOURS,
+  fail,
+  pruneCompletedJobs,
+  type Job,
+  type JobType,
+  type RetryPolicy,
+} from "./queue.ts";
 
 export type JobHandler<P = unknown> = (job: Job<P>) => void | Promise<void>;
 
 export interface WorkerEvent {
-  event: "claimed" | "completed" | "failed" | "retrying" | "unhandled";
+  event: "claimed" | "completed" | "failed" | "retrying" | "unhandled" | "pruned";
   job: Job;
   error?: unknown;
   durationMs?: number;
@@ -35,6 +44,8 @@ export interface WorkerOptions {
    * yet" actually looks like.
    */
   claimOnlyHandled?: boolean;
+  /** How long a completed job is kept. Set to 0 to keep them forever. */
+  completedRetentionHours?: number;
 }
 
 export interface Worker {
@@ -52,9 +63,11 @@ export function createWorker(options: WorkerOptions): Worker {
   const batchSize = options.batchSize ?? 1;
   const emit = options.onEvent ?? (() => {});
 
+  const retentionHours = options.completedRetentionHours ?? DEFAULT_COMPLETED_RETENTION_HOURS;
   let accepting = false;
   let loop: Promise<void> | undefined;
   let inFlight = 0;
+  let lastPruneAt = 0;
 
   async function runJob(job: Job): Promise<void> {
     const handler = handlers[job.type] as JobHandler<unknown> | undefined;
@@ -109,6 +122,21 @@ export function createWorker(options: WorkerOptions): Worker {
       loop = (async () => {
         while (accepting) {
           const ran = await tick();
+
+          // Housekeeping on the idle path, hourly: the queue is a work list, and yesterday's
+          // completed jobs are neither work nor worth 5 GB.
+          if (retentionHours > 0 && Date.now() - lastPruneAt > 3_600_000) {
+            lastPruneAt = Date.now();
+            const pruned = pruneCompletedJobs(db, retentionHours);
+            if (pruned > 0) {
+              emit({
+                event: "pruned",
+                job: { id: "-", type: "normalize_observation", payload: {}, status: "completed", runAfter: new Date(), attempts: 0, maxAttempts: 0 },
+                durationMs: pruned,
+              });
+            }
+          }
+
           if (ran === 0 && accepting) await Bun.sleep(idleMs);
         }
         // Nothing new is claimed once `accepting` is false; wait out what is running.

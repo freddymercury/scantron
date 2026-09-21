@@ -5,7 +5,12 @@ import {
   type ObservationRow,
 } from "@scantron/incident-schema";
 import { createTestDatabase } from "../src/testing.ts";
-import { neighborhoodRows, replaceNeighborhoods, upsertObservation } from "../src/index.ts";
+import {
+  neighborhoodRows,
+  recordSourcePayload,
+  replaceNeighborhoods,
+  upsertObservation,
+} from "../src/index.ts";
 
 const PRD_37_TABLES = [
   "observations",
@@ -268,5 +273,76 @@ test("a later poll may add a point it previously lacked, but never blanks one", 
   // The feed drops the point on a later poll; ours stays.
   expect(upsertObservation(db, anObservationRow({ lat: null, lng: null }))).toBe("unchanged");
   expect(db.query<{ lat: number }, []>("SELECT lat FROM observations").get()?.lat).toBe(37.78);
+  db.close();
+});
+
+test("a republished batch is not a change to every record in it", () => {
+  const db = createTestDatabase();
+  const first = anObservationRow({
+    metadata: JSON.stringify({
+      cad_number: "262600914",
+      disposition: "HAN",
+      data_as_of: "2026-09-19T13:54:13.000",
+      data_loaded_at: "2026-09-19T13:55:32.542",
+    }),
+  });
+  insertObservation(db, first);
+
+  // DataSF republishes the window: every record gets a new batch timestamp and nothing else.
+  const republished = anObservationRow({
+    metadata: JSON.stringify({
+      cad_number: "262600914",
+      disposition: "HAN",
+      data_as_of: "2026-09-21T09:24:10.000",
+      data_loaded_at: "2026-09-21T09:33:10.701",
+    }),
+  });
+  expect(upsertObservation(db, republished)).toBe("unchanged");
+
+  // A real revision still counts — `call_last_updated_at` is per-call, not per-batch.
+  const revised = anObservationRow({
+    metadata: JSON.stringify({
+      cad_number: "262600914",
+      disposition: "REP",
+      data_as_of: "2026-09-21T09:24:10.000",
+      data_loaded_at: "2026-09-21T09:33:10.701",
+    }),
+  });
+  expect(upsertObservation(db, revised)).toBe("updated");
+  db.close();
+});
+
+test("a republished payload is not a new version to store", () => {
+  const db = createTestDatabase();
+  const fetchedAt = new Date("2026-09-21T09:00:00.000Z");
+  const payload = { id: "1", cad_number: "262600914", disposition: "HAN" };
+
+  const first = recordSourcePayload(db, {
+    source: "sf_police_cad",
+    sourceRecordId: "262600914",
+    payload: { ...payload, data_as_of: "2026-09-19T13:54:13.000", data_loaded_at: "2026-09-19T13:55:32.542" },
+    fetchedAt,
+  });
+  const republished = recordSourcePayload(db, {
+    source: "sf_police_cad",
+    sourceRecordId: "262600914",
+    payload: { ...payload, data_as_of: "2026-09-21T09:24:10.000", data_loaded_at: "2026-09-21T09:33:10.701" },
+    fetchedAt,
+  });
+
+  expect(first.isNew).toBe(true);
+  expect(republished.isNew).toBe(false);
+  expect(first.hash).toBe(republished.hash);
+  expect(db.query<{ n: number }, []>("SELECT count(*) AS n FROM source_records").get()?.n).toBe(1);
+
+  // A real revision is still a new version, and the trail keeps both.
+  const revised = recordSourcePayload(db, {
+    source: "sf_police_cad",
+    sourceRecordId: "262600914",
+    payload: { ...payload, disposition: "REP", data_loaded_at: "2026-09-21T09:33:10.701" },
+    fetchedAt,
+  });
+  expect(revised.isNew).toBe(true);
+  expect(db.query<{ n: number }, []>("SELECT count(*) AS n FROM source_records").get()?.n).toBe(2);
   db.close();
 });

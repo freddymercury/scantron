@@ -11,9 +11,52 @@
 import type { Database } from "bun:sqlite";
 import type { ObservationRow } from "@scantron/incident-schema";
 
+/**
+ * Feed bookkeeping: when DataSF last republished the window, not anything about the call.
+ *
+ * Every record in a batch carries the same `data_loaded_at`, so a new batch changes it on
+ * *every* record — and comparing it made one new call look like 3,700 updated ones. Caught
+ * by reading the poll log after three days of running: 34,000 normalize jobs an hour for
+ * 14,000 observations that had not changed, and 5.1 million completed jobs in a 5.6 GB
+ * database.
+ *
+ * `call_last_updated_at` is deliberately *not* in this list — that one is per-call and a
+ * change to it is a real revision.
+ */
+const VOLATILE_METADATA_KEYS = ["data_as_of", "data_loaded_at"] as const;
+
+function stableMetadata(value: string | null): string | null {
+  if (value === null) return null;
+  try {
+    const parsed = JSON.parse(value) as Record<string, unknown>;
+    for (const key of VOLATILE_METADATA_KEYS) delete parsed[key];
+    return JSON.stringify(parsed);
+  } catch {
+    return value;
+  }
+}
+
+/**
+ * Hashed on the *content*, with feed bookkeeping removed.
+ *
+ * The payload is still stored verbatim — that rule is the point of the table — but the
+ * hash decides whether this is a new version, and a republished batch is not. Without
+ * this, `data_loaded_at` changing on every record in every batch made every poll store a
+ * fresh copy of every payload: 2.5 million rows for 14,000 observations, 354 identical
+ * versions of a single call, and most of a 5.6 GB database.
+ */
 export function payloadHash(payload: unknown): string {
+  const stable =
+    payload !== null && typeof payload === "object"
+      ? Object.fromEntries(
+          Object.entries(payload as Record<string, unknown>).filter(
+            ([key]) => !VOLATILE_METADATA_KEYS.includes(key as (typeof VOLATILE_METADATA_KEYS)[number]),
+          ),
+        )
+      : payload;
+
   const hasher = new Bun.CryptoHasher("sha256");
-  hasher.update(JSON.stringify(payload));
+  hasher.update(JSON.stringify(stable));
   return hasher.digest("hex");
 }
 
@@ -120,6 +163,9 @@ export function upsertObservation(db: Database, row: ObservationRow): UpsertOutc
     if (COALESCE_COLUMNS.has(column)) {
       // Absent in this poll is not a change; present and different is.
       return row[column] !== null && existing[column] !== row[column];
+    }
+    if (column === "metadata") {
+      return stableMetadata(existing.metadata) !== stableMetadata(row.metadata);
     }
     return existing[column] !== row[column];
   });

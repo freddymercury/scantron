@@ -257,6 +257,25 @@ export function reclaimStale(db: Database, olderThanSeconds: number, now: Date =
   return result.changes;
 }
 
+/**
+ * Completed jobs are history, not work, and nothing was deleting them: three days of
+ * running left 5.1 million rows in a 5.6 GB database. They are kept long enough to debug a
+ * recent incident and no longer.
+ */
+export const DEFAULT_COMPLETED_RETENTION_HOURS = 6;
+
+export function pruneCompletedJobs(
+  db: Database,
+  retentionHours = DEFAULT_COMPLETED_RETENTION_HOURS,
+  now: Date = new Date(),
+): number {
+  const cutoff = new Date(now.getTime() - retentionHours * 3600 * 1000).toISOString();
+  // Failed jobs are never pruned: they are the ones somebody still has to look at.
+  return db
+    .query("DELETE FROM jobs WHERE status = 'completed' AND completed_at < ?")
+    .run(cutoff).changes;
+}
+
 export interface QueueStats {
   pending: number;
   running: number;

@@ -14,6 +14,7 @@ import {
   listJobs,
   migrate,
   openDatabase,
+  pruneCompletedJobs,
   queueStats,
   reclaimStale,
   release,
@@ -197,5 +198,29 @@ test("queue stats report depth and how far behind we are", () => {
   const stats = queueStats(db, now);
   expect(stats.pending).toBe(2);
   expect(stats.oldestPendingAgeSeconds).toBe(600);
+  db.close();
+});
+
+test("completed jobs are pruned; failed ones are kept for somebody to look at", () => {
+  const db = createTestDatabase();
+  const now = new Date("2026-09-21T12:00:00.000Z");
+  const old = new Date(now.getTime() - 10 * 3600 * 1000);
+
+  const { job: done } = enqueue(db, { type: "geocode_location", payload: {} }, old);
+  const claimed = claim(db, { worker: "w" }, old)[0] as Job;
+  complete(db, claimed.id, old);
+
+  const { job: broken } = enqueue(db, { type: "geocode_location", payload: {}, maxAttempts: 1 }, old);
+  const claimedBroken = claim(db, { worker: "w" }, old)[0] as Job;
+  fail(db, claimedBroken, new Error("still broken"), { now: old });
+
+  const { job: recent } = enqueue(db, { type: "geocode_location", payload: {} }, now);
+  complete(db, claim(db, { worker: "w" }, now)[0]?.id as string, now);
+
+  expect(pruneCompletedJobs(db, 6, now)).toBe(1);
+  expect(getJob(db, done.id)).toBeUndefined();
+  // Kept: a failure nobody has looked at, and a completion from the last six hours.
+  expect(getJob(db, broken.id)?.status).toBe("failed");
+  expect(getJob(db, recent.id)?.status).toBe("completed");
   db.close();
 });

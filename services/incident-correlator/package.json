@@ -15,6 +15,7 @@
     "@scantron/incident-schema": "workspace:*",
     "@scantron/location-normalizer": "workspace:*",
     "@scantron/sf-domain": "workspace:*",
-    "@scantron/event-taxonomy": "workspace:*"
+    "@scantron/event-taxonomy": "workspace:*",
+    "@scantron/correlation": "workspace:*"
   }
 }

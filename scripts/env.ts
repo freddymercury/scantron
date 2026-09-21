@@ -73,6 +73,12 @@ export const ENV_VARS: readonly EnvVar[] = [
     description: "Port for incident-correlator /metrics and /health",
   },
   {
+    name: "STALE_SWEEP_MINUTES",
+    required: false,
+    fallback: "5",
+    description: "How often the correlator looks for incidents that have gone quiet (S-D4)",
+  },
+  {
     name: "JEV_API_KEY",
     required: false,
     description: "Optional Jev key for semantic search re-rank; unset means lexical ranking only",

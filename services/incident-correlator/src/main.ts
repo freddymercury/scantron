@@ -13,8 +13,10 @@ import {
   queueStats,
   sourceConfigurations,
 } from "@scantron/database";
+import { sweepStaleIncidents } from "@scantron/correlation";
 import { createGeocoder } from "@scantron/location-normalizer/geocode";
 import { createPriorityMapper, createTaxonomy, seedTaxonomy } from "@scantron/event-taxonomy";
+import { createCorrelateHandler } from "./handlers/correlate.ts";
 import { createGeocodeHandler } from "./handlers/geocode.ts";
 import { createNormalizeHandler } from "./handlers/normalize.ts";
 import {
@@ -74,14 +76,13 @@ export async function main(): Promise<void> {
   const priorities = createPriorityMapper();
   log.info("normalization.ready", { count: taxonomy.size, result: `${geocoder.polygonCount} polygons` });
 
-  // Correlation handlers arrive with Epic D. A job type with no handler fails loudly and
-  // stays visible rather than being silently consumed.
   const worker = createWorker({
     db,
     name: SERVICE,
     handlers: {
       normalize_observation: createNormalizeHandler({ db, taxonomy, priorities, metrics, log }) as never,
       geocode_location: createGeocodeHandler({ db, geocoder, metrics, log }) as never,
+      correlate_incident: createCorrelateHandler({ db, metrics, log }) as never,
     },
     onEvent: (event) => {
       const fields = {
@@ -102,10 +103,31 @@ export async function main(): Promise<void> {
     },
   });
 
-  log.info("service.started", { result: "worker loop running, no handlers until Epic D" });
+  // The staleness sweep (S-D4): an incident nobody has said anything about for a while
+  // becomes `unknown`, never `resolved` — the system does not get to invent an ending.
+  const sweepMinutes = Number(process.env.STALE_SWEEP_MINUTES ?? 5);
+  const sweep = setInterval(
+    () => {
+      try {
+        const result = sweepStaleIncidents(db);
+        if (result.movedToUnknown > 0) {
+          log.info("incidents.went_quiet", {
+            count: result.movedToUnknown,
+            result: `${result.examined} open`,
+          });
+        }
+      } catch (error) {
+        log.error("sweep.failed", { error: errorMessage(error) });
+      }
+    },
+    sweepMinutes * 60_000,
+  );
+
+  log.info("service.started", { result: `worker running, stale sweep every ${sweepMinutes} min` });
 
   const stop = (signal: string) => () => {
     log.info("service.stopping", { result: signal });
+    clearInterval(sweep);
     void worker.stop().then(() => {
       observability.stop();
       db.close();

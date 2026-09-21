@@ -130,16 +130,26 @@ function toCandidate(fixture: FixtureObservation): CandidateObservation {
   };
 }
 
+/**
+ * Wipe the case's world, children first — `timeline_events` points at both incidents and
+ * observations, so deleting in the wrong order trips a foreign key.
+ */
+function resetCase(db: Database): void {
+  db.query("DELETE FROM timeline_events").run();
+  db.query("DELETE FROM probable_matches").run();
+  db.query("DELETE FROM incident_observations").run();
+  db.query("DELETE FROM incident_units").run();
+  db.query("DELETE FROM incidents").run();
+  db.query("DELETE FROM observations").run();
+}
+
 /** Replay one case against an empty database and report the grouping it produced. */
 export function runCase(
   db: Database,
   testCase: FixtureCase,
   options: EvaluateOptions = {},
 ): CaseOutcome {
-  db.query("DELETE FROM incident_observations").run();
-  db.query("DELETE FROM probable_matches").run();
-  db.query("DELETE FROM incidents").run();
-  db.query("DELETE FROM observations").run();
+  resetCase(db);
 
   const ordered = [...testCase.observations].sort((a, b) => a.occurredAt.localeCompare(b.occurredAt));
   for (const fixture of ordered) upsertObservation(db, observationToRow(toObservation(fixture)));
@@ -246,10 +256,7 @@ export async function runCaseJudged(
   judge: JudgeClient,
   options: EvaluateOptions = {},
 ): Promise<CaseOutcome> {
-  db.query("DELETE FROM incident_observations").run();
-  db.query("DELETE FROM probable_matches").run();
-  db.query("DELETE FROM incidents").run();
-  db.query("DELETE FROM observations").run();
+  resetCase(db);
 
   const ordered = [...testCase.observations].sort((a, b) => a.occurredAt.localeCompare(b.occurredAt));
   for (const fixture of ordered) upsertObservation(db, observationToRow(toObservation(fixture)));

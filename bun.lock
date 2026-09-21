@@ -78,6 +78,7 @@
       "name": "@scantron/incident-correlator",
       "version": "0.0.0",
       "dependencies": {
+        "@scantron/correlation": "workspace:*",
         "@scantron/database": "workspace:*",
         "@scantron/event-taxonomy": "workspace:*",
         "@scantron/incident-schema": "workspace:*",

@@ -14,6 +14,7 @@ import {
   correlationConfig,
   countDecisions,
   createJevJudge,
+  sweepStaleIncidents,
   type CandidateObservation,
 } from "@scantron/correlation";
 import { databasePath, migrate, openDatabase } from "@scantron/database";
@@ -46,10 +47,12 @@ const rows = db
       units: string | null;
       location_normalized: string | null;
       subtype: string | null;
+      metadata: string | null;
     },
     [string]
   >(
-    `SELECT id, source, occurred_at, lat, lng, neighborhood, type, units, location_normalized, subtype
+    `SELECT id, source, occurred_at, lat, lng, neighborhood, type, units, location_normalized,
+            subtype, metadata
        FROM observations WHERE occurred_at >= ? ORDER BY occurred_at`,
   )
   .all(since);
@@ -88,8 +91,14 @@ for (const row of rows) {
           config,
           judge,
           title: row.subtype ?? row.type ?? "Incident",
+          ...(row.metadata ? { metadata: JSON.parse(row.metadata) as Record<string, unknown> } : {}),
         })
-      : applyDecision(db, { observation, config, title: row.subtype ?? row.type ?? "Incident" });
+      : applyDecision(db, {
+          observation,
+          config,
+          title: row.subtype ?? row.type ?? "Incident",
+          ...(row.metadata ? { metadata: JSON.parse(row.metadata) as Record<string, unknown> } : {}),
+        });
   if (result.judgedBy) judged.push(`${row.subtype ?? row.type} — ${result.judgedBy}`);
 
   if (result.decision === "merged" && !result.alreadyAttached) {
@@ -129,6 +138,16 @@ console.log(`  created        ${created}`);
 console.log(`  multi-source   ${multi} incidents`);
 console.log(`  cross-agency   ${crossAgencyIncidents} incidents`);
 console.log(`  decisions      ${JSON.stringify(countDecisions(db))}`);
+
+const statuses = db
+  .query<{ status: string; n: number }, []>("SELECT status, count(*) AS n FROM incidents GROUP BY status ORDER BY n DESC")
+  .all();
+console.log(`  statuses       ${statuses.map((row) => `${row.n} ${row.status}`).join(", ")}`);
+
+const sweep = sweepStaleIncidents(db);
+console.log(`  stale sweep    ${sweep.movedToUnknown} of ${sweep.examined} open incidents went quiet`);
+const timeline = db.query<{ n: number }, []>("SELECT count(*) AS n FROM timeline_events").get();
+console.log(`  timeline       ${timeline?.n ?? 0} entries`);
 
 if (useJudge && judge.available) {
   console.log(

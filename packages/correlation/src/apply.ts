@@ -12,6 +12,13 @@ import type { Database } from "bun:sqlite";
 
 import type { CandidateObservation } from "./candidates.ts";
 import { applyVerdict, judgePair, type JudgeClient } from "./judge.ts";
+import {
+  DEFAULT_STALENESS,
+  nextStatus,
+  signalsFromMetadata,
+  staleStatus,
+  type StatusDecision,
+} from "./lifecycle.ts";
 import type { CorrelationConfig } from "./config.ts";
 import { DEFAULT_CORRELATION_CONFIG } from "./config.ts";
 import { decide, DEFAULT_THRESHOLDS, type Decision, type DecisionResult, type Thresholds } from "./decide.ts";
@@ -19,6 +26,8 @@ import { DEFAULT_WEIGHTS, type Weights } from "./scoring.ts";
 
 export interface ApplyInput {
   observation: CandidateObservation;
+  /** The observation's metadata, which carries the agency's lifecycle timestamps (S-D4). */
+  metadata?: Record<string, unknown> | undefined;
   /** Used for the incident's title and type when a new one is created. */
   title?: string;
   config?: CorrelationConfig;
@@ -205,6 +214,7 @@ export function applyDecision(db: Database, input: ApplyInput): ApplyResult {
     );
 
     updateIncident(db, attachTo, observation, now);
+    applyLifecycle(db, attachTo, observation, input.metadata, now);
 
     let probableLogged = false;
     if (decision.decision === "probable" && decision.best) {
@@ -288,4 +298,89 @@ export async function applyDecisionJudged(
   const judged: ApplyResult = { ...result };
   if (moved.reason) judged.judgedBy = moved.reason;
   return judged;
+}
+
+/**
+ * Move the incident's status if this observation says something new about it, and write the
+ * timeline entry that says why (S-D4: every change carries its source).
+ */
+export function applyLifecycle(
+  db: Database,
+  incidentId: string,
+  observation: CandidateObservation,
+  metadata: Record<string, unknown> | undefined,
+  now: Date,
+): StatusDecision | undefined {
+  const signals = signalsFromMetadata(metadata);
+  const current = db
+    .query<{ status: string }, [string]>("SELECT status FROM incidents WHERE id = ?")
+    .get(incidentId);
+  if (!current) return undefined;
+
+  const decision = nextStatus(current.status as never, signals);
+  if (decision.status === current.status) return decision;
+
+  db.query(
+    `UPDATE incidents SET status = ?, resolved_at = COALESCE(?, resolved_at), last_updated_at = ?
+      WHERE id = ?`,
+  ).run(decision.status, decision.resolvedAt ?? null, now.toISOString(), incidentId);
+
+  db.query(
+    `INSERT INTO timeline_events (id, incident_id, occurred_at, recorded_at, kind, text, observation_id)
+     VALUES (?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT (incident_id, observation_id, kind) DO NOTHING`,
+  ).run(
+    `tl_${incidentId}_${observation.id}_status`,
+    incidentId,
+    (decision.resolvedAt ?? observation.occurredAt.toISOString()),
+    now.toISOString(),
+    decision.status === "resolved" ? "closed" : "status_changed",
+    `Status ${decision.status}: ${decision.reason}`,
+    observation.id,
+  );
+  return decision;
+}
+
+export interface SweepResult {
+  examined: number;
+  movedToUnknown: number;
+}
+
+/**
+ * The staleness sweep (S-D4). Idempotent: an incident already `unknown` is not touched
+ * again, so running it every minute costs one query and changes nothing.
+ */
+export function sweepStaleIncidents(
+  db: Database,
+  now: Date = new Date(),
+  options = DEFAULT_STALENESS,
+): SweepResult {
+  const open = db
+    .query<{ id: string; status: string; primary_type: string; last_observed_at: string | null; first_observed_at: string }, []>(
+      `SELECT id, status, primary_type, last_observed_at, first_observed_at FROM incidents
+        WHERE status NOT IN ('resolved', 'unknown') AND merged_into_id IS NULL`,
+    )
+    .all();
+
+  let moved = 0;
+  const run = db.transaction(() => {
+    for (const incident of open) {
+      const decision = staleStatus(
+        incident.status as never,
+        incident.last_observed_at ?? incident.first_observed_at,
+        incident.primary_type,
+        now,
+        options,
+      );
+      if (!decision) continue;
+
+      db.query("UPDATE incidents SET status = 'unknown', last_updated_at = ? WHERE id = ?").run(
+        now.toISOString(),
+        incident.id,
+      );
+      moved += 1;
+    }
+  });
+  run();
+  return { examined: open.length, movedToUnknown: moved };
 }

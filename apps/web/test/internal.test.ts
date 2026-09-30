@@ -207,6 +207,7 @@ test("the Phase 0 gate is evaluated from the same numbers, and fails loudly", ()
     typed: 95,
     typedPercent: 95,
     duplicateUpserts: 0,
+    payloadVersionsPerRecord: 1.63,
     failedJobs: 0,
     pendingJobs: 0,
     quarantined: 0,
@@ -234,6 +235,7 @@ test("the Phase 0 gate is evaluated from the same numbers, and fails loudly", ()
     typed: 9_500,
     typedPercent: 95,
     duplicateUpserts: 0,
+    payloadVersionsPerRecord: 1.63,
     failedJobs: 0,
     pendingJobs: 0,
     quarantined: 0,
@@ -245,14 +247,25 @@ test("the Phase 0 gate is evaluated from the same numbers, and fails loudly", ()
   }, now);
   expect(passing.passes).toBe(true);
 
+  // Keeping every payload version is the design (S-D7), so a healthy ratio must pass. The
+  // gate spent its first nine days failing on this, counting versions as duplicates.
+  expect(evaluateGate({ ...passing, payloadVersionsPerRecord: 4 } as never, now).passes).toBe(true);
+
+  // An explosion is a different thing. The `data_loaded_at` churn reached roughly 166.
+  const exploded = evaluateGate({ ...passing, payloadVersionsPerRecord: 166 } as never, now);
+  expect(exploded.passes).toBe(false);
+  expect(exploded.reasons.join(" ")).toContain("stored payload versions per record");
+
   // A long span means nothing if ingestion has since stopped.
   const stalled = evaluateGate({ ...passing, newest: "2026-09-17T00:00:00.000Z" } as never, now);
   expect(stalled.passes).toBe(false);
   expect(stalled.reasons.join(" ")).toContain("not current");
 
-  // Duplicates and unrecoverable gaps fail the gate even with plenty of coverage.
+  // One source record becoming two observations is the duplicate that matters, and it fails
+  // the gate even with plenty of coverage.
   const duplicated = evaluateGate({ ...passing, duplicateUpserts: 3 } as never, now);
   expect(duplicated.passes).toBe(false);
+  expect(duplicated.reasons.join(" ")).toContain("became more than one observation");
 });
 
 test("a failed job is listed and can be requeued in one click", async () => {

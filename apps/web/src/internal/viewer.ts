@@ -230,7 +230,8 @@ function counterBlock(counters: WindowCounters): string {
     ["geocoded (locatable)", `${counters.locatablePercent.toFixed(1)}%`],
     ["typed", `${counters.typedPercent.toFixed(1)}%`],
     ["backfilled", String(counters.backfilled)],
-    ["duplicate upserts", String(counters.duplicateUpserts)],
+    ["duplicate observations", String(counters.duplicateUpserts)],
+    ["payload versions / record", counters.payloadVersionsPerRecord.toFixed(2)],
     ["failed jobs", String(counters.failedJobs)],
     ["pending jobs", String(counters.pendingJobs)],
     ["quarantined", String(counters.quarantined)],
@@ -260,6 +261,13 @@ export interface PhaseZeroGate {
  * gaps* — the span alone would happily pass on two records three days apart, which is why
  * a recorded gap fails the gate outright and why ingestion also has to be current now.
  */
+/**
+ * Headroom over a healthy 1.63 and far below the 166 the churn incident reached. Set where
+ * a genuine runaway is caught within an hour but a busy multi-unit fire call — legitimately
+ * one payload row per unit — never trips it.
+ */
+export const PAYLOAD_VERSION_CEILING = 10;
+
 export function evaluateGate(counters: WindowCounters, now: Date = new Date()): PhaseZeroGate {
   const reasons: string[] = [];
   if (counters.coverageHours < 72) {
@@ -274,7 +282,17 @@ export function evaluateGate(counters: WindowCounters, now: Date = new Date()): 
     }
   }
   if (counters.duplicateUpserts > 0) {
-    reasons.push(`${counters.duplicateUpserts} duplicate source records`);
+    reasons.push(`${counters.duplicateUpserts} source record(s) became more than one observation`);
+  }
+  // The gate said "duplicate source records > 0" for its first nine days of running, which
+  // it could never clear: it was counting *stored payload versions*, and keeping every
+  // version is the design (S-D7). What PRD §44 warns about is an explosion, so that is what
+  // is measured — 1.63 versions per record is healthy, and the `data_loaded_at` churn that
+  // once filled this database ran at roughly 166.
+  if (counters.payloadVersionsPerRecord > PAYLOAD_VERSION_CEILING) {
+    reasons.push(
+      `${counters.payloadVersionsPerRecord.toFixed(1)} stored payload versions per record, ceiling ${PAYLOAD_VERSION_CEILING}`,
+    );
   }
   if (counters.unrecoverableGaps > 0) {
     reasons.push(`${counters.unrecoverableGaps} unrecoverable gap(s)`);

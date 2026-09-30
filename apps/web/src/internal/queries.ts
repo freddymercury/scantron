@@ -99,7 +99,10 @@ export interface WindowCounters {
   locatablePercent: number;
   typed: number;
   typedPercent: number;
+  /** Observations sharing one source record — must be zero (PRD §44). */
   duplicateUpserts: number;
+  /** Stored payload versions per record. Kept on purpose; only an explosion is a problem. */
+  payloadVersionsPerRecord: number;
   failedJobs: number;
   pendingJobs: number;
   quarantined: number;
@@ -150,12 +153,30 @@ export function windowCounters(db: Database, filter: ObservationFilter = {}): Wi
 
   // A duplicate upsert is a source record we stored more than once for the same call —
   // the number that would explode if idempotency were broken.
+  // What "no duplicate explosion" (PRD §44) actually means: one real-world record must not
+  // become several observations. The UNIQUE (source, source_record_id) constraint makes it
+  // impossible, and this measures it anyway, because a gate that trusts a constraint is not
+  // measuring anything.
   const duplicates = db
     .query<{ n: number }, []>(
       `SELECT count(*) AS n FROM (
-         SELECT source, source_record_id FROM source_records
+         SELECT source, source_record_id FROM observations
+          WHERE source_record_id IS NOT NULL
           GROUP BY source, source_record_id HAVING count(*) > 1
        )`,
+    )
+    .get();
+
+  // Stored payload *versions* are a different thing and are kept deliberately — every
+  // version is what makes a correction traceable (S-D7). The number that matters is the
+  // ratio: 1.63 versions per record is healthy (fire and EMS publish one row per unit, so
+  // a multi-unit call is legitimately several rows), and the `data_loaded_at` churn that
+  // once filled this database ran at roughly 166.
+  const payloads = db
+    .query<{ rows: number; records: number }, []>(
+      `SELECT count(*) AS rows,
+              count(DISTINCT source || char(31) || source_record_id) AS records
+         FROM source_records`,
     )
     .get();
 
@@ -182,6 +203,8 @@ export function windowCounters(db: Database, filter: ObservationFilter = {}): Wi
     typed: totals?.typed ?? 0,
     typedPercent: percent(totals?.typed ?? 0, total),
     duplicateUpserts: duplicates?.n ?? 0,
+    payloadVersionsPerRecord:
+      payloads && payloads.records > 0 ? payloads.rows / payloads.records : 0,
     failedJobs: jobCount("failed"),
     pendingJobs: jobCount("pending"),
     quarantined: quarantined?.n ?? 0,
